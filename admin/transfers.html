@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>التحويل بين المحلين - لوحة التحكم</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') window.location.href = 'login.html';
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div>
+      <span class="sidebar-brand">نيوتك الطبية</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">م س</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">م. محمد السقاف</div>
+          <div class="sidebar-user-role">المدير العام</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">دورة التحويل بين المحلين</h1>
+        <div class="breadcrumb">
+          <a href="index.html">الرئيسية</a>
+          <i class="fas fa-chevron-left" style="font-size:8px"></i>
+          <span>التحويلات بين الفروع</span>
+        </div>
+      </div>
+      <div class="topbar-left">
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
+        <div style="position:relative">
+          <button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div>
+            <div class="user-dropdown-divider"></div>
+            <div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <h2 style="font-size:18px;font-weight:700">طلبات شحن ونقل البضاعة بين الفروع</h2>
+          <p style="font-size:12px;color:var(--text-secondary)">متابعة دورة التحويل: طلب -> اعتماد -> خروج بضاعة بالطريق -> فحص وتأكيد استلام</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewTransferModal()"><i class="fas fa-plus"></i> إنشاء طلب تحويل جديد</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="flex-wrap:wrap;gap:12px">
+          <div style="display:flex;gap:10px">
+            <select class="form-control" id="statusFilter" style="width:180px" onchange="loadTransfers()">
+              <option value="">جميع الحالات</option>
+              <option value="pending">قيد الانتظار</option>
+              <option value="approved">معتمد</option>
+              <option value="in_transit">في الطريق (مشحونة)</option>
+              <option value="completed">مكتمل ومستلم</option>
+              <option value="disputed">فروقات / نزاع</option>
+            </select>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadTransfers()"><i class="fas fa-sync"></i> تحديث</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>رقم التحويل</th>
+                <th>من المحل (المرسل)</th>
+                <th>إلى المحل (المستلم)</th>
+                <th>عدد الأصناف</th>
+                <th>إجمالي القطع</th>
+                <th>الحالة</th>
+                <th>تاريخ الطلب</th>
+                <th>إجراءات المرحلة</th>
+              </tr>
+            </thead>
+            <tbody id="transfersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Transfer Modal -->
+  <div class="modal-overlay" id="newTransferModal">
+    <div class="modal" style="max-width:700px">
+      <div class="modal-header">
+        <span class="modal-title">إنشاء طلب تحويل بضاعة جديد</span>
+        <button class="modal-close" onclick="closeModal('newTransferModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+          <div class="form-group">
+            <label class="form-label">المحل المرسل (خصم البضاعة منه) *</label>
+            <select class="form-control" id="trFromStore" onchange="onFromStoreChange()"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">المحل المستلم (إضافة البضاعة إليه) *</label>
+            <select class="form-control" id="trToStore"></select>
+          </div>
+        </div>
+
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <label class="form-label" style="margin:0">الأصناف المراد تحويلها</label>
+            <button class="btn btn-outline btn-sm" onclick="addTransferItemRow()"><i class="fas fa-plus"></i> إضافة صنف</button>
+          </div>
+          <div class="table-wrapper" style="max-height:240px;overflow-y:auto">
+            <table style="font-size:13px">
+              <thead>
+                <tr>
+                  <th style="width:45%">المنتج</th>
+                  <th>الرصيد المتاح</th>
+                  <th>الكمية للتحويل</th>
+                  <th style="width:40px"></th>
+                </tr>
+              </thead>
+              <tbody id="transferItemsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ملاحظات التحويل والسبب</label>
+          <textarea class="form-control" id="trNotes" rows="2" placeholder="مثال: تغطية عجز طلبات، إعادة توازن مخزون"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitCreateTransfer()"><i class="fas fa-paper-plane"></i> إرسال طلب التحويل</button>
+        <button class="btn btn-outline" onclick="closeModal('newTransferModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receive Confirmation Modal -->
+  <div class="modal-overlay" id="receiveModal">
+    <div class="modal" style="max-width:700px">
+      <div class="modal-header">
+        <span class="modal-title">تأكيد استلام وفحص البضاعة</span>
+        <button class="modal-close" onclick="closeModal('receiveModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="receiveTransferId">
+        <div style="background:var(--bg-hover);padding:12px;border-radius:8px;margin-bottom:16px" id="receiveTransferInfo"></div>
+        <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">يرجى مطابقة الكميات المشحونة مع الكميات الفعلية المستلمة، وتدوين أي تالف أو ناقص:</p>
+        <div class="table-wrapper">
+          <table style="font-size:13px">
+            <thead>
+              <tr>
+                <th>المنتج</th>
+                <th>المشحون</th>
+                <th>المستلم الفعلي السليم</th>
+                <th>التالف / الناقص</th>
+              </tr>
+            </thead>
+            <tbody id="receiveItemsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitReceiveConfirmation()"><i class="fas fa-check-double"></i> تأكيد الاستلام وإدخال للمخزون</button>
+        <button class="btn btn-outline" onclick="closeModal('receiveModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Transfer Details Modal -->
+  <div class="modal-overlay" id="viewTransferModal">
+    <div class="modal" style="max-width:650px">
+      <div class="modal-header">
+        <span class="modal-title">تفاصيل التحويل <span id="vTrNum"></span></span>
+        <button class="modal-close" onclick="closeModal('viewTransferModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div id="vTrSummary" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;background:var(--bg-hover);padding:16px;border-radius:8px;margin-bottom:16px"></div>
+        <h4 style="font-size:14px;margin-bottom:8px">قائمة الأصناف المحولة</h4>
+        <div class="table-wrapper">
+          <table style="font-size:13px">
+            <thead>
+              <tr>
+                <th>المنتج</th>
+                <th>الكمية المشحونة</th>
+                <th>الكمية المستلمة</th>
+                <th>التالف / الناقص</th>
+              </tr>
+            </thead>
+            <tbody id="vTrItemsBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('viewTransferModal')">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    var currentStoreInventory = [];
+
+    function loadTransfers() {
+      var status = document.getElementById('statusFilter').value;
+      DataStore.getTransfers().then(function(transfers) {
+        if (status) transfers = transfers.filter(function(t) { return t.status === status; });
+
+        var statusMap = {
+          'pending': '<span class="status status-pending"><i class="fas fa-clock"></i> قيد الانتظار</span>',
+          'approved': '<span class="status" style="background:#0ea5e920;color:#0ea5e9"><i class="fas fa-check"></i> معتمد للشحن</span>',
+          'in_transit': '<span class="status status-in-transit"><i class="fas fa-truck"></i> في الطريق (مشحونة)</span>',
+          'completed': '<span class="status status-completed"><i class="fas fa-check-double"></i> مكتمل ومستلم</span>',
+          'disputed': '<span class="status status-disputed"><i class="fas fa-exclamation-triangle"></i> فروقات / نزاع</span>'
+        };
+
+        var tbody = document.getElementById('transfersTableBody');
+        if (transfers.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-secondary)">لا توجد طلبات تحويل مسجلة</td></tr>';
+          return;
+        }
+
+        var html = '';
+        transfers.forEach(function(t) {
+          var date = new Date(t.created_at);
+          var dateStr = date.toLocaleDateString('ar-YE');
+
+          var actionBtns = '<button class="btn btn-outline btn-icon btn-sm" title="عرض التفاصيل" onclick="viewTransferDetails(' + t.id + ')"><i class="fas fa-eye"></i></button>';
+
+          if (t.status === 'pending') {
+            actionBtns += ' <button class="btn btn-outline btn-sm" style="color:#0ea5e9" onclick="approveTransfer(' + t.id + ')"><i class="fas fa-check"></i> اعتماد</button>';
+          }
+          if (t.status === 'pending' || t.status === 'approved') {
+            actionBtns += ' <button class="btn btn-primary btn-sm" onclick="dispatchTransfer(' + t.id + ')"><i class="fas fa-truck"></i> شحن البضاعة</button>';
+          }
+          if (t.status === 'in_transit') {
+            actionBtns += ' <button class="btn btn-primary btn-sm" style="background:#10b981;border-color:#10b981" onclick="openReceiveModal(' + t.id + ')"><i class="fas fa-box-open"></i> استلام البضاعة</button>';
+          }
+
+          html += `
+            <tr>
+              <td><strong>${t.transfer_number}</strong></td>
+              <td><span class="store-badge ${t.from_store_id === 1 ? 's1' : 's2'}">${t.from_store_name}</span></td>
+              <td><span class="store-badge ${t.to_store_id === 1 ? 's1' : 's2'}">${t.to_store_name}</span></td>
+              <td>${t.total_items} أصناف</td>
+              <td><strong>${t.total_units_sent} قطعة</strong></td>
+              <td>${statusMap[t.status] || t.status}</td>
+              <td style="font-size:12px">${dateStr}</td>
+              <td><div style="display:flex;gap:4px;align-items:center">${actionBtns}</div></td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openNewTransferModal() {
+      api('GET', '/stores').then(function(stores) {
+        var fromSel = document.getElementById('trFromStore');
+        var toSel = document.getElementById('trToStore');
+        fromSel.innerHTML = '';
+        toSel.innerHTML = '';
+
+        stores.forEach(function(s, idx) {
+          fromSel.innerHTML += '<option value="' + s.id + '" ' + (idx === 0 ? 'selected' : '') + '>' + s.name + '</option>';
+          toSel.innerHTML += '<option value="' + s.id + '" ' + (idx === 1 ? 'selected' : '') + '>' + s.name + '</option>';
+        });
+
+        document.getElementById('transferItemsBody').innerHTML = '';
+        onFromStoreChange();
+        openModal('newTransferModal');
+      });
+    }
+
+    function onFromStoreChange() {
+      var fromId = document.getElementById('trFromStore').value;
+      DataStore.getStoreInventory(fromId).then(function(items) {
+        currentStoreInventory = items;
+        document.getElementById('transferItemsBody').innerHTML = '';
+        addTransferItemRow();
+      });
+    }
+
+    function addTransferItemRow() {
+      var tbody = document.getElementById('transferItemsBody');
+      var rowId = 'row-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+
+      var optionsHtml = currentStoreInventory.map(function(item) {
+        return '<option value="' + item.product_id + '" data-avail="' + item.stock_quantity + '">' + item.product_name + ' (متاح: ' + item.stock_quantity + ')</option>';
+      }).join('');
+
+      var firstAvail = currentStoreInventory.length > 0 ? currentStoreInventory[0].stock_quantity : 0;
+
+      var tr = document.createElement('tr');
+      tr.id = rowId;
+      tr.innerHTML = `
+        <td>
+          <select class="form-control form-control-sm item-select" onchange="onItemSelectChange(this, '${rowId}')">
+            ${optionsHtml}
+          </select>
+        </td>
+        <td class="avail-display" style="font-weight:700;color:var(--primary)">${firstAvail}</td>
+        <td>
+          <input type="number" class="form-control form-control-sm item-qty" value="1" min="1" max="${firstAvail}">
+        </td>
+        <td>
+          <button class="btn btn-outline btn-icon btn-sm" style="color:var(--danger)" onclick="document.getElementById('${rowId}').remove()"><i class="fas fa-trash"></i></button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function onItemSelectChange(sel, rowId) {
+      var opt = sel.options[sel.selectedIndex];
+      var avail = opt ? opt.getAttribute('data-avail') : 0;
+      var row = document.getElementById(rowId);
+      if (row) {
+        row.querySelector('.avail-display').textContent = avail;
+        var qtyInput = row.querySelector('.item-qty');
+        qtyInput.max = avail;
+      }
+    }
+
+    function submitCreateTransfer() {
+      var fromId = document.getElementById('trFromStore').value;
+      var toId = document.getElementById('trToStore').value;
+      var notes = document.getElementById('trNotes').value.trim();
+
+      if (fromId === toId) {
+        showToast('لا يمكن التحويل لنفس المحل', 'error');
+        return;
+      }
+
+      var rows = document.querySelectorAll('#transferItemsBody tr');
+      if (rows.length === 0) {
+        showToast('يرجى إضافة صنف واحد على الأقل للتحويل', 'error');
+        return;
+      }
+
+      var items = [];
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var pId = r.querySelector('.item-select').value;
+        var qty = parseInt(r.querySelector('.item-qty').value);
+        var avail = parseInt(r.querySelector('.avail-display').textContent);
+
+        if (!qty || qty <= 0) {
+          showToast('يرجى تحديد كمية صحيحة لكل صنف', 'error');
+          return;
+        }
+        if (qty > avail) {
+          showToast('الكمية المطلوبة أكبر من الرصيد المتاح بالمحل المرسل', 'error');
+          return;
+        }
+        items.push({ product_id: pId, quantity: qty });
+      }
+
+      DataStore.createTransfer({
+        from_store_id: fromId,
+        to_store_id: toId,
+        items: items,
+        notes: notes
+      }).then(function() {
+        closeModal('newTransferModal');
+        showToast('تم إنشاء طلب التحويل بنجاح');
+        loadTransfers();
+      });
+    }
+
+    function approveTransfer(id) {
+      DataStore.approveTransfer(id).then(function(res) {
+        showToast(res.message);
+        loadTransfers();
+      });
+    }
+
+    function dispatchTransfer(id) {
+      if (!confirm('هل أنت متأكد من خروج وشحن البضاعة؟ سيتم خصم الكميات فوراً من رصيد المحل المرسل ودخولها في حالة (في الطريق).')) return;
+      DataStore.dispatchTransfer(id).then(function(res) {
+        showToast(res.message);
+        loadTransfers();
+      });
+    }
+
+    function openReceiveModal(id) {
+      DataStore.getTransfer(id).then(function(t) {
+        document.getElementById('receiveTransferId').value = t.id;
+        document.getElementById('receiveTransferInfo').innerHTML = `
+          <strong>التحويل: ${t.transfer_number}</strong> | من: <strong>${t.from_store_name}</strong> إلى: <strong>${t.to_store_name}</strong>
+        `;
+
+        var html = '';
+        (t.items || []).forEach(function(itm) {
+          html += `
+            <tr data-item-id="${itm.id}" data-prod-id="${itm.product_id}">
+              <td><strong>${itm.product_name}</strong></td>
+              <td><strong>${itm.quantity_sent}</strong></td>
+              <td>
+                <input type="number" class="form-control form-control-sm rec-good" value="${itm.quantity_sent}" min="0" max="${itm.quantity_sent}">
+              </td>
+              <td>
+                <input type="number" class="form-control form-control-sm rec-damage" value="0" min="0" max="${itm.quantity_sent}">
+              </td>
+            </tr>
+          `;
+        });
+        document.getElementById('receiveItemsTableBody').innerHTML = html;
+        openModal('receiveModal');
+      });
+    }
+
+    function submitReceiveConfirmation() {
+      var id = document.getElementById('receiveTransferId').value;
+      var rows = document.querySelectorAll('#receiveItemsTableBody tr');
+      var items = [];
+
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var itmId = r.getAttribute('data-item-id');
+        var pId = r.getAttribute('data-prod-id');
+        var good = parseInt(r.querySelector('.rec-good').value) || 0;
+        var dam = parseInt(r.querySelector('.rec-damage').value) || 0;
+        items.push({ id: itmId, product_id: pId, quantity_received: good, quantity_damaged: dam });
+      }
+
+      DataStore.receiveTransfer(id, items).then(function(res) {
+        closeModal('receiveModal');
+        showToast(res.message);
+        loadTransfers();
+      });
+    }
+
+    function viewTransferDetails(id) {
+      DataStore.getTransfer(id).then(function(t) {
+        document.getElementById('vTrNum').textContent = '#' + t.transfer_number;
+        document.getElementById('vTrSummary').innerHTML = `
+          <div><span style="font-size:11px;color:var(--text-secondary)">المحل المرسل</span><div style="font-weight:700">${t.from_store_name}</div></div>
+          <div><span style="font-size:11px;color:var(--text-secondary)">المحل المستلم</span><div style="font-weight:700">${t.to_store_name}</div></div>
+          <div><span style="font-size:11px;color:var(--text-secondary)">أنشئ بواسطة</span><div>${t.created_by_name || 'النظام'}</div></div>
+          <div><span style="font-size:11px;color:var(--text-secondary)">الحالة</span><div>${t.status}</div></div>
+        `;
+
+        var html = '';
+        (t.items || []).forEach(function(itm) {
+          html += `
+            <tr>
+              <td><strong>${itm.product_name}</strong></td>
+              <td>${itm.quantity_sent} قطعة</td>
+              <td><strong style="color:#10b981">${itm.quantity_received} قطعة</strong></td>
+              <td><strong style="color:${itm.quantity_damaged > 0 ? '#ef4444' : 'var(--text-secondary)'}">${itm.quantity_damaged} قطعة</strong></td>
+            </tr>
+          `;
+        });
+        document.getElementById('vTrItemsBody').innerHTML = html;
+        openModal('viewTransferModal');
+      });
+    }
+
+    DataStore.init().then(function() {
+      loadTransfers();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>العملاء - لوحة التحكم</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div><span class="sidebar-brand">نيوتك الطبية</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">الرئيسية</div>
+      <a class="nav-item" data-page="index.html"><i class="fas fa-th-large"></i><span>لوحة التحكم</span></a>
+      <div class="nav-section">الإدارة</div>
+      <a class="nav-item" data-page="products.html"><i class="fas fa-box"></i><span>المنتجات</span></a>
+      <a class="nav-item" data-page="orders.html"><i class="fas fa-shopping-cart"></i><span>الطلبات</span><span class="badge" id="ordersBadge">0</span></a>
+      <a class="nav-item" data-page="quotes.html"><i class="fas fa-file-invoice"></i><span>عروض الأسعار</span><span class="badge" id="quotesBadge">0</span></a>
+      <a class="nav-item active" data-page="customers.html"><i class="fas fa-users"></i><span>العملاء</span></a>
+      <div class="nav-section">التقارير</div>
+      <a class="nav-item" data-page="reports.html"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+      <div class="nav-section">النظام</div>
+      <a class="nav-item" data-page="users.html"><i class="fas fa-user-shield"></i><span>المستخدمين</span></a>
+      <a class="nav-item" data-page="profile.html"><i class="fas fa-id-card"></i><span>الملف الشخصي</span></a>
+      <a class="nav-item" data-page="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">م أ</div><div class="sidebar-user-info"><div class="sidebar-user-name">محمد أحمد</div><div class="sidebar-user-role">مدير النظام</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">العملاء</h1>
+        <div class="breadcrumb"><a href="index.html">الرئيسية</a><i class="fas fa-chevron-left" style="font-size:8px"></i><span>العملاء</span></div>
+      </div>
+      <div class="topbar-left">
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="بحث في العملاء..." id="tableSearch" oninput="filterTable('tableSearch','customersTable')"></div>
+        <div style="position:relative"><button class="icon-btn" id="notificationsBtn"><i class="fas fa-bell"></i><span class="badge-count" id="notifCount" style="display:none"></span></button><div class="notifications-dropdown" id="notificationsDropdown"><div class="notifications-header"><h4>الإشعارات</h4><a href="#" class="mark-all-read" onclick="markAllRead();return false" style="font-size:12px;color:var(--primary)">تحديد الكل كمقروء</a></div><div id="notificationsList"></div></div></div>
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"><span class="star"></span><span class="star"></span><span class="star"></span></span></label>
+        <div style="position:relative"><button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button><div class="user-dropdown" id="userDropdown"><div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div><div class="user-dropdown-divider"></div><div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div></div></div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><div class="stat-label">إجمالي العملاء</div><div class="stat-value" id="totalCustomers">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><i class="fas fa-user-check"></i></div><div class="stat-info"><div class="stat-label">نشطون</div><div class="stat-value" id="activeCustomers">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon yellow"><i class="fas fa-user-clock"></i></div><div class="stat-info"><div class="stat-label">جدد</div><div class="stat-value" id="newCustomers">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon red"><i class="fas fa-user-times"></i></div><div class="stat-info"><div class="stat-label">غير نشط</div><div class="stat-value" id="inactiveCustomers">0</div></div></div>
+      </div>
+
+      <div id="bulkActions" class="bulk-actions" style="display:none">
+        <span>تم تحديد <span class="bulk-count" id="selectedCount">0</span> عميل</span>
+        <button class="btn btn-sm" onclick="bulkToggle()"><i class="fas fa-ban"></i> إيقاف تنشيط المحدد</button>
+        <button class="btn btn-sm" onclick="clearSelection()"><i class="fas fa-times"></i> إلغاء</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <button class="btn btn-primary" onclick="openModal('addCustomerModal')" data-perm-write="customers"><i class="fas fa-plus"></i> إضافة عميل</button>
+          <button class="btn btn-outline" onclick="exportCSV('customersTable','customers')"><i class="fas fa-download"></i> تصدير</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="customersTable">
+            <thead><tr><th><input type="checkbox" class="select-row" id="selectAll"></th><th>العميل</th><th>الهاتف</th><th>المدينة</th><th>إجمالي الطلبات</th><th>المبلغ الإجمالي</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+            <tbody id="customersBody"></tbody>
+          </table>
+        </div>
+        <div id="customersPagination" class="pagination"></div>
+        <div id="emptyState" style="display:none;text-align:center;padding:60px 20px">
+          <i class="fas fa-users" style="font-size:48px;color:var(--border-color);margin-bottom:16px"></i>
+          <p style="color:var(--text-secondary);font-size:14px">لا يوجد عملاء بعد</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Customer Modal -->
+  <div class="modal-overlay" id="addCustomerModal">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">إضافة عميل جديد</span><button class="modal-close" onclick="closeModal('addCustomerModal')"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>الاسم الكامل *</label><input type="text" class="form-control" id="addCustomerName" placeholder="الاسم الكامل"></div>
+        <div class="form-group"><label>البريد الإلكتروني *</label><input type="email" class="form-control" id="addCustomerEmail" placeholder="email@example.com"></div>
+        <div class="form-row"><div class="form-group"><label>الهاتف *</label><input type="text" class="form-control" id="addCustomerPhone" placeholder="0771234567"></div><div class="form-group"><label>المدينة</label><select class="form-control" id="addCustomerCity"><option>صنعاء</option><option>عدن</option><option>تعز</option><option>الحديدة</option><option>المكلا</option><option>ذمار</option><option>إب</option></select></div></div>
+        <div class="form-group"><label>العنوان</label><input type="text" class="form-control" id="addCustomerAddress" placeholder="العنوان التفصيلي"></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-primary" onclick="addCustomer()"><i class="fas fa-save"></i> حفظ</button><button class="btn btn-outline" onclick="closeModal('addCustomerModal')">إلغاء</button></div>
+    </div>
+  </div>
+
+  <!-- Edit Customer Modal -->
+  <div class="modal-overlay" id="editCustomerModal">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">تعديل العميل</span><button class="modal-close" onclick="closeModal('editCustomerModal')"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>الاسم الكامل *</label><input type="text" class="form-control" id="editCustomerName"></div>
+        <div class="form-group"><label>البريد الإلكتروني *</label><input type="email" class="form-control" id="editCustomerEmail"></div>
+        <div class="form-row"><div class="form-group"><label>الهاتف *</label><input type="text" class="form-control" id="editCustomerPhone"></div><div class="form-group"><label>المدينة</label><select class="form-control" id="editCustomerCity"><option>صنعاء</option><option>عدن</option><option>تعز</option><option>الحديدة</option><option>المكلا</option><option>ذمار</option><option>إب</option></select></div></div>
+        <div class="form-group"><label>العنوان</label><input type="text" class="form-control" id="editCustomerAddress"></div>
+        <div class="form-group"><label>الحالة</label><select class="form-control" id="editCustomerStatus"><option value="active">نشط</option><option value="inactive">غير نشط</option></select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-primary" onclick="saveCustomer()"><i class="fas fa-save"></i> حفظ التعديلات</button><button class="btn btn-outline" onclick="closeModal('editCustomerModal')">إلغاء</button></div>
+    </div>
+  </div>
+
+  <!-- View Customer Modal -->
+  <div class="modal-overlay" id="viewCustomerModal">
+    <div class="modal" style="max-width:520px">
+      <div class="modal-header"><span class="modal-title">تفاصيل العميل</span><button class="modal-close" onclick="closeModal('viewCustomerModal')"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body" id="viewCustomerBody"></div>
+      <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('viewCustomerModal')">إغلاق</button></div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    var currentEditId = null;
+
+    var customersPage = 1;
+    var PER_PAGE = 5;
+
+    function loadCustomers() {
+      var customers = DataStore.getCustomers();
+      updateStats(customers);
+      renderTable(customers);
+    }
+
+    function updateStats(customers) {
+      document.getElementById('totalCustomers').textContent = customers.length;
+      document.getElementById('activeCustomers').textContent = customers.filter(function(c) { return c.status === 'active'; }).length;
+      document.getElementById('inactiveCustomers').textContent = customers.filter(function(c) { return c.status === 'inactive'; }).length;
+      document.getElementById('newCustomers').textContent = customers.filter(function(c) { return c.orders === 0; }).length;
+    }
+
+    function renderTable(customers) {
+      var emptyState = document.getElementById('emptyState');
+      if (customers.length === 0) {
+        document.getElementById('customersBody').innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      var statusMap = { 'active': '<span class="status status-active">نشط</span>', 'inactive': '<span class="status status-inactive">غير نشط</span>' };
+      var cityColors = ['#0284c7', '#10b981', '#f59e0b', '#8b5cf6', '#0d9488', '#dc2626', '#64748b'];
+
+      var result = renderPaginatedTable(customers, '#customersBody', 'customersPagination', customersPage, PER_PAGE, function(c) {
+        var initials = c.name.split(' ').map(function(w) { return w.charAt(0); }).join('').slice(0, 2);
+        var color = cityColors[c.city ? c.city.length % cityColors.length : 0];
+        return '<tr class="' + (c.status === 'inactive' ? 'row-inactive' : '') + '">' +
+          '<td><input type="checkbox" class="select-row"></td>' +
+          '<td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:' + color + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600">' + initials + '</div><div><div style="font-weight:500">' + c.name + '</div><div style="font-size:11px;color:var(--text-secondary)">' + (c.email || '') + '</div></div></div></td>' +
+          '<td>' + (c.phone || '') + '</td>' +
+          '<td>' + (c.city || '') + '</td>' +
+          '<td>' + (c.orders || 0) + '</td>' +
+          '<td>' + formatNumber(c.total || 0) + ' ر.ي</td>' +
+          '<td>' + (statusMap[c.status] || statusMap['inactive']) + '</td>' +
+          '<td><div class="action-btns">' +
+          '<button class="btn btn-outline btn-icon btn-sm" title="عرض" onclick="viewCustomer(' + c.id + ')"><i class="fas fa-eye"></i></button>' +
+          (canWrite('customers') ? '<button class="btn btn-outline btn-icon btn-sm" title="تعديل" onclick="editCustomer(' + c.id + ')"><i class="fas fa-edit"></i></button>' : '') +
+           (canWrite('customers') ? '<button class="btn btn-outline btn-icon btn-sm" title="إيقاف تنشيط" onclick="toggleCustomer(' + c.id + ')"><i class="fas fa-ban"></i></button>' : '') +
+          '</div></td>' +
+        '</tr>';
+      });
+      customersPage = result.currentPage;
+
+      bindRowSelection();
+    }
+
+    function bindRowSelection() {
+      document.querySelectorAll('#customersBody .select-row').forEach(function(cb) {
+        cb.addEventListener('change', updateBulkActions);
+      });
+      var selectAll = document.getElementById('selectAll');
+      if (selectAll) {
+        selectAll.checked = false;
+        selectAll.onchange = function() {
+          document.querySelectorAll('#customersBody .select-row').forEach(function(c) { c.checked = selectAll.checked; });
+          updateBulkActions();
+        };
+      }
+    }
+
+    function updateBulkActions() {
+      var checked = document.querySelectorAll('#customersBody .select-row:checked').length;
+      var bar = document.getElementById('bulkActions');
+      bar.style.display = checked > 0 ? 'flex' : 'none';
+      document.getElementById('selectedCount').textContent = checked;
+    }
+
+    function clearSelection() {
+      document.querySelectorAll('#customersBody .select-row').forEach(function(c) { c.checked = false; });
+      updateBulkActions();
+    }
+
+    function bulkToggle() {
+      var rows = document.querySelectorAll('#customersBody tr');
+      var ids = [];
+      rows.forEach(function(row) {
+        var cb = row.querySelector('.select-row');
+        if (cb && cb.checked) {
+          var btn = row.querySelector('[onclick^="toggleCustomer"]');
+          if (btn) {
+            var m = btn.getAttribute('onclick').match(/toggleCustomer\((\d+)\)/);
+            if (m) ids.push(parseInt(m[1]));
+          }
+        }
+      });
+      if (ids.length === 0) return;
+      if (!confirm('هل أنت متأكد من إيقاف تنشيط ' + ids.length + ' عميل؟')) return;
+      Promise.all(ids.map(function(id) { return DataStore.toggleCustomer(id); })).then(function() {
+        loadCustomers();
+        showToast('تم إيقاف تنشيط العملاء بنجاح');
+      });
+    }
+
+    function addCustomer() {
+      var name = document.getElementById('addCustomerName').value.trim();
+      var email = document.getElementById('addCustomerEmail').value.trim();
+      var phone = document.getElementById('addCustomerPhone').value.trim();
+      var city = document.getElementById('addCustomerCity').value;
+      var address = document.getElementById('addCustomerAddress').value.trim();
+
+      if (!name || !email || !phone) {
+        alert('يرجى ملء الحقول المطلوبة (الاسم، البريد، الهاتف)');
+        return;
+      }
+      var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('يرجى إدخال بريد إلكتروني صحيح');
+        return;
+      }
+
+      DataStore.addCustomer({ name: name, email: email, phone: phone, city: city, address: address, orders: 0, total: 0, status: 'active' });
+      closeModal('addCustomerModal');
+      loadCustomers();
+      showToast('تمت إضافة العميل بنجاح');
+      document.getElementById('addCustomerName').value = '';
+      document.getElementById('addCustomerEmail').value = '';
+      document.getElementById('addCustomerPhone').value = '';
+      document.getElementById('addCustomerAddress').value = '';
+    }
+
+    function editCustomer(id) {
+      var c = DataStore.getCustomer(id);
+      if (!c) return;
+      currentEditId = id;
+      document.getElementById('editCustomerName').value = c.name;
+      document.getElementById('editCustomerEmail').value = c.email;
+      document.getElementById('editCustomerPhone').value = c.phone;
+      document.getElementById('editCustomerCity').value = c.city || 'صنعاء';
+      document.getElementById('editCustomerAddress').value = c.address || '';
+      document.getElementById('editCustomerStatus').value = c.status;
+      openModal('editCustomerModal');
+    }
+
+    function saveCustomer() {
+      if (!currentEditId) return;
+      var name = document.getElementById('editCustomerName').value.trim();
+      var email = document.getElementById('editCustomerEmail').value.trim();
+      var phone = document.getElementById('editCustomerPhone').value.trim();
+      var city = document.getElementById('editCustomerCity').value;
+      var address = document.getElementById('editCustomerAddress').value.trim();
+      var status = document.getElementById('editCustomerStatus').value;
+
+      if (!name || !email || !phone) {
+        alert('يرجى ملء الحقول المطلوبة');
+        return;
+      }
+
+      DataStore.updateCustomer(currentEditId, { name: name, email: email, phone: phone, city: city, address: address, status: status });
+      closeModal('editCustomerModal');
+      loadCustomers();
+      showToast('تم تحديث العميل بنجاح');
+    }
+
+    function viewCustomer(id) {
+      var c = DataStore.getCustomer(id);
+      if (!c) return;
+      var body = document.getElementById('viewCustomerBody');
+      body.innerHTML =
+        '<div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">' +
+          '<div style="width:64px;height:64px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:700">' + c.name.split(' ').map(function(w){return w.charAt(0);}).join('').slice(0,2) + '</div>' +
+          '<div><div style="font-size:18px;font-weight:700">' + c.name + '</div><div style="color:var(--text-secondary);font-size:13px">' + (c.email || '') + '</div></div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">' +
+          rowHtml('الهاتف', c.phone || '-') +
+          rowHtml('المدينة', c.city || '-') +
+          rowHtml('عدد الطلبات', c.orders || 0) +
+          rowHtml('المبلغ الإجمالي', formatNumber(c.total || 0) + ' ر.ي') +
+          rowHtml('الحالة', c.status === 'active' ? 'نشط' : 'غير نشط') +
+          rowHtml('العنوان', c.address || '-') +
+        '</div>';
+      openModal('viewCustomerModal');
+    }
+
+    function rowHtml(label, value) {
+      return '<div style="background:var(--bg-main);padding:10px 12px;border-radius:8px"><div style="font-size:11px;color:var(--text-secondary)">' + label + '</div><div style="font-weight:600;margin-top:4px">' + value + '</div></div>';
+    }
+
+    function toggleCustomer(id) {
+      var c = DataStore.getCustomer(id);
+      if (!c) return;
+      var isActive = c.status === 'active';
+      if (!confirm('هل أنت متأكد من ' + (isActive ? 'إيقاف تنشيط' : 'تفعيل') + ' "' + c.name + '"؟')) return;
+      DataStore.toggleCustomer(id).then(function() {
+        loadCustomers();
+        showToast(isActive ? 'تم إيقاف تنشيط العميل' : 'تم تفعيل العميل');
+      });
+    }
+
+    DataStore.init().then(function() {
+      loadCustomers();
+      applyPermissions('customers');
+      if (window.loadNotifications) window.loadNotifications();
+    }).catch(function(err) { console.warn('DataStore.init error:', err); });
+  </script>
+</body>
+</html>

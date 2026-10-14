@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مخزون المحلات والجرد - لوحة التحكم</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') window.location.href = 'login.html';
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div>
+      <span class="sidebar-brand">نيوتك الطبية</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">م س</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">م. محمد السقاف</div>
+          <div class="sidebar-user-role">المدير العام</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">مخزون المحلات والجرد</h1>
+        <div class="breadcrumb">
+          <a href="index.html">الرئيسية</a>
+          <i class="fas fa-chevron-left" style="font-size:8px"></i>
+          <span>مخزون المحلات</span>
+        </div>
+      </div>
+      <div class="topbar-left">
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
+        <div style="position:relative">
+          <button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div>
+            <div class="user-dropdown-divider"></div>
+            <div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <!-- Tabs Header -->
+      <div class="tabs-header">
+        <button class="tab-btn active" id="tabBtnStock" onclick="switchTab('stock')"><i class="fas fa-boxes"></i> أرصدة المخزون والأسعار</button>
+        <button class="tab-btn" id="tabBtnLedger" onclick="switchTab('ledger')"><i class="fas fa-list-alt"></i> سجل حركات المخزون (Ledger)</button>
+        <button class="tab-btn" id="tabBtnAlerts" onclick="switchTab('alerts')"><i class="fas fa-exclamation-triangle"></i> تنبيهات النواقص</button>
+      </div>
+
+      <!-- Tab 1: Current Stock -->
+      <div id="tabContentStock">
+        <div class="stats-grid" style="margin-bottom:20px">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="fas fa-warehouse"></i></div>
+            <div class="stat-info">
+              <div class="stat-label">إجمالي الوحدات بالمخزن</div>
+              <div class="stat-value" id="statTotalUnits">0</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fas fa-coins"></i></div>
+            <div class="stat-info">
+              <div class="stat-label">قيمة المخزون بسعر الشراء</div>
+              <div class="stat-value" id="statCostValue">0 ر.ي</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon yellow"><i class="fas fa-tag"></i></div>
+            <div class="stat-info">
+              <div class="stat-label">قيمة المخزون بسعر البيع</div>
+              <div class="stat-value" id="statRetailValue">0 ر.ي</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="stat-info">
+              <div class="stat-label">أصناف منخفضة المخزون</div>
+              <div class="stat-value" id="statLowStock">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header" style="flex-wrap:wrap;gap:12px">
+            <div style="display:flex;gap:10px;align-items:center">
+              <input type="text" class="form-control" id="inventorySearch" placeholder="بحث باسم المنتج أو الموديل..." style="width:250px" oninput="filterInventory()">
+              <select class="form-control" id="storeFilter" style="width:220px" onchange="onLocalStoreFilterChange()">
+                <!-- Populated via JS -->
+              </select>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-outline" onclick="openAdjustModal()"><i class="fas fa-clipboard-check"></i> تسوية جرد فعلي</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table id="inventoryTable">
+              <thead>
+                <tr>
+                  <th>المنتج والموديل</th>
+                  <th>المحل</th>
+                  <th>الرصيد المتاح</th>
+                  <th>حد التنبيه</th>
+                  <th>سعر الشراء</th>
+                  <th>سعر الجملة</th>
+                  <th>سعر البيع</th>
+                  <th>التشغيلة / الصلاحية</th>
+                  <th>الحالة</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Movement Ledger -->
+      <div id="tabContentLedger" style="display:none">
+        <div class="card">
+          <div class="card-header" style="flex-wrap:wrap;gap:12px">
+            <span class="card-title"><i class="fas fa-history"></i> سجل كل حركة مخزون مع التاريخ والمستخدم والسبب</span>
+            <div style="display:flex;gap:8px">
+              <select class="form-control" id="ledgerTypeFilter" onchange="loadLedger()">
+                <option value="">جميع أنواع الحركات</option>
+                <option value="opening">رصيد افتتاحي</option>
+                <option value="sale">مبيعات (صادر)</option>
+                <option value="sale_return">مرتجع مبيعات (وارد)</option>
+                <option value="transfer_out">تحويل خارج (صادر)</option>
+                <option value="transfer_in">تحويل داخل (وارد)</option>
+                <option value="purchase">مشتريات (وارد)</option>
+                <option value="adjustment">تسوية جرد</option>
+              </select>
+              <button class="btn btn-outline" onclick="loadLedger()"><i class="fas fa-sync"></i> تحديث</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم الحركة</th>
+                  <th>المحل</th>
+                  <th>المنتج</th>
+                  <th>نوع الحركة</th>
+                  <th>الكمية</th>
+                  <th>الرصيد بعد الحركة</th>
+                  <th>المستخدم المسؤول</th>
+                  <th>البيان والسبب</th>
+                  <th>التاريخ والوقت</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Alerts -->
+      <div id="tabContentAlerts" style="display:none">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title" style="color:var(--danger)"><i class="fas fa-bell"></i> أصناف وصلت للحد الأدنى وتتطلب إعادة طلب</span>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>المحل</th>
+                  <th>المنتج</th>
+                  <th>الكمية الحالية</th>
+                  <th>الحد الأدنى للتنبيه</th>
+                  <th>حالة العجز</th>
+                  <th>إجراء سريع</th>
+                </tr>
+              </thead>
+              <tbody id="alertsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Stocktake Adjustment Modal -->
+  <div class="modal-overlay" id="adjustModal">
+    <div class="modal" style="max-width:550px">
+      <div class="modal-header">
+        <span class="modal-title">تسوية جرد فعلي (Stock Adjustment)</span>
+        <button class="modal-close" onclick="closeModal('adjustModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">المحل *</label>
+          <select class="form-control" id="adjStoreSelect" onchange="onAdjStoreChange()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">المنتج *</label>
+          <select class="form-control" id="adjProductSelect" onchange="onAdjProductChange()"></select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">الرصيد المسجل بالنظام</label>
+            <input type="text" class="form-control" id="adjSystemQty" readonly style="background:var(--bg-hover);font-weight:700">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الكمية الفعلية بعد العد *</label>
+            <input type="number" class="form-control" id="adjActualQty" min="0" oninput="calcDifference()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الفارق (الزيادة أو النقص)</label>
+          <div id="adjDiffDisplay" style="font-weight:700;font-size:15px;padding:8px;border-radius:6px;background:var(--bg-hover)">0</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">سبب التسوية والملاحظات *</label>
+          <textarea class="form-control" id="adjReason" rows="2" placeholder="مثال: جرد شهري، بضاعة منتهية، عجز في العد"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitAdjustment()"><i class="fas fa-check"></i> اعتماد تسوية المخزون</button>
+        <button class="btn btn-outline" onclick="closeModal('adjustModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Pricing & Details Modal -->
+  <div class="modal-overlay" id="editInvModal">
+    <div class="modal" style="max-width:550px">
+      <div class="modal-header">
+        <span class="modal-title">تعديل تسعيرة ومواصفات المخزون</span>
+        <button class="modal-close" onclick="closeModal('editInvModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editInvId">
+        <div class="form-group">
+          <label class="form-label">المنتج</label>
+          <input type="text" class="form-control" id="editInvProdName" readonly style="background:var(--bg-hover)">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label class="form-label">سعر الشراء</label>
+            <input type="number" class="form-control" id="editInvCost">
+          </div>
+          <div class="form-group">
+            <label class="form-label">سعر الجملة</label>
+            <input type="number" class="form-control" id="editInvWholesale">
+          </div>
+          <div class="form-group">
+            <label class="form-label">سعر البيع</label>
+            <input type="number" class="form-control" id="editInvRetail">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label class="form-label">وحدة القياس</label>
+            <input type="text" class="form-control" id="editInvUnit" placeholder="قطعة / كرتون / عبوة">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم التشغيلة (Batch)</label>
+            <input type="text" class="form-control" id="editInvBatch">
+          </div>
+          <div class="form-group">
+            <label class="form-label">تاريخ الصلاحية</label>
+            <input type="date" class="form-control" id="editInvExpiry">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">حد التنبيه عند النقص</label>
+          <input type="number" class="form-control" id="editInvMinAlert" min="1">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitEditInv()"><i class="fas fa-save"></i> حفظ التعديلات</button>
+        <button class="btn btn-outline" onclick="closeModal('editInvModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    var currentInventoryData = [];
+
+    function switchTab(tab) {
+      document.getElementById('tabContentStock').style.display = tab === 'stock' ? 'block' : 'none';
+      document.getElementById('tabContentLedger').style.display = tab === 'ledger' ? 'block' : 'none';
+      document.getElementById('tabContentAlerts').style.display = tab === 'alerts' ? 'block' : 'none';
+
+      document.getElementById('tabBtnStock').classList.toggle('active', tab === 'stock');
+      document.getElementById('tabBtnLedger').classList.toggle('active', tab === 'ledger');
+      document.getElementById('tabBtnAlerts').classList.toggle('active', tab === 'alerts');
+
+      if (tab === 'ledger') loadLedger();
+      if (tab === 'alerts') loadAlerts();
+    }
+
+    function initStoreFilter() {
+      api('GET', '/stores').then(function(stores) {
+        var sel = document.getElementById('storeFilter');
+        var adjStore = document.getElementById('adjStoreSelect');
+        sel.innerHTML = '';
+        adjStore.innerHTML = '';
+
+        var current = getCurrentStoreId() || '1';
+
+        stores.forEach(function(s) {
+          sel.innerHTML += '<option value="' + s.id + '" ' + (String(s.id) === String(current) ? 'selected' : '') + '>🏪 ' + s.name + ' (' + s.code + ')</option>';
+          adjStore.innerHTML += '<option value="' + s.id + '">🏪 ' + s.name + ' (' + s.code + ')</option>';
+        });
+
+        loadInventory();
+      });
+    }
+
+    function onLocalStoreFilterChange() {
+      var sId = document.getElementById('storeFilter').value;
+      setCurrentStoreId(sId);
+      loadInventory();
+    }
+
+    window.onStoreChange = function() {
+      var sId = getCurrentStoreId();
+      if (sId && document.getElementById('storeFilter')) {
+        document.getElementById('storeFilter').value = sId;
+      }
+      loadInventory();
+    };
+
+    function loadInventory() {
+      var sId = document.getElementById('storeFilter').value || getCurrentStoreId() || 1;
+
+      DataStore.getStoreInventory(sId).then(function(items) {
+        currentInventoryData = items;
+        renderInventoryTable(items);
+
+        var totalUnits = items.reduce(function(acc, x) { return acc + (x.stock_quantity || 0); }, 0);
+        var costVal = items.reduce(function(acc, x) { return acc + ((x.stock_quantity || 0) * (x.purchase_price || 0)); }, 0);
+        var retailVal = items.reduce(function(acc, x) { return acc + ((x.stock_quantity || 0) * (x.retail_price || 0)); }, 0);
+        var lowCount = items.filter(function(x) { return x.stock_quantity <= x.min_stock_alert; }).length;
+
+        document.getElementById('statTotalUnits').textContent = totalUnits.toLocaleString();
+        document.getElementById('statCostValue').textContent = costVal.toLocaleString() + ' ر.ي';
+        document.getElementById('statRetailValue').textContent = retailVal.toLocaleString() + ' ر.ي';
+        document.getElementById('statLowStock').textContent = lowCount;
+      });
+    }
+
+    function renderInventoryTable(items) {
+      var search = (document.getElementById('inventorySearch').value || '').toLowerCase();
+      var filtered = items.filter(function(x) {
+        return !search || (x.product_name && x.product_name.toLowerCase().includes(search)) || (x.model && x.model.toLowerCase().includes(search));
+      });
+
+      var tbody = document.getElementById('inventoryTableBody');
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--text-secondary)">لا توجد أصناف تطابق البحث</td></tr>';
+        return;
+      }
+
+      var html = '';
+      filtered.forEach(function(item) {
+        var statusBadge = item.stock_quantity <= 0 
+          ? '<span class="status status-cancelled">نفذ المخزون</span>'
+          : item.stock_quantity <= item.min_stock_alert
+          ? '<span class="status status-pending">مخزون منخفض</span>'
+          : '<span class="status status-completed">متوفر</span>';
+
+        html += `
+          <tr>
+            <td>
+              <strong>${item.product_name}</strong>
+              <div style="font-size:11px;color:var(--text-secondary)">${item.model || ''} · ${item.category || ''}</div>
+            </td>
+            <td><span class="store-badge ${item.store_id === 1 ? 's1' : 's2'}">${item.store_code}</span></td>
+            <td><strong style="font-size:15px;color:var(--primary)">${item.stock_quantity}</strong> <span style="font-size:11px;color:var(--text-secondary)">${item.unit || 'قطعة'}</span></td>
+            <td>${item.min_stock_alert}</td>
+            <td>${(item.purchase_price || 0).toLocaleString()} ر.ي</td>
+            <td>${(item.wholesale_price || 0).toLocaleString()} ر.ي</td>
+            <td><strong>${(item.retail_price || 0).toLocaleString()} ر.ي</strong></td>
+            <td>
+              <div style="font-size:11px">تشغيلة: <code>${item.batch_number || '—'}</code></div>
+              <div style="font-size:11px;color:var(--text-secondary)">صلاحية: ${item.expiry_date || '—'}</div>
+            </td>
+            <td>${statusBadge}</td>
+            <td>
+              <button class="btn btn-outline btn-icon btn-sm" title="تعديل الأسعار والمواصفات" onclick="openEditInvModal(${item.id})"><i class="fas fa-edit"></i></button>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function filterInventory() {
+      renderInventoryTable(currentInventoryData);
+    }
+
+    function openEditInvModal(id) {
+      var itm = currentInventoryData.find(function(x) { return x.id === id; });
+      if (!itm) return;
+
+      document.getElementById('editInvId').value = itm.id;
+      document.getElementById('editInvProdName').value = itm.product_name + ' (' + itm.store_name + ')';
+      document.getElementById('editInvCost').value = itm.purchase_price || 0;
+      document.getElementById('editInvWholesale').value = itm.wholesale_price || 0;
+      document.getElementById('editInvRetail').value = itm.retail_price || 0;
+      document.getElementById('editInvUnit').value = itm.unit || 'قطعة';
+      document.getElementById('editInvBatch').value = itm.batch_number || '';
+      document.getElementById('editInvExpiry').value = itm.expiry_date || '';
+      document.getElementById('editInvMinAlert').value = itm.min_stock_alert || 5;
+
+      openModal('editInvModal');
+    }
+
+    function submitEditInv() {
+      var id = document.getElementById('editInvId').value;
+      var data = {
+        purchase_price: parseFloat(document.getElementById('editInvCost').value) || 0,
+        wholesale_price: parseFloat(document.getElementById('editInvWholesale').value) || 0,
+        retail_price: parseFloat(document.getElementById('editInvRetail').value) || 0,
+        unit: document.getElementById('editInvUnit').value.trim() || 'قطعة',
+        batch_number: document.getElementById('editInvBatch').value.trim(),
+        expiry_date: document.getElementById('editInvExpiry').value,
+        min_stock_alert: parseInt(document.getElementById('editInvMinAlert').value) || 5
+      };
+
+      DataStore.updateInventoryItem(id, data).then(function() {
+        closeModal('editInvModal');
+        showToast('تم تحديث إعدادات المخزون بنجاح');
+        loadInventory();
+      });
+    }
+
+    // Adjustment Modal Logic
+    function openAdjustModal() {
+      var sId = document.getElementById('storeFilter').value || 1;
+      document.getElementById('adjStoreSelect').value = sId;
+      onAdjStoreChange();
+      openModal('adjustModal');
+    }
+
+    function onAdjStoreChange() {
+      var sId = document.getElementById('adjStoreSelect').value;
+      DataStore.getStoreInventory(sId).then(function(items) {
+        var pSel = document.getElementById('adjProductSelect');
+        pSel.innerHTML = '';
+        items.forEach(function(x) {
+          pSel.innerHTML += '<option value="' + x.product_id + '" data-qty="' + x.stock_quantity + '">' + x.product_name + ' (الرصيد: ' + x.stock_quantity + ')</option>';
+        });
+        onAdjProductChange();
+      });
+    }
+
+    function onAdjProductChange() {
+      var pSel = document.getElementById('adjProductSelect');
+      var opt = pSel.options[pSel.selectedIndex];
+      var qty = opt ? opt.getAttribute('data-qty') : 0;
+      document.getElementById('adjSystemQty').value = qty;
+      document.getElementById('adjActualQty').value = qty;
+      calcDifference();
+    }
+
+    function calcDifference() {
+      var sys = parseInt(document.getElementById('adjSystemQty').value) || 0;
+      var act = parseInt(document.getElementById('adjActualQty').value) || 0;
+      var diff = act - sys;
+      var display = document.getElementById('adjDiffDisplay');
+      if (diff > 0) {
+        display.innerHTML = '<span style="color:#10b981"><i class="fas fa-plus"></i> زيادة قدرها +' + diff + ' قطعة</span>';
+      } else if (diff < 0) {
+        display.innerHTML = '<span style="color:#ef4444"><i class="fas fa-minus"></i> عجز / نقص قدره ' + diff + ' قطعة</span>';
+      } else {
+        display.innerHTML = '<span style="color:var(--text-secondary)">مطابق للرصيد المسجل (فارق 0)</span>';
+      }
+    }
+
+    function submitAdjustment() {
+      var sId = document.getElementById('adjStoreSelect').value;
+      var pId = document.getElementById('adjProductSelect').value;
+      var actualQty = parseInt(document.getElementById('adjActualQty').value);
+      var reason = document.getElementById('adjReason').value.trim();
+
+      if (isNaN(actualQty) || actualQty < 0) {
+        showToast('يرجى إدخال كمية فعلية صحيحة', 'error');
+        return;
+      }
+      if (!reason) {
+        showToast('يرجى كتابة سبب التسوية', 'error');
+        return;
+      }
+
+      DataStore.adjustInventory({
+        store_id: sId,
+        product_id: pId,
+        actual_quantity: actualQty,
+        reason: reason
+      }).then(function(res) {
+        closeModal('adjustModal');
+        showToast(res.message);
+        loadInventory();
+      });
+    }
+
+    // Ledger Logic
+    function loadLedger() {
+      var sId = document.getElementById('storeFilter').value || getCurrentStoreId();
+      var changeType = document.getElementById('ledgerTypeFilter').value;
+      var q = sId ? ('store_id=' + sId) : '';
+      if (changeType) q += (q ? '&' : '') + 'change_type=' + changeType;
+
+      api('GET', '/inventory/transactions?' + q).then(function(records) {
+        var typeMap = {
+          'opening': '<span class="status status-completed">رصيد افتتاحي</span>',
+          'purchase': '<span class="status status-completed">مشتريات (وارد)</span>',
+          'sale': '<span class="status status-cancelled">مبيعات (صادر)</span>',
+          'sale_return': '<span class="status status-completed">مرتجع (وارد)</span>',
+          'transfer_out': '<span class="status status-pending">تحويل صادر</span>',
+          'transfer_in': '<span class="status status-completed">تحويل وارد</span>',
+          'adjustment': '<span class="status" style="background:#8b5cf620;color:#8b5cf6">تسوية جرد</span>'
+        };
+
+        var tbody = document.getElementById('ledgerTableBody');
+        if (records.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-secondary)">لا توجد حركات مسجلة</td></tr>';
+          return;
+        }
+
+        var html = '';
+        records.forEach(function(r) {
+          var qtyColor = r.quantity > 0 ? '#10b981' : '#ef4444';
+          var qtySign = r.quantity > 0 ? '+' : '';
+          var date = new Date(r.created_at);
+          var dateStr = date.toLocaleDateString('ar-YE') + ' ' + date.toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' });
+
+          html += `
+            <tr>
+              <td>#${r.id}</td>
+              <td><span class="store-badge ${r.store_id === 1 ? 's1' : 's2'}">${r.store_code}</span></td>
+              <td><strong>${r.product_name}</strong></td>
+              <td>${typeMap[r.change_type] || r.change_type}</td>
+              <td><strong style="color:${qtyColor}">${qtySign}${r.quantity}</strong></td>
+              <td><strong>${r.balance_after}</strong></td>
+              <td>${r.user_name || 'النظام'}</td>
+              <td style="font-size:12px;color:var(--text-secondary)">${r.notes || '—'}</td>
+              <td style="font-size:11px">${dateStr}</td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    // Alerts Logic
+    function loadAlerts() {
+      var sId = document.getElementById('storeFilter').value || getCurrentStoreId();
+      DataStore.getInventoryAlerts(sId).then(function(alerts) {
+        var tbody = document.getElementById('alertsTableBody');
+        if (alerts.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#10b981"><i class="fas fa-check-circle"></i> لا توجد أي نواقص، جميع الأصناف ضمن المستويات الآمنة</td></tr>';
+          return;
+        }
+
+        var html = '';
+        alerts.forEach(function(a) {
+          html += `
+            <tr>
+              <td><strong>${a.store_name}</strong></td>
+              <td><strong>${a.product_name}</strong></td>
+              <td><strong style="color:var(--danger)">${a.stock_quantity}</strong></td>
+              <td>${a.min_stock_alert}</td>
+              <td><span class="status status-cancelled">عجز بحاجة لإعادة طلب</span></td>
+              <td>
+                <a href="transfers.html" class="btn btn-outline btn-sm"><i class="fas fa-dolly"></i> طلب تحويل من فرع آخر</a>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    DataStore.init().then(function() {
+      initStoreFilter();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المبيعات والفواتير - لوحة التحكم</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') window.location.href = 'login.html';
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div>
+      <span class="sidebar-brand">نيوتك الطبية</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">م س</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">م. محمد السقاف</div>
+          <div class="sidebar-user-role">المدير العام</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">المبيعات وفواتير المحلات</h1>
+        <div class="breadcrumb">
+          <a href="index.html">الرئيسية</a>
+          <i class="fas fa-chevron-left" style="font-size:8px"></i>
+          <span>فواتير المبيعات</span>
+        </div>
+      </div>
+      <div class="topbar-left">
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
+        <div style="position:relative">
+          <button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div>
+            <div class="user-dropdown-divider"></div>
+            <div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <h2 style="font-size:18px;font-weight:700">سجل فواتير المبيعات ونقاط البيع</h2>
+          <p style="font-size:12px;color:var(--text-secondary)">فصل أرقام وسجلات المبيعات لكل محل مع تحديث المخزون الحقيقي وطباعة الفاتورة</p>
+        </div>
+        <button class="btn btn-primary" onclick="openNewInvoiceModal()"><i class="fas fa-plus"></i> إنشاء فاتورة بيع جديدة</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="flex-wrap:wrap;gap:12px">
+          <div style="display:flex;gap:10px;align-items:center">
+            <input type="text" class="form-control" id="invSearch" placeholder="بحث برقم الفاتورة أو العميل..." style="width:240px" oninput="loadInvoices()">
+            <select class="form-control" id="paymentTypeFilter" style="width:160px" onchange="loadInvoices()">
+              <option value="">جميع طرق الدفع</option>
+              <option value="cash">نقدي (Cash)</option>
+              <option value="credit">آجل (Credit)</option>
+            </select>
+            <select class="form-control" id="paymentStatusFilter" style="width:160px" onchange="loadInvoices()">
+              <option value="">جميع حالات السداد</option>
+              <option value="paid">مسدد بالكامل</option>
+              <option value="partial">مسدد جزئياً</option>
+              <option value="unpaid">غير مسدد (مديونية)</option>
+            </select>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="loadInvoices()"><i class="fas fa-sync"></i> تحديث</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>رقم الفاتورة</th>
+                <th>المحل المصدر</th>
+                <th>العميل</th>
+                <th>الأصناف المباعة</th>
+                <th>الإجمالي</th>
+                <th>المدفوع</th>
+                <th>المتبقي</th>
+                <th>طريقة الدفع</th>
+                <th>الحالة</th>
+                <th>التاريخ</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="invoicesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Create Invoice Modal (POS) -->
+  <div class="modal-overlay" id="newInvoiceModal">
+    <div class="modal" style="max-width:850px">
+      <div class="modal-header">
+        <span class="modal-title">إنشاء فاتورة بيع جديدة</span>
+        <button class="modal-close" onclick="closeModal('newInvoiceModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="form-group">
+            <label class="form-label">المحل المصدر *</label>
+            <select class="form-control" id="posStoreSelect" onchange="onPosStoreChange()"></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">اسم العميل *</label>
+            <input type="text" class="form-control" id="posCustomerName" placeholder="اسم العميل أو الجهة الطبية">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم هاتف العميل</label>
+            <input type="text" class="form-control" id="posCustomerPhone" placeholder="077...">
+          </div>
+        </div>
+
+        <!-- Line items table -->
+        <div style="margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <label class="form-label" style="margin:0">قائمة الأصناف والأسعار</label>
+            <button class="btn btn-outline btn-sm" onclick="addInvoiceItemRow()"><i class="fas fa-plus"></i> إضافة صنف</button>
+          </div>
+          <div class="table-wrapper" style="max-height:220px;overflow-y:auto">
+            <table style="font-size:13px">
+              <thead>
+                <tr>
+                  <th style="width:40%">المنتج</th>
+                  <th>الرصيد المتاح بالمحل</th>
+                  <th>سعر الوحدة (ر.ي)</th>
+                  <th>الكمية</th>
+                  <th>الإجمالي</th>
+                  <th style="width:40px"></th>
+                </tr>
+              </thead>
+              <tbody id="posItemsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:12px;background:var(--bg-hover);padding:14px;border-radius:8px;margin-bottom:16px">
+          <div>
+            <div style="font-size:11px;color:var(--text-secondary)">المجموع الفرعي</div>
+            <div style="font-size:16px;font-weight:700;color:var(--text-primary)" id="posSubtotalDisplay">0 ر.ي</div>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label" style="font-size:11px">الخصم (ر.ي)</label>
+            <input type="number" class="form-control form-control-sm" id="posDiscount" value="0" min="0" oninput="recalcInvoiceTotals()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label" style="font-size:11px">الضريبة (ر.ي)</label>
+            <input type="number" class="form-control form-control-sm" id="posTax" value="0" min="0" oninput="recalcInvoiceTotals()">
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--text-secondary)">المبلغ الإجمالي النهائي</div>
+            <div style="font-size:18px;font-weight:800;color:var(--primary)" id="posTotalDisplay">0 ر.ي</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">طريقة الدفع *</label>
+            <select class="form-control" id="posPaymentType" onchange="onPaymentTypeChange()">
+              <option value="cash">نقدي (Cash)</option>
+              <option value="credit">آجل (Credit / ذمم)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">المبلغ المدفوع حالياً (ر.ي)</label>
+            <input type="number" class="form-control" id="posPaidAmount" min="0" oninput="recalcInvoiceTotals()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">المتبقي (مديونية)</label>
+            <input type="text" class="form-control" id="posRemainingAmount" readonly style="font-weight:700;color:#ef4444;background:var(--bg-hover)">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">ملاحظات الفاتورة</label>
+          <input type="text" class="form-control" id="posNotes" placeholder="أي شروط أو تفاصيل إضافية">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitCreateInvoice()"><i class="fas fa-check"></i> اعتماد البيع وإصدار الفاتورة</button>
+        <button class="btn btn-outline" onclick="closeModal('newInvoiceModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print & View Invoice Modal -->
+  <div class="modal-overlay" id="printInvoiceModal">
+    <div class="modal" style="max-width:850px">
+      <div class="modal-header no-print">
+        <span class="modal-title">معاينة وطباعة الفاتورة</span>
+        <button class="modal-close" onclick="closeModal('printInvoiceModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="printableInvoice">
+        <div class="invoice-preview-card">
+          <div class="invoice-header-box">
+            <div>
+              <h2 style="font-size:22px;color:#1e3a8a;margin-bottom:4px" id="prStoreName">نيوتك الطبية</h2>
+              <div style="font-size:13px;color:#475569" id="prStoreAddress">العنوان</div>
+              <div style="font-size:13px;color:#475569">هاتف: <span id="prStorePhone"></span> · ضريبة: <span id="prStoreTax"></span></div>
+            </div>
+            <div style="text-align:left">
+              <h3 style="font-size:18px;color:#0f172a" id="prInvoiceNumber">INV-0000</h3>
+              <div style="font-size:12px;color:#64748b">التاريخ: <span id="prInvoiceDate"></span></div>
+              <div id="prPaymentBadge" style="margin-top:6px"></div>
+            </div>
+          </div>
+
+          <div class="invoice-meta-grid">
+            <div>
+              <span style="font-size:11px;color:#64748b">اسم العميل</span>
+              <div style="font-weight:700" id="prCustomerName">عميل نقدي</div>
+            </div>
+            <div>
+              <span style="font-size:11px;color:#64748b">هاتف العميل</span>
+              <div style="font-weight:700" id="prCustomerPhone">—</div>
+            </div>
+            <div>
+              <span style="font-size:11px;color:#64748b">المحل المصدر</span>
+              <div style="font-weight:700" id="prStoreCode">S1</div>
+            </div>
+          </div>
+
+          <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+            <thead>
+              <tr style="background:#f1f5f9;text-align:right">
+                <th style="padding:10px">#</th>
+                <th style="padding:10px">المنتج والوصف</th>
+                <th style="padding:10px">الكمية</th>
+                <th style="padding:10px">سعر الوحدة</th>
+                <th style="padding:10px">الإجمالي</th>
+              </tr>
+            </thead>
+            <tbody id="prItemsBody"></tbody>
+          </table>
+
+          <div class="invoice-summary-box">
+            <table class="invoice-summary-table">
+              <tr>
+                <td>المجموع الفرعي:</td>
+                <td style="text-align:left;font-weight:600" id="prSubtotal">0 ر.ي</td>
+              </tr>
+              <tr>
+                <td>الخصم:</td>
+                <td style="text-align:left;color:#ef4444" id="prDiscount">0 ر.ي</td>
+              </tr>
+              <tr style="font-size:16px;font-weight:800;background:#f8fafc">
+                <td>الإجمالي الصافي:</td>
+                <td style="text-align:left;color:#1e3a8a" id="prTotal">0 ر.ي</td>
+              </tr>
+              <tr>
+                <td>المبلغ المدفوع:</td>
+                <td style="text-align:left;color:#10b981;font-weight:700" id="prPaid">0 ر.ي</td>
+              </tr>
+              <tr>
+                <td>المتبقي (مديونية):</td>
+                <td style="text-align:left;color:#ef4444;font-weight:700" id="prRemaining">0 ر.ي</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="margin-top:30px;padding-top:15px;border-top:1px dashed #cbd5e1;font-size:11px;color:#64748b;text-align:center" id="prFooterTerms">
+            شكراً لتعاملكم معنا.
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer no-print">
+        <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> طباعة الفاتورة الآن</button>
+        <button class="btn btn-outline" onclick="closeModal('printInvoiceModal')">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    var currentStoreStock = [];
+
+    function loadInvoices() {
+      var sId = getCurrentStoreId();
+      var pType = document.getElementById('paymentTypeFilter').value;
+      var pStatus = document.getElementById('paymentStatusFilter').value;
+      var search = (document.getElementById('invSearch').value || '').toLowerCase();
+
+      DataStore.getInvoices(sId).then(function(invoices) {
+        if (pType) invoices = invoices.filter(function(i) { return i.payment_type === pType; });
+        if (pStatus) invoices = invoices.filter(function(i) { return i.payment_status === pStatus; });
+        if (search) {
+          invoices = invoices.filter(function(i) {
+            return (i.invoice_number && i.invoice_number.toLowerCase().includes(search)) ||
+                   (i.customer_name && i.customer_name.toLowerCase().includes(search));
+          });
+        }
+
+        var tbody = document.getElementById('invoicesTableBody');
+        if (invoices.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--text-secondary)">لا توجد فواتير مطابقة</td></tr>';
+          return;
+        }
+
+        var html = '';
+        invoices.forEach(function(inv) {
+          var date = new Date(inv.created_at);
+          var dateStr = date.toLocaleDateString('ar-YE');
+
+          var typeBadge = inv.payment_type === 'cash' 
+            ? '<span class="status status-completed">نقدي</span>' 
+            : '<span class="status" style="background:#8b5cf620;color:#8b5cf6">آجل</span>';
+
+          var payBadge = inv.payment_status === 'paid'
+            ? '<span class="status status-completed">مسدد</span>'
+            : inv.payment_status === 'partial'
+            ? '<span class="status status-pending">جزئي</span>'
+            : '<span class="status status-cancelled">غير مسدد</span>';
+
+          html += `
+            <tr>
+              <td><strong>${inv.invoice_number}</strong></td>
+              <td><span class="store-badge ${inv.store_id === 1 ? 's1' : 's2'}">${inv.store_code}</span></td>
+              <td><strong>${inv.customer_name}</strong><br><span style="font-size:11px;color:var(--text-secondary)">${inv.customer_phone || ''}</span></td>
+              <td style="font-size:12px;max-width:200px">${inv.products_summary || '—'}</td>
+              <td><strong>${(inv.total_amount || 0).toLocaleString()} ر.ي</strong></td>
+              <td style="color:#10b981">${(inv.paid_amount || 0).toLocaleString()}</td>
+              <td style="color:#ef4444;font-weight:700">${(inv.remaining_amount || 0).toLocaleString()}</td>
+              <td>${typeBadge}</td>
+              <td>${payBadge}</td>
+              <td style="font-size:11px">${dateStr}</td>
+              <td>
+                <button class="btn btn-outline btn-icon btn-sm" title="معاينة وطباعة الفاتورة" onclick="viewPrintInvoice(${inv.id})"><i class="fas fa-print"></i></button>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    window.onStoreChange = function() {
+      loadInvoices();
+    };
+
+    function openNewInvoiceModal() {
+      api('GET', '/stores').then(function(stores) {
+        var sSel = document.getElementById('posStoreSelect');
+        sSel.innerHTML = '';
+        var current = getCurrentStoreId() || '1';
+
+        stores.forEach(function(s) {
+          sSel.innerHTML += '<option value="' + s.id + '" ' + (String(s.id) === String(current) ? 'selected' : '') + '>' + s.name + ' (' + s.code + ')</option>';
+        });
+
+        document.getElementById('posItemsBody').innerHTML = '';
+        onPosStoreChange();
+        openModal('newInvoiceModal');
+      });
+    }
+
+    function onPosStoreChange() {
+      var sId = document.getElementById('posStoreSelect').value;
+      DataStore.getStoreInventory(sId).then(function(items) {
+        currentStoreStock = items;
+        document.getElementById('posItemsBody').innerHTML = '';
+        addInvoiceItemRow();
+      });
+    }
+
+    function addInvoiceItemRow() {
+      var tbody = document.getElementById('posItemsBody');
+      var rowId = 'inv-row-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+
+      var optionsHtml = currentStoreStock.map(function(item) {
+        return '<option value="' + item.product_id + '" data-avail="' + item.stock_quantity + '" data-price="' + (item.retail_price || 0) + '">' + item.product_name + ' (متاح: ' + item.stock_quantity + ')</option>';
+      }).join('');
+
+      var firstPrice = currentStoreStock.length > 0 ? (currentStoreStock[0].retail_price || 0) : 0;
+      var firstAvail = currentStoreStock.length > 0 ? currentStoreStock[0].stock_quantity : 0;
+
+      var tr = document.createElement('tr');
+      tr.id = rowId;
+      tr.innerHTML = `
+        <td>
+          <select class="form-control form-control-sm item-select" onchange="onPosItemChange(this, '${rowId}')">
+            ${optionsHtml}
+          </select>
+        </td>
+        <td class="avail-display" style="font-weight:700;color:var(--primary)">${firstAvail}</td>
+        <td>
+          <input type="number" class="form-control form-control-sm item-price" value="${firstPrice}" min="0" oninput="recalcInvoiceTotals()">
+        </td>
+        <td>
+          <input type="number" class="form-control form-control-sm item-qty" value="1" min="1" max="${firstAvail}" oninput="recalcInvoiceTotals()">
+        </td>
+        <td class="row-total" style="font-weight:700">${firstPrice.toLocaleString()} ر.ي</td>
+        <td>
+          <button class="btn btn-outline btn-icon btn-sm" style="color:var(--danger)" onclick="document.getElementById('${rowId}').remove(); recalcInvoiceTotals()"><i class="fas fa-trash"></i></button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+      recalcInvoiceTotals();
+    }
+
+    function onPosItemChange(sel, rowId) {
+      var opt = sel.options[sel.selectedIndex];
+      var avail = opt ? opt.getAttribute('data-avail') : 0;
+      var price = opt ? opt.getAttribute('data-price') : 0;
+      var row = document.getElementById(rowId);
+      if (row) {
+        row.querySelector('.avail-display').textContent = avail;
+        row.querySelector('.item-price').value = price;
+        row.querySelector('.item-qty').max = avail;
+        recalcInvoiceTotals();
+      }
+    }
+
+    function recalcInvoiceTotals() {
+      var rows = document.querySelectorAll('#posItemsBody tr');
+      var subtotal = 0;
+
+      rows.forEach(function(r) {
+        var price = parseFloat(r.querySelector('.item-price').value) || 0;
+        var qty = parseInt(r.querySelector('.item-qty').value) || 0;
+        var total = price * qty;
+        r.querySelector('.row-total').textContent = total.toLocaleString() + ' ر.ي';
+        subtotal += total;
+      });
+
+      var disc = parseFloat(document.getElementById('posDiscount').value) || 0;
+      var tax = parseFloat(document.getElementById('posTax').value) || 0;
+      var totalFinal = Math.max(0, subtotal - disc + tax);
+
+      document.getElementById('posSubtotalDisplay').textContent = subtotal.toLocaleString() + ' ر.ي';
+      document.getElementById('posTotalDisplay').textContent = totalFinal.toLocaleString() + ' ر.ي';
+
+      var pType = document.getElementById('posPaymentType').value;
+      var paidInput = document.getElementById('posPaidAmount');
+      if (pType === 'cash' && (!paidInput.value || parseFloat(paidInput.value) === 0)) {
+        paidInput.value = totalFinal;
+      }
+
+      var paid = parseFloat(paidInput.value) || 0;
+      var rem = Math.max(0, totalFinal - paid);
+      document.getElementById('posRemainingAmount').value = rem.toLocaleString() + ' ر.ي';
+    }
+
+    function onPaymentTypeChange() {
+      var pType = document.getElementById('posPaymentType').value;
+      var totalText = document.getElementById('posTotalDisplay').textContent.replace(/[^\d]/g, '');
+      var total = parseFloat(totalText) || 0;
+      var paidInput = document.getElementById('posPaidAmount');
+      paidInput.value = pType === 'cash' ? total : 0;
+      recalcInvoiceTotals();
+    }
+
+    function submitCreateInvoice() {
+      var sId = document.getElementById('posStoreSelect').value;
+      var cName = document.getElementById('posCustomerName').value.trim();
+      var cPhone = document.getElementById('posCustomerPhone').value.trim();
+      var pType = document.getElementById('posPaymentType').value;
+      var disc = parseFloat(document.getElementById('posDiscount').value) || 0;
+      var tax = parseFloat(document.getElementById('posTax').value) || 0;
+      var paid = parseFloat(document.getElementById('posPaidAmount').value) || 0;
+      var notes = document.getElementById('posNotes').value.trim();
+
+      if (!cName) {
+        showToast('يرجى إدخال اسم العميل', 'error');
+        return;
+      }
+
+      var rows = document.querySelectorAll('#posItemsBody tr');
+      if (rows.length === 0) {
+        showToast('يرجى إضافة صنف واحد على الأقل للفاتورة', 'error');
+        return;
+      }
+
+      var items = [];
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var pId = r.querySelector('.item-select').value;
+        var pPrice = parseFloat(r.querySelector('.item-price').value) || 0;
+        var pQty = parseInt(r.querySelector('.item-qty').value) || 0;
+        var avail = parseInt(r.querySelector('.avail-display').textContent) || 0;
+
+        if (pQty <= 0) {
+          showToast('يرجى تحديد كمية صحيحة للأصناف', 'error');
+          return;
+        }
+        if (pQty > avail) {
+          showToast('الكمية المطلوبة أكبر من الرصيد المتاح بالمحل', 'error');
+          return;
+        }
+        items.push({ product_id: pId, quantity: pQty, unit_price: pPrice });
+      }
+
+      DataStore.createInvoice({
+        store_id: sId,
+        customer_name: cName,
+        customer_phone: cPhone,
+        payment_type: pType,
+        discount: disc,
+        tax: tax,
+        paid_amount: paid,
+        items: items,
+        notes: notes
+      }).then(function(savedInvoice) {
+        closeModal('newInvoiceModal');
+        showToast('تم اعتماد البيع وإصدار الفاتورة رقم ' + savedInvoice.invoice_number);
+        loadInvoices();
+        viewPrintInvoice(savedInvoice.id);
+      });
+    }
+
+    function viewPrintInvoice(id) {
+      DataStore.getInvoice(id).then(function(inv) {
+        document.getElementById('prStoreName').textContent = inv.store_name;
+        document.getElementById('prStoreAddress').textContent = inv.store_address || 'صنعاء / عدن - اليمن';
+        document.getElementById('prStorePhone').textContent = inv.store_phone || '—';
+        document.getElementById('prStoreTax').textContent = inv.store_tax_number || '—';
+        document.getElementById('prInvoiceNumber').textContent = inv.invoice_number;
+        document.getElementById('prCustomerName').textContent = inv.customer_name;
+        document.getElementById('prCustomerPhone').textContent = inv.customer_phone || '—';
+        document.getElementById('prStoreCode').textContent = inv.store_code;
+
+        var d = new Date(inv.created_at);
+        document.getElementById('prInvoiceDate').textContent = d.toLocaleDateString('ar-YE') + ' ' + d.toLocaleTimeString('ar-YE', { hour: '2-digit', minute: '2-digit' });
+
+        document.getElementById('prSubtotal').textContent = (inv.subtotal || 0).toLocaleString() + ' ر.ي';
+        document.getElementById('prDiscount').textContent = (inv.discount || 0).toLocaleString() + ' ر.ي';
+        document.getElementById('prTotal').textContent = (inv.total_amount || 0).toLocaleString() + ' ر.ي';
+        document.getElementById('prPaid').textContent = (inv.paid_amount || 0).toLocaleString() + ' ر.ي';
+        document.getElementById('prRemaining').textContent = (inv.remaining_amount || 0).toLocaleString() + ' ر.ي';
+
+        document.getElementById('prFooterTerms').textContent = inv.store_invoice_footer || 'شكراً لتعاملكم مع نيوتك الطبية للاستيراد والتوزيع.';
+
+        var html = '';
+        (inv.items || []).forEach(function(itm, idx) {
+          html += `
+            <tr style="border-bottom:1px solid #e2e8f0">
+              <td style="padding:8px">${idx + 1}</td>
+              <td style="padding:8px"><strong>${itm.product_name}</strong></td>
+              <td style="padding:8px">${itm.quantity}</td>
+              <td style="padding:8px">${(itm.unit_price || 0).toLocaleString()} ر.ي</td>
+              <td style="padding:8px;font-weight:700">${(itm.total_price || 0).toLocaleString()} ر.ي</td>
+            </tr>
+          `;
+        });
+        document.getElementById('prItemsBody').innerHTML = html;
+
+        openModal('printInvoiceModal');
+      });
+    }
+
+    DataStore.init().then(function() {
+      loadInvoices();
+    });
+  </script>
+</body>
+</html>

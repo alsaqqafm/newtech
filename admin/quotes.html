@@ -1,0 +1,365 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>طلبات عروض الأسعار - لوحة التحكم</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/admin.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div><span class="sidebar-brand">نيوتك الطبية</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">الرئيسية</div>
+      <a class="nav-item" data-page="index.html"><i class="fas fa-th-large"></i><span>لوحة التحكم</span></a>
+      <div class="nav-section">الإدارة</div>
+      <a class="nav-item" data-page="products.html"><i class="fas fa-box"></i><span>المنتجات</span></a>
+      <a class="nav-item" data-page="orders.html"><i class="fas fa-shopping-cart"></i><span>الطلبات</span><span class="badge" id="ordersBadge">0</span></a>
+      <a class="nav-item" data-page="quotes.html"><i class="fas fa-file-invoice"></i><span>عروض الأسعار</span><span class="badge" id="quotesBadge">0</span></a>
+      <a class="nav-item" data-page="partners.html"><i class="fas fa-handshake"></i><span>الشركات</span></a>
+      <a class="nav-item" data-page="customers.html"><i class="fas fa-users"></i><span>العملاء</span></a>
+      <div class="nav-section">التقارير</div>
+      <a class="nav-item" data-page="reports.html"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+      <div class="nav-section">النظام</div>
+      <a class="nav-item" data-page="users.html"><i class="fas fa-user-shield"></i><span>المستخدمين</span></a>
+      <a class="nav-item" data-page="profile.html"><i class="fas fa-id-card"></i><span>الملف الشخصي</span></a>
+      <a class="nav-item" data-page="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">م أ</div><div class="sidebar-user-info"><div class="sidebar-user-name">محمد أحمد</div><div class="sidebar-user-role">مدير النظام</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">طلبات عروض الأسعار</h1>
+        <div class="breadcrumb"><a href="index.html">الرئيسية</a><i class="fas fa-chevron-left" style="font-size:8px"></i><span>عروض الأسعار</span></div>
+      </div>
+      <div class="topbar-left">
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="بحث..." id="tableSearch" oninput="filterTable('tableSearch','quotesTable')"></div>
+        <div style="position:relative">
+          <button class="icon-btn" id="notificationsBtn"><i class="fas fa-bell"></i><span class="badge-count" id="notifCount" style="display:none"></span></button>
+          <div class="notifications-dropdown" id="notificationsDropdown">
+            <div class="notifications-header"><h4>الإشعارات</h4><a href="#" style="font-size:12px;color:var(--primary)">تحديد الكل كمقروء</a></div>
+            <div id="notificationsList"></div>
+          </div>
+        </div>
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"><span class="star"></span><span class="star"></span><span class="star"></span></span></label>
+        <div style="position:relative"><button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button><div class="user-dropdown" id="userDropdown"><div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div><div class="user-dropdown-divider"></div><div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div></div></div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-file-invoice"></i></div><div class="stat-info"><div class="stat-label">إجمالي الطلبات</div><div class="stat-value" id="totalQuotes">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon yellow"><i class="fas fa-clock"></i></div><div class="stat-info"><div class="stat-label">جديد</div><div class="stat-value" id="newQuotes">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div class="stat-info"><div class="stat-label">تم الرد</div><div class="stat-value" id="repliedQuotes">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon red"><i class="fas fa-hourglass-half"></i></div><div class="stat-info"><div class="stat-label">قيد المراجعة</div><div class="stat-value" id="pendingQuotes">0</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline" onclick="exportCSV('quotesTable','quotes')"><i class="fas fa-download"></i> تصدير</button>
+          </div>
+          <div style="display:flex;gap:8px">
+            <select class="form-control" style="width:auto;padding:6px 32px 6px 12px" id="statusFilter" onchange="filterQuotes()">
+              <option value="">جميع الحالات</option>
+              <option value="new">جديد</option>
+              <option value="reviewing">قيد المراجعة</option>
+              <option value="replied">تم الرد</option>
+              <option value="completed">مكتمل</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          <table id="quotesTable">
+            <thead>
+              <tr>
+                <th><input type="checkbox" class="select-row" id="selectAll"></th>
+                <th>العميل</th>
+                <th>المنتج</th>
+                <th>الهاتف</th>
+                <th>التاريخ</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="quotesBody">
+              <!-- Quotes loaded dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div id="emptyState" style="display:none;text-align:center;padding:60px 20px">
+          <i class="fas fa-file-invoice" style="font-size:48px;color:var(--border-color);margin-bottom:16px"></i>
+          <p style="color:var(--text-secondary);font-size:14px">لا توجد طلبات عروض أسعار بعد</p>
+        </div>
+        <div id="quotesPagination" class="pagination"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- View Quote Modal -->
+  <div class="modal-overlay" id="viewQuoteModal">
+    <div class="modal" style="max-width:650px">
+      <div class="modal-header">
+        <span class="modal-title">تفاصيل طلب عرض السعر</span>
+        <button class="modal-close" onclick="closeModal('viewQuoteModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+          <div><span style="font-size:12px;color:var(--text-secondary)">العميل</span><div style="font-weight:600;margin-top:4px" id="detailName"></div></div>
+          <div><span style="font-size:12px;color:var(--text-secondary)">البريد الإلكتروني</span><div style="font-weight:600;margin-top:4px" id="detailEmail"></div></div>
+          <div><span style="font-size:12px;color:var(--text-secondary)">الهاتف</span><div style="font-weight:600;margin-top:4px" id="detailPhone"></div></div>
+          <div><span style="font-size:12px;color:var(--text-secondary)">التاريخ</span><div style="font-weight:600;margin-top:4px" id="detailDate"></div></div>
+        </div>
+        <div style="margin-bottom:20px">
+          <span style="font-size:12px;color:var(--text-secondary)">المنتج المطلوب</span>
+          <div style="font-weight:600;margin-top:4px;color:var(--primary);font-size:15px" id="detailProduct"></div>
+        </div>
+        <div style="margin-bottom:20px">
+          <span style="font-size:12px;color:var(--text-secondary)">رسالة العميل</span>
+          <div style="background:var(--bg-main);padding:12px;border-radius:8px;margin-top:8px;font-size:13px;line-height:1.6" id="detailMessage"></div>
+        </div>
+        <div>
+          <span style="font-size:12px;color:var(--text-secondary)">الحالة</span>
+          <select class="form-control" style="margin-top:6px" id="detailStatus">
+            <option value="new">جديد</option>
+            <option value="reviewing">قيد المراجعة</option>
+            <option value="replied">تم الرد</option>
+            <option value="completed">مكتمل</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="saveQuoteStatus()" data-perm-write="quotes"><i class="fas fa-save"></i> حفظ الحالة</button>
+        <button class="btn btn-success" onclick="openReplyModal()" data-perm-write="quotes"><i class="fas fa-reply"></i> رد على العميل</button>
+        <button class="btn btn-outline" onclick="closeModal('viewQuoteModal')">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reply Modal -->
+  <div class="modal-overlay" id="replyModal">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <span class="modal-title">رد على العميل</span>
+        <button class="modal-close" onclick="closeModal('replyModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="background:var(--bg-main);padding:12px;border-radius:8px;margin-bottom:16px">
+          <div style="font-size:12px;color:var(--text-secondary)">العميل</div>
+          <div style="font-weight:600" id="replyToName"></div>
+        </div>
+        <div class="form-group">
+          <label>عنوان الرد</label>
+          <input type="text" class="form-control" id="replySubject" value="عرض سعر - نيوتك الطبية">
+        </div>
+        <div class="form-group">
+          <label>نص الرد</label>
+          <textarea class="form-control" id="replyMessage" rows="6" placeholder="اكتب ردك على العميل هنا...
+
+مثال:
+مرحباً [اسم العميل]،
+
+شكراً لطلبك. سعر المنتج المطلوب هو [السعر] ريال يمني.
+
+يمكنك التواصل معنا على الرقم +967 772 000 577 لأي استفسارات.
+
+مع تحياتنا،
+فريق نيوتك الطبية"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-success" onclick="sendReply()"><i class="fas fa-paper-plane"></i> إرسال الرد</button>
+        <button class="btn btn-outline" onclick="closeModal('replyModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    var currentQuoteId = null;
+    var quotes = [];
+    var quotesPage = 1;
+    var PER_PAGE = 5;
+
+    function loadQuotes() {
+      quotes = DataStore.getQuotes();
+      updateStats();
+      renderQuotesTable();
+      updateBadge();
+    }
+
+    function updateStats() {
+      document.getElementById('totalQuotes').textContent = quotes.length;
+      document.getElementById('newQuotes').textContent = quotes.filter(function(q) { return q.status === 'new'; }).length;
+      document.getElementById('repliedQuotes').textContent = quotes.filter(function(q) { return q.status === 'replied' || q.status === 'completed'; }).length;
+      document.getElementById('pendingQuotes').textContent = quotes.filter(function(q) { return q.status === 'reviewing'; }).length;
+    }
+
+    function renderQuotesTable() {
+      var filter = document.getElementById('statusFilter').value;
+      var filtered = quotes.filter(function(q) {
+        return !filter || q.status === filter;
+      });
+
+      var emptyState = document.getElementById('emptyState');
+
+      if (filtered.length === 0) {
+        document.getElementById('quotesBody').innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+
+      var statusLabels = {
+        'new': '<span class="status status-pending">جديد</span>',
+        'reviewing': '<span class="status status-processing">قيد المراجعة</span>',
+        'replied': '<span class="status status-completed">تم الرد</span>',
+        'completed': '<span class="status status-active">مكتمل</span>'
+      };
+
+      var result = renderPaginatedTable(filtered, '#quotesBody', 'quotesPagination', quotesPage, PER_PAGE, function(q) {
+        var date = new Date(q.date);
+        var dateStr = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+        var initials = q.name.split(' ').map(function(w) { return w.charAt(0); }).join('');
+        var isNew = q.status === 'new';
+        return '<tr data-id="quote-' + q.id + '" class="' + (q.active === 0 ? 'row-inactive' : '') + '">' +
+          '<td><input type="checkbox" class="select-row"></td>' +
+          '<td><div style="display:flex;align-items:center;gap:8px">' +
+            '<div style="width:32px;height:32px;border-radius:50%;background:' + (isNew ? 'rgba(2,132,199,0.1)' : 'var(--bg-main)') + ';display:flex;align-items:center;justify-content:center;color:' + (isNew ? 'var(--primary)' : 'var(--text-secondary)') + ';font-size:12px;font-weight:600">' + initials + '</div>' +
+            '<div><div style="font-weight:500">' + q.name + (isNew ? ' <span style="color:var(--danger);font-size:10px">●</span>' : '') + '</div><div style="font-size:11px;color:var(--text-secondary)">' + q.email + '</div></div>' +
+          '</div></td>' +
+          '<td><span style="font-weight:500;color:var(--primary)">' + (q.product || 'غير محدد') + '</span></td>' +
+          '<td>' + q.phone + '</td>' +
+          '<td>' + dateStr + '</td>' +
+          '<td>' + (statusLabels[q.status] || statusLabels['new']) + '</td>' +
+          '<td><div class="action-btns">' +
+            '<button class="btn btn-outline btn-icon btn-sm" title="عرض" onclick="viewQuote(' + q.id + ')"><i class="fas fa-eye"></i></button>' +
+            (canWrite('quotes') ? '<button class="btn btn-outline btn-icon btn-sm" title="إيقاف تنشيط" onclick="toggleQuote(' + q.id + ')"><i class="fas fa-ban"></i></button>' : '') +
+          '</div></td>' +
+        '</tr>';
+      });
+      quotesPage = result.currentPage;
+    }
+
+    function updateBadge() {
+      if (window.loadNotifications) window.loadNotifications();
+    }
+
+    function getTimeAgo(date) {
+      var seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'الآن';
+      var minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return 'منذ ' + minutes + ' دقيقة';
+      var hours = Math.floor(minutes / 60);
+      if (hours < 24) return 'منذ ' + hours + ' ساعة';
+      var days = Math.floor(hours / 24);
+      return 'منذ ' + days + ' يوم';
+    }
+
+    function viewQuote(id) {
+      currentQuoteId = id;
+      var quote = quotes.find(function(q) { return q.id === id; });
+      if (!quote) return;
+
+      document.getElementById('detailName').textContent = quote.name;
+      document.getElementById('detailEmail').textContent = quote.email;
+      document.getElementById('detailPhone').textContent = quote.phone;
+      document.getElementById('detailProduct').textContent = quote.product || 'غير محدد';
+      document.getElementById('detailMessage').textContent = quote.message || 'لا توجد رسالة';
+      document.getElementById('detailStatus').value = quote.status;
+
+      var date = new Date(quote.date);
+      document.getElementById('detailDate').textContent = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + ' ' + date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+
+      openModal('viewQuoteModal');
+    }
+
+    function saveQuoteStatus() {
+      if (!currentQuoteId) return;
+      var status = document.getElementById('detailStatus').value;
+      DataStore.updateQuote(currentQuoteId, { status: status });
+      loadQuotes();
+      showToast('تم تحديث الحالة بنجاح');
+      closeModal('viewQuoteModal');
+      if (window.loadNotifications) window.loadNotifications();
+    }
+
+    function openReplyModal() {
+      var quote = quotes.find(function(q) { return q.id === currentQuoteId; });
+      if (!quote) return;
+
+      document.getElementById('replyToName').textContent = quote.name + ' - ' + quote.email;
+      closeModal('viewQuoteModal');
+      openModal('replyModal');
+    }
+
+    function sendReply() {
+      var message = document.getElementById('replyMessage').value.trim();
+      if (!message) {
+        alert('يرجى كتابة نص الرد');
+        return;
+      }
+
+      var quote = quotes.find(function(q) { return q.id === currentQuoteId; });
+      if (quote) {
+        DataStore.updateQuote(currentQuoteId, {
+          status: 'replied',
+          response: message,
+          responseDate: new Date().toISOString()
+        });
+      }
+
+      loadQuotes();
+      showToast('تم إرسال الرد بنجاح');
+      closeModal('replyModal');
+      document.getElementById('replyMessage').value = '';
+      if (window.loadNotifications) window.loadNotifications();
+    }
+
+    function toggleQuote(id) {
+      var quote = quotes.find(function(q) { return q.id === id; });
+      if (!quote) return;
+      var isActive = quote.active !== 0;
+      if (!confirm('هل أنت متأكد من ' + (isActive ? 'إيقاف تنشيط' : 'تفعيل') + ' طلب "' + quote.name + '"؟')) return;
+      DataStore.toggleQuote(id).then(function() {
+        loadQuotes();
+        showToast(isActive ? 'تم إيقاف تنشيط الطلب' : 'تم تفعيل الطلب');
+        if (window.loadNotifications) window.loadNotifications();
+      });
+    }
+
+    function filterQuotes() {
+      renderQuotesTable();
+    }
+
+    // Request notification permission (handled globally by loadNotifications)
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    // Initialize
+    DataStore.init().then(function() {
+      loadQuotes();
+      applyPermissions('quotes');
+      if (window.loadNotifications) window.loadNotifications();
+      if (window.handleHighlight) window.handleHighlight();
+    }).catch(function(err) { console.warn('DataStore.init error:', err); });
+
+    // Auto refresh every 30 seconds
+    setInterval(function() { DataStore.init().then(loadQuotes).catch(function(err) { console.warn('DataStore.init error:', err); }); }, 30000);
+  </script>
+</body>
+</html>

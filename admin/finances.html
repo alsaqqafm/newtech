@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المالية والمصروفات والديون - لوحة التحكم</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') window.location.href = 'login.html';
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div>
+      <span class="sidebar-brand">نيوتك الطبية</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">م س</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">م. محمد السقاف</div>
+          <div class="sidebar-user-role">المدير العام</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">المالية والمصروفات والديون</h1>
+        <div class="breadcrumb">
+          <a href="index.html">الرئيسية</a>
+          <i class="fas fa-chevron-left" style="font-size:8px"></i>
+          <span>المالية والمصروفات</span>
+        </div>
+      </div>
+      <div class="topbar-left">
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
+        <div style="position:relative">
+          <button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div>
+            <div class="user-dropdown-divider"></div>
+            <div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="tabs-header">
+        <button class="tab-btn active" id="tabBtnExpenses" onclick="switchFinTab('expenses')"><i class="fas fa-receipt"></i> المصروفات التشغيلية</button>
+        <button class="tab-btn" id="tabBtnPurchases" onclick="switchFinTab('purchases')"><i class="fas fa-truck-loading"></i> فواتير المشتريات والتوريد</button>
+        <button class="tab-btn" id="tabBtnDebts" onclick="switchFinTab('debts')"><i class="fas fa-hand-holding-usd"></i> مديونيات العملاء والتحصيل</button>
+      </div>
+
+      <!-- Tab 1: Expenses -->
+      <div id="tabContentExpenses">
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <h3 style="font-size:16px;font-weight:700">سجل المصروفات التشغيلية</h3>
+            <p style="font-size:12px;color:var(--text-secondary)">الإيجارات، الرواتب، فواتير الكهرباء، النقل، والصيانة لكل محل لحساب صافي الأرباح</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddExpenseModal()"><i class="fas fa-plus"></i> تسجيل مصروف جديد</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>المعرف</th>
+                  <th>المحل</th>
+                  <th>البند / التصنيف</th>
+                  <th>المبلغ</th>
+                  <th>البيان والتفاصيل</th>
+                  <th>التاريخ</th>
+                  <th>المسؤول</th>
+                </tr>
+              </thead>
+              <tbody id="expensesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Purchases -->
+      <div id="tabContentPurchases" style="display:none">
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <h3 style="font-size:16px;font-weight:700">فواتير الشراء وتوريد الأصناف</h3>
+            <p style="font-size:12px;color:var(--text-secondary)">تسجيل تكلفة شراء البضاعة من الموردين وإضافتها لمخزون المحل تلقائياً</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddPurchaseModal()"><i class="fas fa-plus"></i> فاتورة شراء جديدة</button>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم فاتورة الشراء</th>
+                  <th>المحل المورد إليه</th>
+                  <th>اسم المورد</th>
+                  <th>إجمالي الفاتورة</th>
+                  <th>حالة التوريد</th>
+                  <th>التاريخ</th>
+                  <th>المسؤول</th>
+                </tr>
+              </thead>
+              <tbody id="purchasesTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Customer Debts -->
+      <div id="tabContentDebts" style="display:none">
+        <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div>
+            <h3 style="font-size:16px;font-weight:700">فواتير البيع الآجل ومستحقات العملاء</h3>
+            <p style="font-size:12px;color:var(--text-secondary)">متابعة الأرصدة المتبقية وسداد دفعات المديونية وتوثيق سندات القبض</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم الفاتورة</th>
+                  <th>المحل</th>
+                  <th>العميل</th>
+                  <th>رقم الهاتف</th>
+                  <th>إجمالي الفاتورة</th>
+                  <th>المسدد</th>
+                  <th>المتبقي (المديونية)</th>
+                  <th>تاريخ الفاتورة</th>
+                  <th>إجراء سداد</th>
+                </tr>
+              </thead>
+              <tbody id="debtsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Expense Modal -->
+  <div class="modal-overlay" id="addExpenseModal">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <span class="modal-title">تسجيل مصروف جديد</span>
+        <button class="modal-close" onclick="closeModal('addExpenseModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">المحل *</label>
+          <select class="form-control" id="expStoreSelect"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">بند المصروف *</label>
+          <select class="form-control" id="expCategory">
+            <option value="إيجار">إيجار مقر / مستودع</option>
+            <option value="كهرباء وإنترنت">كهرباء وطاقة وإنترنت</option>
+            <option value="رواتب">رواتب ومكافآت موظفين</option>
+            <option value="شحن ونقل">شحن ونقل وتوصيل</option>
+            <option value="صيانة">صيانة وأدوات تشغيل</option>
+            <option value="دعاية وتسويق">دعاية وتسويق</option>
+            <option value="أخرى">مصروفات نثرية أخرى</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">المبلغ (ر.ي) *</label>
+          <input type="number" class="form-control" id="expAmount" min="1" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">التاريخ *</label>
+          <input type="date" class="form-control" id="expDate">
+        </div>
+        <div class="form-group">
+          <label class="form-label">البيان والشرح *</label>
+          <textarea class="form-control" id="expDesc" rows="2" placeholder="وصف وتفاصيل المصروف"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitAddExpense()"><i class="fas fa-check"></i> حفظ المصروف</button>
+        <button class="btn btn-outline" onclick="closeModal('addExpenseModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pay Debt Modal -->
+  <div class="modal-overlay" id="payDebtModal">
+    <div class="modal" style="max-width:500px">
+      <div class="modal-header">
+        <span class="modal-title">تسجيل سداد دفعة من المديونية</span>
+        <button class="modal-close" onclick="closeModal('payDebtModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="payInvoiceId">
+        <div style="background:var(--bg-hover);padding:14px;border-radius:8px;margin-bottom:16px" id="payDebtInfo"></div>
+        <div class="form-group">
+          <label class="form-label">مبلغ السداد المدفوع الآن (ر.ي) *</label>
+          <input type="number" class="form-control" id="payDebtAmount" min="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">طريقة السداد</label>
+          <select class="form-control" id="payDebtMethod">
+            <option value="cash">نقدي (كاش)</option>
+            <option value="bank">حوالة بنكية / شيك</option>
+            <option value="transfer">كريمي / صرافة</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ملاحظات وسند القبض</label>
+          <input type="text" class="form-control" id="payDebtNotes" placeholder="رقم السند أو الإيصال">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitPayDebt()"><i class="fas fa-check"></i> تسجيل السداد</button>
+        <button class="btn btn-outline" onclick="closeModal('payDebtModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    function switchFinTab(tab) {
+      document.getElementById('tabContentExpenses').style.display = tab === 'expenses' ? 'block' : 'none';
+      document.getElementById('tabContentPurchases').style.display = tab === 'purchases' ? 'block' : 'none';
+      document.getElementById('tabContentDebts').style.display = tab === 'debts' ? 'block' : 'none';
+
+      document.getElementById('tabBtnExpenses').classList.toggle('active', tab === 'expenses');
+      document.getElementById('tabBtnPurchases').classList.toggle('active', tab === 'purchases');
+      document.getElementById('tabBtnDebts').classList.toggle('active', tab === 'debts');
+
+      if (tab === 'expenses') loadExpenses();
+      if (tab === 'purchases') loadPurchases();
+      if (tab === 'debts') loadDebts();
+    }
+
+    function loadExpenses() {
+      var sId = getCurrentStoreId();
+      DataStore.getExpenses(sId).then(function(expenses) {
+        var tbody = document.getElementById('expensesTableBody');
+        if (expenses.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-secondary)">لا توجد مصروفات مسجلة</td></tr>';
+          return;
+        }
+
+        var html = '';
+        expenses.forEach(function(e) {
+          html += `
+            <tr>
+              <td>#${e.id}</td>
+              <td><span class="store-badge ${e.store_id === 1 ? 's1' : 's2'}">${e.store_code}</span></td>
+              <td><strong>${e.category}</strong></td>
+              <td><strong style="color:#ef4444">${(e.amount || 0).toLocaleString()} ر.ي</strong></td>
+              <td>${e.description}</td>
+              <td style="font-size:12px">${e.date}</td>
+              <td>${e.created_by_name || 'النظام'}</td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function loadPurchases() {
+      var sId = getCurrentStoreId();
+      DataStore.getPurchases(sId).then(function(purchases) {
+        var tbody = document.getElementById('purchasesTableBody');
+        if (purchases.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-secondary)">لا توجد فواتير شراء مسجلة</td></tr>';
+          return;
+        }
+
+        var html = '';
+        purchases.forEach(function(p) {
+          var date = new Date(p.created_at);
+          html += `
+            <tr>
+              <td><strong>${p.purchase_number}</strong></td>
+              <td><span class="store-badge ${p.store_id === 1 ? 's1' : 's2'}">${p.store_code}</span></td>
+              <td><strong>${p.supplier_name}</strong></td>
+              <td><strong>${(p.total_amount || 0).toLocaleString()} ر.ي</strong></td>
+              <td><span class="status status-completed">تم التوريد للمخزن</span></td>
+              <td style="font-size:12px">${date.toLocaleDateString('ar-YE')}</td>
+              <td>${p.created_by_name || 'النظام'}</td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function loadDebts() {
+      var sId = getCurrentStoreId();
+      DataStore.getDebts(sId).then(function(debts) {
+        var tbody = document.getElementById('debtsTableBody');
+        if (debts.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:#10b981"><i class="fas fa-check-circle"></i> لا توجد أي مديونيات معلقة، جميع الفواتير مسددة بالكامل</td></tr>';
+          return;
+        }
+
+        var html = '';
+        debts.forEach(function(d) {
+          var date = new Date(d.invoice_date);
+          html += `
+            <tr>
+              <td><strong>${d.invoice_number}</strong></td>
+              <td><span class="store-badge ${d.store_id === 1 ? 's1' : 's2'}">${d.store_name}</span></td>
+              <td><strong>${d.customer_name}</strong></td>
+              <td>${d.customer_phone || '—'}</td>
+              <td>${(d.total_amount || 0).toLocaleString()} ر.ي</td>
+              <td style="color:#10b981">${(d.paid_amount || 0).toLocaleString()}</td>
+              <td><strong style="color:#ef4444;font-size:14px">${(d.remaining_amount || 0).toLocaleString()} ر.ي</strong></td>
+              <td style="font-size:11px">${date.toLocaleDateString('ar-YE')}</td>
+              <td>
+                <button class="btn btn-primary btn-sm" onclick="openPayDebtModal(${d.invoice_id}, '${d.invoice_number}', '${d.customer_name}', ${d.remaining_amount})"><i class="fas fa-coins"></i> سداد دفعة</button>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      });
+    }
+
+    function openAddExpenseModal() {
+      api('GET', '/stores').then(function(stores) {
+        var sel = document.getElementById('expStoreSelect');
+        sel.innerHTML = '';
+        var current = getCurrentStoreId() || '1';
+        stores.forEach(function(s) {
+          sel.innerHTML += '<option value="' + s.id + '" ' + (String(s.id) === String(current) ? 'selected' : '') + '>' + s.name + '</option>';
+        });
+        document.getElementById('expDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('expAmount').value = '';
+        document.getElementById('expDesc').value = '';
+        openModal('addExpenseModal');
+      });
+    }
+
+    function submitAddExpense() {
+      var sId = document.getElementById('expStoreSelect').value;
+      var cat = document.getElementById('expCategory').value;
+      var amt = parseFloat(document.getElementById('expAmount').value);
+      var date = document.getElementById('expDate').value;
+      var desc = document.getElementById('expDesc').value.trim();
+
+      if (!amt || amt <= 0 || !desc) {
+        showToast('يرجى ملء المبلغ والبيان', 'error');
+        return;
+      }
+
+      DataStore.addExpense({
+        store_id: sId,
+        category: cat,
+        amount: amt,
+        date: date,
+        description: desc
+      }).then(function() {
+        closeModal('addExpenseModal');
+        showToast('تم تسجيل المصروف بنجاح');
+        loadExpenses();
+      });
+    }
+
+    function openPayDebtModal(invId, invNum, custName, remaining) {
+      document.getElementById('payInvoiceId').value = invId;
+      document.getElementById('payDebtInfo').innerHTML = `
+        فاتورة: <strong>${invNum}</strong> | العميل: <strong>${custName}</strong><br>
+        المبلغ المتبقي الحالي: <strong style="color:#ef4444">${remaining.toLocaleString()} ر.ي</strong>
+      `;
+      document.getElementById('payDebtAmount').value = remaining;
+      document.getElementById('payDebtAmount').max = remaining;
+      openModal('payDebtModal');
+    }
+
+    function submitPayDebt() {
+      var invId = document.getElementById('payInvoiceId').value;
+      var amt = parseFloat(document.getElementById('payDebtAmount').value);
+      var method = document.getElementById('payDebtMethod').value;
+      var notes = document.getElementById('payDebtNotes').value.trim();
+
+      if (!amt || amt <= 0) {
+        showToast('يرجى تحديد مبلغ سداد صحيح', 'error');
+        return;
+      }
+
+      DataStore.payDebt({
+        invoice_id: invId,
+        amount: amt,
+        payment_method: method,
+        notes: notes
+      }).then(function(res) {
+        closeModal('payDebtModal');
+        showToast(res.message);
+        loadDebts();
+      });
+    }
+
+    window.onStoreChange = function() {
+      loadExpenses();
+      loadDebts();
+    };
+
+    DataStore.init().then(function() {
+      loadExpenses();
+    });
+  </script>
+</body>
+</html>

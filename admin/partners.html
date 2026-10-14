@@ -1,0 +1,256 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الشركات - لوحة التحكم</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div><span class="sidebar-brand">نيوتك الطبية</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">الرئيسية</div>
+      <a class="nav-item" data-page="index.html"><i class="fas fa-th-large"></i><span>لوحة التحكم</span></a>
+      <div class="nav-section">الإدارة</div>
+      <a class="nav-item" data-page="products.html"><i class="fas fa-box"></i><span>المنتجات</span></a>
+      <a class="nav-item" data-page="orders.html"><i class="fas fa-shopping-cart"></i><span>الطلبات</span><span class="badge" id="ordersBadge">0</span></a>
+      <a class="nav-item" data-page="quotes.html"><i class="fas fa-file-invoice"></i><span>عروض الأسعار</span><span class="badge" id="quotesBadge">0</span></a>
+      <a class="nav-item active" data-page="partners.html"><i class="fas fa-handshake"></i><span>الشركات</span></a>
+      <a class="nav-item" data-page="customers.html"><i class="fas fa-users"></i><span>العملاء</span></a>
+      <div class="nav-section">التقارير</div>
+      <a class="nav-item" data-page="reports.html"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+      <div class="nav-section">النظام</div>
+      <a class="nav-item" data-page="users.html"><i class="fas fa-user-shield"></i><span>المستخدمين</span></a>
+      <a class="nav-item" data-page="profile.html"><i class="fas fa-id-card"></i><span>الملف الشخصي</span></a>
+      <a class="nav-item" data-page="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">م أ</div><div class="sidebar-user-info"><div class="sidebar-user-name">محمد أحمد</div><div class="sidebar-user-role">مدير النظام</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">الشركات الموردة</h1>
+        <div class="breadcrumb"><a href="index.html">الرئيسية</a><i class="fas fa-chevron-left" style="font-size:8px"></i><span>الشركات</span></div>
+      </div>
+      <div class="topbar-left">
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" placeholder="بحث..." id="tableSearch" oninput="filterTable('tableSearch','partnersTable')"></div>
+        <div style="position:relative"><button class="icon-btn" id="notificationsBtn"><i class="fas fa-bell"></i><span class="badge-count" id="notifCount" style="display:none"></span></button><div class="notifications-dropdown" id="notificationsDropdown"><div class="notifications-header"><h4>الإشعارات</h4><a href="#" class="mark-all-read" onclick="markAllRead();return false" style="font-size:12px;color:var(--primary)">تحديد الكل كمقروء</a></div><div id="notificationsList"></div></div></div>
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"><span class="star"></span><span class="star"></span><span class="star"></span></span></label>
+        <div style="position:relative"><button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button><div class="user-dropdown" id="userDropdown"><div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div><div class="user-dropdown-divider"></div><div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div></div></div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-handshake"></i></div><div class="stat-info"><div class="stat-label">إجمالي الشركات</div><div class="stat-value" id="totalPartners">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div class="stat-info"><div class="stat-label">نشطون</div><div class="stat-value" id="activePartners">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon yellow"><i class="fas fa-globe"></i></div><div class="stat-info"><div class="stat-label">دول مختلفة</div><div class="stat-value" id="countriesCount">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon red"><i class="fas fa-handshake-slash"></i></div><div class="stat-info"><div class="stat-label">غير نشط</div><div class="stat-value" id="inactivePartners">0</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <button class="btn btn-primary" onclick="openModal('addPartnerModal')" data-perm-write="partners"><i class="fas fa-plus"></i> إضافة شركة</button>
+          <button class="btn btn-outline" onclick="exportCSV('partnersTable','partners')"><i class="fas fa-download"></i> تصدير</button>
+        </div>
+        <div class="table-wrapper">
+          <table id="partnersTable">
+            <thead><tr><th><input type="checkbox" class="select-row" id="selectAll"></th><th>الشركة</th><th>الدولة</th><th>التخصص</th><th style="min-width:250px">وصف مختصر</th><th>الهاتف</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+            <tbody id="partnersBody"></tbody>
+          </table>
+        </div>
+        <div id="partnersPagination" class="pagination"></div>
+        <div id="emptyState" style="display:none;text-align:center;padding:60px 20px">
+          <i class="fas fa-handshake" style="font-size:48px;color:var(--border-color);margin-bottom:16px"></i>
+          <p style="color:var(--text-secondary);font-size:14px">لا توجد شركات بعد</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Partner Modal -->
+  <div class="modal-overlay" id="addPartnerModal">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">إضافة شركة جديدة</span><button class="modal-close" onclick="closeModal('addPartnerModal')"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>اسم الشركة *</label><input type="text" class="form-control" id="addPartnerName" placeholder="أدخل اسم الشركة"></div>
+        <div class="form-row"><div class="form-group"><label>الدولة</label><select class="form-control" id="addPartnerCountry"><option>الولايات المتحدة</option><option>ألمانيا</option><option>اليابان</option><option>هولندا</option><option>الصين</option><option>كوريا الجنوبية</option><option>اليمن</option></select></div><div class="form-group"><label>التخصص *</label><input type="text" class="form-control" id="addPartnerSpecialty" placeholder="مثال: أجهزة طبية"></div></div>
+        <div class="form-group"><label>وصف مختصر عن الشركة</label><textarea class="form-control" id="addPartnerDescription" placeholder="اكتب نبذة مختصرة عن الشركة..."></textarea></div>
+        <div class="form-row"><div class="form-group"><label>الهاتف</label><input type="text" class="form-control" id="addPartnerPhone" placeholder="+1-800-000-0000"></div><div class="form-group"><label>البريد الإلكتروني</label><input type="email" class="form-control" id="addPartnerEmail" placeholder="email@company.com"></div></div>
+        <div class="form-group"><label>العنوان</label><input type="text" class="form-control" id="addPartnerAddress" placeholder="العنوان الكامل"></div>
+        <div class="form-group"><label>ملاحظات داخلية</label><textarea class="form-control" id="addPartnerNotes" placeholder="أي ملاحظات إضافية..."></textarea></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-primary" onclick="addPartner()"><i class="fas fa-save"></i> حفظ</button><button class="btn btn-outline" onclick="closeModal('addPartnerModal')">إلغاء</button></div>
+    </div>
+  </div>
+
+  <!-- Edit Partner Modal -->
+  <div class="modal-overlay" id="editPartnerModal">
+    <div class="modal">
+      <div class="modal-header"><span class="modal-title">تعديل الشركة</span><button class="modal-close" onclick="closeModal('editPartnerModal')"><i class="fas fa-times"></i></button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>اسم الشركة *</label><input type="text" class="form-control" id="editPartnerName"></div>
+        <div class="form-row"><div class="form-group"><label>الدولة</label><select class="form-control" id="editPartnerCountry"><option>الولايات المتحدة</option><option>ألمانيا</option><option>اليابان</option><option>هولندا</option><option>الصين</option><option>كوريا الجنوبية</option><option>اليمن</option></select></div><div class="form-group"><label>التخصص *</label><input type="text" class="form-control" id="editPartnerSpecialty"></div></div>
+        <div class="form-group"><label>وصف مختصر عن الشركة</label><textarea class="form-control" id="editPartnerDescription"></textarea></div>
+        <div class="form-row"><div class="form-group"><label>الهاتف</label><input type="text" class="form-control" id="editPartnerPhone"></div><div class="form-group"><label>البريد الإلكتروني</label><input type="email" class="form-control" id="editPartnerEmail"></div></div>
+        <div class="form-group"><label>العنوان</label><input type="text" class="form-control" id="editPartnerAddress"></div>
+        <div class="form-group"><label>الحالة</label><select class="form-control" id="editPartnerStatus"><option value="active">نشط</option><option value="inactive">غير نشط</option></select></div>
+      </div>
+      <div class="modal-footer"><button class="btn btn-primary" onclick="savePartner()"><i class="fas fa-save"></i> حفظ التعديلات</button><button class="btn btn-outline" onclick="closeModal('editPartnerModal')">إلغاء</button></div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    var currentEditId = null;
+
+    var partnersPage = 1;
+    var PER_PAGE = 5;
+
+    function loadPartners() {
+      var partners = DataStore.getPartners();
+      updateStats(partners);
+      renderTable(partners);
+    }
+
+    function updateStats(partners) {
+      document.getElementById('totalPartners').textContent = partners.length;
+      document.getElementById('activePartners').textContent = partners.filter(function(p) { return p.status === 'active'; }).length;
+      document.getElementById('inactivePartners').textContent = partners.filter(function(p) { return p.status === 'inactive'; }).length;
+      var countries = {};
+      partners.forEach(function(p) { countries[p.country] = true; });
+      document.getElementById('countriesCount').textContent = Object.keys(countries).length;
+    }
+
+    function renderTable(partners) {
+      var emptyState = document.getElementById('emptyState');
+      if (partners.length === 0) {
+        document.getElementById('partnersBody').innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      var statusMap = { 'active': '<span class="status status-active">نشط</span>', 'inactive': '<span class="status status-inactive">غير نشط</span>' };
+      var countryColors = { 'الولايات المتحدة': 'var(--primary)', 'ألمانيا': 'var(--warning)', 'اليابان': 'var(--danger)', 'هولندا': 'var(--success)', 'الصين': 'var(--primary)', 'كوريا الجنوبية': 'var(--info)', 'اليمن': 'var(--primary)' };
+
+      var result = renderPaginatedTable(partners, '#partnersBody', 'partnersPagination', partnersPage, PER_PAGE, function(p) {
+        var color = countryColors[p.country] || 'var(--primary)';
+        var desc = p.description || p.notes || '';
+        if (desc.length > 80) desc = desc.substring(0, 80) + '...';
+        return '<tr class="' + (p.status === 'inactive' ? 'row-inactive' : '') + '">' +
+          '<td><input type="checkbox" class="select-row"></td>' +
+          '<td><strong>' + p.name + '</strong></td>' +
+          '<td><i class="fas fa-flag" style="color:' + color + ';margin-left:4px"></i>' + p.country + '</td>' +
+          '<td>' + (p.specialty || '') + '</td>' +
+          '<td style="font-size:12px;color:var(--text-secondary);max-width:250px" title="' + (p.description || p.notes || '') + '">' + desc + '</td>' +
+          '<td>' + (p.phone || '-') + '</td>' +
+          '<td>' + (statusMap[p.status] || statusMap['inactive']) + '</td>' +
+          '<td><div class="action-btns">' +
+          (canWrite('partners') ? '<button class="btn btn-outline btn-icon btn-sm" title="تعديل" onclick="editPartner(' + p.id + ')"><i class="fas fa-edit"></i></button>' : '') +
+           (canWrite('partners') ? '<button class="btn btn-outline btn-icon btn-sm" title="إيقاف تنشيط" onclick="togglePartner(' + p.id + ')"><i class="fas fa-ban"></i></button>' : '') +
+          '</div></td>' +
+        '</tr>';
+      });
+      partnersPage = result.currentPage;
+    }
+
+    function addPartner() {
+      var name = document.getElementById('addPartnerName').value.trim();
+      var specialty = document.getElementById('addPartnerSpecialty').value.trim();
+      var country = document.getElementById('addPartnerCountry').value;
+      var description = document.getElementById('addPartnerDescription').value.trim();
+      var phone = document.getElementById('addPartnerPhone').value.trim();
+      var email = document.getElementById('addPartnerEmail').value.trim();
+      var address = document.getElementById('addPartnerAddress').value.trim();
+      var notes = document.getElementById('addPartnerNotes').value.trim();
+
+      if (!name || !specialty) {
+        alert('يرجى ملء الحقول المطلوبة (الاسم، التخصص)');
+        return;
+      }
+
+      DataStore.addPartner({ name: name, country: country, specialty: specialty, description: description, phone: phone, email: email, address: address, notes: notes, status: 'active' });
+      closeModal('addPartnerModal');
+      loadPartners();
+      showToast('تمت إضافة الشركة بنجاح');
+      document.getElementById('addPartnerName').value = '';
+      document.getElementById('addPartnerSpecialty').value = '';
+      document.getElementById('addPartnerDescription').value = '';
+      document.getElementById('addPartnerPhone').value = '';
+      document.getElementById('addPartnerEmail').value = '';
+      document.getElementById('addPartnerAddress').value = '';
+      document.getElementById('addPartnerNotes').value = '';
+    }
+
+    function editPartner(id) {
+      var p = DataStore.getPartner ? DataStore.getPartner(id) : DataStore.getPartners().find(function(x) { return x.id === id; });
+      if (!p) {
+        var partners = DataStore.getPartners();
+        p = partners.find(function(x) { return x.id === id; });
+      }
+      if (!p) return;
+      currentEditId = id;
+      document.getElementById('editPartnerName').value = p.name;
+      document.getElementById('editPartnerCountry').value = p.country || 'الولايات المتحدة';
+      document.getElementById('editPartnerSpecialty').value = p.specialty || '';
+      document.getElementById('editPartnerDescription').value = p.description || '';
+      document.getElementById('editPartnerPhone').value = p.phone || '';
+      document.getElementById('editPartnerEmail').value = p.email || '';
+      document.getElementById('editPartnerAddress').value = p.address || '';
+      document.getElementById('editPartnerStatus').value = p.status;
+      openModal('editPartnerModal');
+    }
+
+    function savePartner() {
+      if (!currentEditId) return;
+      var name = document.getElementById('editPartnerName').value.trim();
+      var specialty = document.getElementById('editPartnerSpecialty').value.trim();
+      var country = document.getElementById('editPartnerCountry').value;
+      var description = document.getElementById('editPartnerDescription').value.trim();
+      var phone = document.getElementById('editPartnerPhone').value.trim();
+      var email = document.getElementById('editPartnerEmail').value.trim();
+      var address = document.getElementById('editPartnerAddress').value.trim();
+      var status = document.getElementById('editPartnerStatus').value;
+
+      if (!name || !specialty) {
+        alert('يرجى ملء الحقول المطلوبة');
+        return;
+      }
+
+      DataStore.updatePartner(currentEditId, { name: name, country: country, specialty: specialty, description: description, phone: phone, email: email, address: address, status: status });
+      closeModal('editPartnerModal');
+      loadPartners();
+      showToast('تم تحديث الشركة بنجاح');
+    }
+
+    function togglePartner(id) {
+      var partners = DataStore.getPartners();
+      var p = partners.find(function(x) { return x.id === id; });
+      if (!p) return;
+      var isActive = p.status === 'active';
+      if (!confirm('هل أنت متأكد من ' + (isActive ? 'إيقاف تنشيط' : 'تفعيل') + ' "' + p.name + '"؟')) return;
+      DataStore.togglePartner(id).then(function() {
+        loadPartners();
+        showToast(isActive ? 'تم إيقاف تنشيط الشركة' : 'تم تفعيل الشركة');
+      });
+    }
+
+    DataStore.init().then(function() {
+      loadPartners();
+      applyPermissions('partners');
+      if (window.loadNotifications) window.loadNotifications();
+    }).catch(function(err) { console.warn('DataStore.init error:', err); });
+  </script>
+</body>
+</html>

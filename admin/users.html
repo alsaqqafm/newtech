@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المستخدمين والصلاحيات - لوحة التحكم</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') window.location.href = 'login.html';
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div><span class="sidebar-brand">نيوتك الطبية</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">م س</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">م. محمد السقاف</div>
+          <div class="sidebar-user-role">المدير العام</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">إدارة المستخدمين والصلاحيات</h1>
+        <div class="breadcrumb"><a href="index.html">الرئيسية</a><i class="fas fa-chevron-left" style="font-size:8px"></i><span>المستخدمين</span></div>
+      </div>
+      <div class="topbar-left">
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
+        <div style="position:relative"><button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button><div class="user-dropdown" id="userDropdown"><div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div><div class="user-dropdown-divider"></div><div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div></div></div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="stats-grid" style="margin-bottom:20px">
+        <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-user-shield"></i></div><div class="stat-info"><div class="stat-label">إجمالي المستخدمين</div><div class="stat-value" id="totalUsers">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon green"><i class="fas fa-user-check"></i></div><div class="stat-info"><div class="stat-label">نشطون</div><div class="stat-value" id="activeUsers">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon yellow"><i class="fas fa-store"></i></div><div class="stat-info"><div class="stat-label">مدراء وموظفو المحلات</div><div class="stat-value" id="storeStaffCount">0</div></div></div>
+        <div class="stat-card"><div class="stat-icon red"><i class="fas fa-user-times"></i></div><div class="stat-info"><div class="stat-label">غير نشط</div><div class="stat-value" id="bannedUsers">0</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <button class="btn btn-primary" onclick="openAddUserModal()"><i class="fas fa-plus"></i> إضافة مستخدم جديد</button>
+          <div style="font-size:12px;color:var(--text-secondary)">يتم فرض الصلاحيات وفصل المحلات على مستوى الخادم وقاعدة البيانات</div>
+        </div>
+        <div class="table-wrapper">
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>المستخدم</th>
+                <th>البريد الإلكتروني</th>
+                <th>الدور / الصلاحية</th>
+                <th>المحل المخصص</th>
+                <th>آخر دخول</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add User Modal -->
+  <div class="modal-overlay" id="addUserModal">
+    <div class="modal" style="max-width:550px">
+      <div class="modal-header">
+        <span class="modal-title">إضافة مستخدم جديد</span>
+        <button class="modal-close" onclick="closeModal('addUserModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">الاسم الكامل *</label>
+            <input type="text" class="form-control" id="addUserName" placeholder="مثال: أحمد المحمدي">
+          </div>
+          <div class="form-group">
+            <label class="form-label">البريد الإلكتروني *</label>
+            <input type="email" class="form-control" id="addUserEmail" placeholder="user@newtechmed.com">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">كلمة المرور *</label>
+            <input type="password" class="form-control" id="addUserPassword" placeholder="كلمة المرور">
+          </div>
+          <div class="form-group">
+            <label class="form-label">تأكيد كلمة المرور *</label>
+            <input type="password" class="form-control" id="addUserPasswordConfirm" placeholder="تأكيد كلمة المرور">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">الدور الوظيفي والصلاحية *</label>
+            <select class="form-control" id="addUserRole" onchange="onRoleChange('add')">
+              <option value="admin">المدير العام (إشراف كامل على المحلين)</option>
+              <option value="store_manager">مدير محل (إدارة المحل المحدد)</option>
+              <option value="cashier">موظف مبيعات / كاشير</option>
+              <option value="inventory">مسؤول المخزون العام والتحويلات</option>
+              <option value="accountant">المحاسب المالي والتقارير</option>
+              <option value="editor">محرر أصناف ودليل المنتجات</option>
+            </select>
+          </div>
+          <div class="form-group" id="addStoreGroup">
+            <label class="form-label">المحل المخصص للمستخدم</label>
+            <select class="form-control" id="addUserStore"></select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitAddUser()"><i class="fas fa-save"></i> حفظ المستخدم</button>
+        <button class="btn btn-outline" onclick="closeModal('addUserModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal-overlay" id="editUserModal">
+    <div class="modal" style="max-width:550px">
+      <div class="modal-header">
+        <span class="modal-title">تعديل بيانات وصلاحيات المستخدم</span>
+        <button class="modal-close" onclick="closeModal('editUserModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editUserId">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">الاسم الكامل *</label>
+            <input type="text" class="form-control" id="editUserName">
+          </div>
+          <div class="form-group">
+            <label class="form-label">البريد الإلكتروني *</label>
+            <input type="email" class="form-control" id="editUserEmail">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">كلمة المرور الجديدة (اتركها فارغة للاحتفاظ بالحالية)</label>
+          <input type="password" class="form-control" id="editUserPassword" placeholder="كلمة المرور الجديدة إن رغبت بتغييرها">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">الدور الوظيفي *</label>
+            <select class="form-control" id="editUserRole" onchange="onRoleChange('edit')">
+              <option value="admin">المدير العام</option>
+              <option value="store_manager">مدير محل</option>
+              <option value="cashier">موظف مبيعات / كاشير</option>
+              <option value="inventory">مسؤول المخزون</option>
+              <option value="accountant">المحاسب المالي</option>
+              <option value="editor">محرر أصناف</option>
+            </select>
+          </div>
+          <div class="form-group" id="editStoreGroup">
+            <label class="form-label">المحل المخصص</label>
+            <select class="form-control" id="editUserStore"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الحالة</label>
+          <select class="form-control" id="editUserStatus">
+            <option value="active">نشط ومفعل</option>
+            <option value="inactive">معطل / موقف</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitEditUser()"><i class="fas fa-save"></i> حفظ التعديلات</button>
+        <button class="btn btn-outline" onclick="closeModal('editUserModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    var allStores = [];
+    var usersList = [];
+
+    var roleLabels = {
+      'admin': 'المدير العام',
+      'store_manager': 'مدير محل',
+      'cashier': 'موظف مبيعات',
+      'inventory': 'مسؤول المخزون',
+      'accountant': 'المحاسب المالي',
+      'editor': 'محرر أصناف'
+    };
+
+    function loadUsersData() {
+      api('GET', '/stores').then(function(stores) {
+        allStores = stores;
+        populateStoreDropdowns();
+      });
+
+      api('GET', '/users').then(function(users) {
+        usersList = users;
+        renderUsersTable(users);
+
+        document.getElementById('totalUsers').textContent = users.length;
+        document.getElementById('activeUsers').textContent = users.filter(function(u) { return u.status === 'active'; }).length;
+        document.getElementById('storeStaffCount').textContent = users.filter(function(u) { return u.store_id; }).length;
+        document.getElementById('bannedUsers').textContent = users.filter(function(u) { return u.status !== 'active'; }).length;
+      });
+    }
+
+    function populateStoreDropdowns() {
+      var addSel = document.getElementById('addUserStore');
+      var editSel = document.getElementById('editUserStore');
+      var opts = '<option value="">🏢 غير محدد (صلاحية عامة لجميع المحلات)</option>';
+      allStores.forEach(function(s) {
+        opts += '<option value="' + s.id + '">🏪 ' + s.name + ' (' + s.code + ')</option>';
+      });
+      addSel.innerHTML = opts;
+      editSel.innerHTML = opts;
+    }
+
+    function onRoleChange(type) {
+      var role = document.getElementById(type === 'add' ? 'addUserRole' : 'editUserRole').value;
+      var storeGroup = document.getElementById(type === 'add' ? 'addStoreGroup' : 'editStoreGroup');
+      if (role === 'admin') {
+        storeGroup.style.opacity = '0.5';
+      } else {
+        storeGroup.style.opacity = '1';
+      }
+    }
+
+    function renderUsersTable(users) {
+      var tbody = document.getElementById('usersBody');
+      var html = '';
+
+      users.forEach(function(u) {
+        var storeBadge = u.store_id 
+          ? '<span class="store-badge ' + (u.store_id === 1 ? 's1' : 's2') + '">' + (u.store_name || ('محل #' + u.store_id)) + '</span>'
+          : '<span style="font-size:11px;color:var(--text-secondary)">جميع المحلات (عام)</span>';
+
+        var statusBadge = u.status === 'active' 
+          ? '<span class="status status-completed">نشط</span>' 
+          : '<span class="status status-cancelled">معطل</span>';
+
+        html += `
+          <tr>
+            <td>
+              <strong>${u.name}</strong>
+            </td>
+            <td><code>${u.email}</code></td>
+            <td><span class="status status-processing">${roleLabels[u.role] || u.role}</span></td>
+            <td>${storeBadge}</td>
+            <td style="font-size:11px">${u.last_login || 'لم يسجل دخول بعد'}</td>
+            <td>${statusBadge}</td>
+            <td>
+              <div class="action-btns">
+                <button class="btn btn-outline btn-icon btn-sm" title="تعديل" onclick="openEditUserModal(${u.id})"><i class="fas fa-edit"></i></button>
+                <button class="btn btn-outline btn-icon btn-sm" title="تعطيل / تفعيل" onclick="toggleUser(${u.id})"><i class="fas fa-power-off"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = html;
+    }
+
+    function openAddUserModal() {
+      document.getElementById('addUserName').value = '';
+      document.getElementById('addUserEmail').value = '';
+      document.getElementById('addUserPassword').value = '';
+      document.getElementById('addUserPasswordConfirm').value = '';
+      openModal('addUserModal');
+    }
+
+    function submitAddUser() {
+      var name = document.getElementById('addUserName').value.trim();
+      var email = document.getElementById('addUserEmail').value.trim();
+      var password = document.getElementById('addUserPassword').value;
+      var passwordConfirm = document.getElementById('addUserPasswordConfirm').value;
+      var role = document.getElementById('addUserRole').value;
+      var storeId = document.getElementById('addUserStore').value || null;
+
+      if (!name || !email || !password) {
+        showToast('يرجى ملء جميع الحقول المطلوبة', 'error');
+        return;
+      }
+      if (password !== passwordConfirm) {
+        showToast('كلمتا المرور غير متطابقتين', 'error');
+        return;
+      }
+      if (password.length < 6) {
+        showToast('كلمة المرور يجب أن تكون 6 خانات على الأقل', 'error');
+        return;
+      }
+
+      api('POST', '/users', {
+        name: name,
+        email: email,
+        password: password,
+        role: role,
+        store_id: storeId
+      }).then(function() {
+        closeModal('addUserModal');
+        showToast('تمت إضافة المستخدم بنجاح');
+        loadUsersData();
+      });
+    }
+
+    function openEditUserModal(id) {
+      var u = usersList.find(function(x) { return x.id === id; });
+      if (!u) return;
+
+      document.getElementById('editUserId').value = u.id;
+      document.getElementById('editUserName').value = u.name;
+      document.getElementById('editUserEmail').value = u.email;
+      document.getElementById('editUserRole').value = u.role;
+      document.getElementById('editUserStore').value = u.store_id || '';
+      document.getElementById('editUserStatus').value = u.status || 'active';
+      document.getElementById('editUserPassword').value = '';
+
+      openModal('editUserModal');
+    }
+
+    function submitEditUser() {
+      var id = document.getElementById('editUserId').value;
+      var name = document.getElementById('editUserName').value.trim();
+      var email = document.getElementById('editUserEmail').value.trim();
+      var role = document.getElementById('editUserRole').value;
+      var storeId = document.getElementById('editUserStore').value || null;
+      var status = document.getElementById('editUserStatus').value;
+      var password = document.getElementById('editUserPassword').value;
+
+      var data = { name: name, email: email, role: role, store_id: storeId, status: status };
+      if (password) data.password = password;
+
+      api('PUT', '/users/' + id, data).then(function() {
+        closeModal('editUserModal');
+        showToast('تم حفظ تعديلات المستخدم');
+        loadUsersData();
+      });
+    }
+
+    function toggleUser(id) {
+      api('PATCH', '/users/' + id + '/toggle').then(function(res) {
+        showToast(res.message);
+        loadUsersData();
+      });
+    }
+
+    DataStore.init().then(function() {
+      loadUsersData();
+    });
+  </script>
+</body>
+</html>

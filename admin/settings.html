@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الإعدادات - لوحة التحكم</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div><span class="sidebar-brand">نيوتك الطبية</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">الرئيسية</div>
+      <a class="nav-item" data-page="index.html"><i class="fas fa-th-large"></i><span>لوحة التحكم</span></a>
+      <div class="nav-section">الإدارة</div>
+      <a class="nav-item" data-page="products.html"><i class="fas fa-box"></i><span>المنتجات</span></a>
+      <a class="nav-item" data-page="orders.html"><i class="fas fa-shopping-cart"></i><span>الطلبات</span><span class="badge" id="ordersBadge">0</span></a>
+      <a class="nav-item" data-page="quotes.html"><i class="fas fa-file-invoice"></i><span>عروض الأسعار</span><span class="badge" id="quotesBadge">0</span></a>
+      <a class="nav-item" data-page="partners.html"><i class="fas fa-handshake"></i><span>الشركات</span></a>
+      <a class="nav-item" data-page="customers.html"><i class="fas fa-users"></i><span>العملاء</span></a>
+      <div class="nav-section">التقارير</div>
+      <a class="nav-item" data-page="reports.html"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+      <div class="nav-section">النظام</div>
+      <a class="nav-item" data-page="users.html"><i class="fas fa-user-shield"></i><span>المستخدمين</span></a>
+      <a class="nav-item" data-page="profile.html"><i class="fas fa-id-card"></i><span>الملف الشخصي</span></a>
+      <a class="nav-item active" data-page="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">م أ</div><div class="sidebar-user-info"><div class="sidebar-user-name">محمد أحمد</div><div class="sidebar-user-role">مدير النظام</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">الإعدادات</h1>
+        <div class="breadcrumb"><a href="index.html">الرئيسية</a><i class="fas fa-chevron-left" style="font-size:8px"></i><span>الإعدادات</span></div>
+      </div>
+      <div class="topbar-left">
+        <div style="position:relative"><button class="icon-btn" id="notificationsBtn"><i class="fas fa-bell"></i><span class="badge-count" id="notifCount" style="display:none"></span></button><div class="notifications-dropdown" id="notificationsDropdown"><div class="notifications-header"><h4>الإشعارات</h4><a href="#" class="mark-all-read" onclick="markAllRead();return false" style="font-size:12px;color:var(--primary)">تحديد الكل كمقروء</a></div><div id="notificationsList"></div></div></div>
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"><span class="star"></span><span class="star"></span><span class="star"></span></span></label>
+        <div style="position:relative"><button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button><div class="user-dropdown" id="userDropdown"><div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div><div class="user-dropdown-divider"></div><div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div></div></div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(this,'general')">عام</button>
+        <button class="tab-btn" onclick="switchTab(this,'profile')">الملف الشخصي</button>
+        <button class="tab-btn" onclick="switchTab(this,'security')">الأمان</button>
+        <button class="tab-btn" onclick="switchTab(this,'notifications')">الإشعارات</button>
+      </div>
+
+      <div id="tab-general">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><span class="card-title">إعدادات الموقع</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label>اسم الموقع</label><input type="text" class="form-control" value="نيوتك الطبية"></div>
+              <div class="form-group"><label>البريد الإلكتروني للموقع</label><input type="email" class="form-control" value="info@newtechmed.com"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>رقم الهاتف</label><input type="text" class="form-control" value="+967 772 000 577"></div>
+              <div class="form-group"><label>واتساب</label><input type="text" class="form-control" value="967711559753"></div>
+            </div>
+            <div class="form-group"><label>العنوان</label><input type="text" class="form-control" value="صنعاء، اليمن"></div>
+            <div class="form-group"><label>وصف الموقع</label><textarea class="form-control">شركة نيوتك الطبية - الوكيل الحصري لأجهزة Medline الطبية في اليمن</textarea></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><span class="card-title">إعدادات العرض</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group">
+                <label>اللغة</label>
+                <select class="form-control"><option selected>العربية</option><option>English</option></select>
+              </div>
+              <div class="form-group">
+                <label>المنطقة الزمنية</label>
+                <select class="form-control"><option selected>Asia/Aden (GMT+3)</option><option>Asia/Riyadh (GMT+3)</option></select>
+              </div>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color)">
+              <div><div style="font-weight:500">الوضع الليلي</div><div style="font-size:12px;color:var(--text-secondary)">تفعيل المظهر الداكن للموقع</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color)">
+              <div><div style="font-weight:500">عرض المنتجات</div><div style="font-size:12px;color:var(--text-secondary)">عدد المنتجات في كل صفحة</div></div>
+              <select class="form-control" style="width:100px;padding:6px 32px 6px 12px"><option>6</option><option selected>12</option><option>24</option><option>48</option></select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span class="card-title">النسخ الاحتياطي</span></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+              <div><div style="font-weight:500">آخر نسخة احتياطية</div><div style="font-size:12px;color:var(--text-secondary)" id="lastBackupTime">جاري التحميل...</div></div>
+              <button class="btn btn-primary" onclick="exportBackup()"><i class="fas fa-download"></i> إنشاء نسخة احتياطية</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-weight:500">النسخ التلقائي</div><div style="font-size:12px;color:var(--text-secondary)">يتم كل يوم الساعة 1:00 ص</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div id="dbStats" style="margin-top:16px;padding:12px;background:var(--bg-main);border-radius:8px;display:none">
+              <div style="font-weight:500;margin-bottom:8px">إحصائيات قاعدة البيانات</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;font-size:12px;color:var(--text-secondary)">
+                <div>المنتجات: <span id="dbProducts">0</span></div>
+                <div>الطلبات: <span id="dbOrders">0</span></div>
+                <div>العملاء: <span id="dbCustomers">0</span></div>
+                <div>الشركات: <span id="dbPartners">0</span></div>
+                <div>عروض الأسعار: <span id="dbQuotes">0</span></div>
+                <div>المستخدمين: <span id="dbUsers">0</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-profile" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="card-title">الملف الشخصي</span></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+              <div style="width:80px;height:80px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:700">م أ</div>
+              <div><button class="btn btn-outline btn-sm"><i class="fas fa-camera"></i> تغيير الصورة</button><div style="font-size:11px;color:var(--text-secondary);margin-top:4px">JPG, PNG بحد أقصى 2MB</div></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>الاسم الأول</label><input type="text" class="form-control" value="محمد"></div>
+              <div class="form-group"><label>اسم العائلة</label><input type="text" class="form-control" value="أحمد"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>البريد الإلكتروني</label><input type="email" class="form-control" value="admin@newtechmed.com"></div>
+              <div class="form-group"><label>رقم الهاتف</label><input type="text" class="form-control" value="0771234567"></div>
+            </div>
+            <div class="form-group"><label>الدور</label><input type="text" class="form-control" value="مدير النظام" disabled style="background:var(--bg-main)"></div>
+            <button class="btn btn-primary" onclick="showToast('تم حفظ التعديلات بنجاح')"><i class="fas fa-save"></i> حفظ التعديلات</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-security" style="display:none">
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header"><span class="card-title">تغيير كلمة المرور</span></div>
+          <div class="card-body">
+            <div class="form-group"><label>كلمة المرور الحالية</label><input type="password" class="form-control" placeholder="أدخل كلمة المرور الحالية"></div>
+            <div class="form-row">
+              <div class="form-group"><label>كلمة المرور الجديدة</label><input type="password" class="form-control" placeholder="كلمة المرور الجديدة"></div>
+              <div class="form-group"><label>تأكيد كلمة المرور</label><input type="password" class="form-control" placeholder="أعد إدخال كلمة المرور"></div>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('تم تغيير كلمة المرور بنجاح')"><i class="fas fa-lock"></i> تحديث كلمة المرور</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">جلسات الدخول</span></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color)">
+              <div style="display:flex;align-items:center;gap:12px"><i class="fas fa-desktop" style="font-size:20px;color:var(--primary)"></i><div><div style="font-weight:500">Chrome - Windows</div><div style="font-size:12px;color:var(--text-secondary)">صنعاء، اليمن - الآن (الجلسة الحالية)</div></div></div>
+              <span class="status status-active">نشطة</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color)">
+              <div style="display:flex;align-items:center;gap:12px"><i class="fas fa-mobile-alt" style="font-size:20px;color:var(--success)"></i><div><div style="font-weight:500">Safari - iPhone</div><div style="font-size:12px;color:var(--text-secondary)">عدن، اليمن - منذ يومين</div></div></div>
+              <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger)">إنهاء</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-notifications" style="display:none">
+        <div class="card">
+          <div class="card-header"><span class="card-title">تفضيلات الإشعارات</span></div>
+          <div class="card-body">
+            <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color)">
+              <div><div style="font-weight:500">إشعارات الطلبات الجديدة</div><div style="font-size:12px;color:var(--text-secondary)">استلام إشعار عند كل طلب جديد</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color)">
+              <div><div style="font-weight:500">تنبيهات المخزون</div><div style="font-size:12px;color:var(--text-secondary)">تنبيه عند انخفاض المخزون</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color)">
+              <div><div style="font-weight:500">تقارير المبيعات</div><div style="font-size:12px;color:var(--text-secondary)">إشعار يومي بتقرير المبيعات</div></div>
+              <label class="toggle"><input type="checkbox"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border-color)">
+              <div><div style="font-weight:500">إشعارات البريد الإلكتروني</div><div style="font-size:12px;color:var(--text-secondary)">إرسال ملخص أسبوعي على البريد</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="form-group" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0">
+              <div><div style="font-weight:500">تنبيهات الأمان</div><div style="font-size:12px;color:var(--text-secondary)">إشعار عند تسجيل دخول من جهاز جديد</div></div>
+              <label class="toggle"><input type="checkbox" checked><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="showToast('تم حفظ جميع الإعدادات بنجاح')"><i class="fas fa-save"></i> حفظ جميع الإعدادات</button>
+        <button class="btn btn-outline" onclick="showToast('تم التراجع عن التغييرات','error')"><i class="fas fa-undo"></i> تراجع</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/admin.js"></script>
+  <script>
+    function switchTab(btn, tabId) {
+      document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.querySelectorAll('[id^="tab-"]').forEach(function(tab) { tab.style.display = 'none'; });
+      document.getElementById('tab-' + tabId).style.display = 'block';
+    }
+
+    function exportBackup() {
+      var data = {};
+      if (window.DataStore) {
+        data = {
+          products: DataStore.getProducts(),
+          orders: DataStore.getOrders(),
+          customers: DataStore.getCustomers(),
+          partners: DataStore.getPartners(),
+          quotes: DataStore.getQuotes(),
+          users: DataStore.getUsers(),
+          exportDate: new Date().toISOString(),
+          version: '1.0'
+        };
+      }
+      var json = JSON.stringify(data, null, 2);
+      var blob = new Blob([json], { type: 'application/json' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'newtech-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+      link.click();
+      showToast('تم إنشاء النسخة الاحتياطية بنجاح');
+    }
+
+    DataStore.init().then(function() {
+      var stats = DataStore.getStats();
+      document.getElementById('lastBackupTime').textContent = new Date().toLocaleString('ar-EG');
+      document.getElementById('dbProducts').textContent = stats.totalProducts;
+      document.getElementById('dbOrders').textContent = stats.totalOrders;
+      document.getElementById('dbCustomers').textContent = stats.totalCustomers;
+      document.getElementById('dbPartners').textContent = DataStore.getPartners().length;
+      document.getElementById('dbQuotes').textContent = stats.totalQuotes;
+      document.getElementById('dbUsers').textContent = DataStore.getUsers().length;
+      document.getElementById('dbStats').style.display = 'block';
+      applyPermissions('settings');
+    }).catch(function(err) { console.warn('DataStore.init error:', err); });
+  </script>
+</body>
+</html>

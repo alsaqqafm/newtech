@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة المحلات والفروع - لوحة التحكم</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') window.location.href = 'login.html';
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div>
+      <span class="sidebar-brand">نيوتك الطبية</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">م س</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">م. محمد السقاف</div>
+          <div class="sidebar-user-role">المدير العام</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">إدارة المحلات والفروع</h1>
+        <div class="breadcrumb">
+          <a href="index.html">الرئيسية</a>
+          <i class="fas fa-chevron-left" style="font-size:8px"></i>
+          <span>المحلات والفروع</span>
+        </div>
+      </div>
+      <div class="topbar-left">
+        <label class="toggle" title="الوضع الليلي">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="toggle-slider"></span>
+        </label>
+        <div style="position:relative">
+          <button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div>
+            <div class="user-dropdown-divider"></div>
+            <div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="page-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div>
+          <h2 style="font-size:18px;font-weight:700">المحلات المعتمدة في النظام</h2>
+          <p style="font-size:12px;color:var(--text-secondary)">إدارة بيانات المحل الأول والمحل الثاني وإضافة محلات وفروع جديدة</p>
+        </div>
+        <button class="btn btn-primary" onclick="openAddStoreModal()"><i class="fas fa-plus"></i> إضافة محل جديد</button>
+      </div>
+
+      <!-- Stores Overview Cards Grid -->
+      <div id="storesCardsContainer" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));gap:20px;margin-bottom:30px">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Stores Details Table -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">قائمة المحلات وإعدادات الفواتير</span>
+        </div>
+        <div class="table-wrapper">
+          <table id="storesTable">
+            <thead>
+              <tr>
+                <th>المعرف</th>
+                <th>اسم المحل</th>
+                <th>رمز المحل</th>
+                <th>رقم الهاتف</th>
+                <th>الرقم الضريبي</th>
+                <th>بادئة الفاتورة</th>
+                <th>الحالة</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="storesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Store Modal -->
+  <div class="modal-overlay" id="addStoreModal">
+    <div class="modal" style="max-width:550px">
+      <div class="modal-header">
+        <span class="modal-title">إضافة محل / فرع جديد</span>
+        <button class="modal-close" onclick="closeModal('addStoreModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">اسم المحل / الفرع *</label>
+          <input type="text" class="form-control" id="storeName" placeholder="مثال: المحل الثالث - فرع المكلا">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">رمز المحل (Code) *</label>
+            <input type="text" class="form-control" id="storeCode" placeholder="مثال: S3">
+          </div>
+          <div class="form-group">
+            <label class="form-label">بادئة الفاتورة</label>
+            <input type="text" class="form-control" id="storePrefix" placeholder="مثال: INV-S3">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">رقم الهاتف</label>
+            <input type="text" class="form-control" id="storePhone" placeholder="+967 ...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الرقم الضريبي</label>
+            <input type="text" class="form-control" id="storeTax" placeholder="TX-...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">العنوان بالتفصيل</label>
+          <input type="text" class="form-control" id="storeAddress" placeholder="المدينة، الشارع، المعلم">
+        </div>
+        <div class="form-group">
+          <label class="form-label">نص تذييل الفاتورة</label>
+          <textarea class="form-control" id="storeFooter" rows="2" placeholder="شروط الضمان أو الاسترجاع المطبوعة أسفل الفاتورة"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitAddStore()"><i class="fas fa-check"></i> حفظ المحل</button>
+        <button class="btn btn-outline" onclick="closeModal('addStoreModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Store Modal -->
+  <div class="modal-overlay" id="editStoreModal">
+    <div class="modal" style="max-width:550px">
+      <div class="modal-header">
+        <span class="modal-title">تعديل بيانات المحل</span>
+        <button class="modal-close" onclick="closeModal('editStoreModal')"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editStoreId">
+        <div class="form-group">
+          <label class="form-label">اسم المحل *</label>
+          <input type="text" class="form-control" id="editStoreName">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-group">
+            <label class="form-label">بادئة الفاتورة</label>
+            <input type="text" class="form-control" id="editStorePrefix">
+          </div>
+          <div class="form-group">
+            <label class="form-label">رقم الهاتف</label>
+            <input type="text" class="form-control" id="editStorePhone">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الرقم الضريبي</label>
+          <input type="text" class="form-control" id="editStoreTax">
+        </div>
+        <div class="form-group">
+          <label class="form-label">العنوان</label>
+          <input type="text" class="form-control" id="editStoreAddress">
+        </div>
+        <div class="form-group">
+          <label class="form-label">نص تذييل الفاتورة</label>
+          <textarea class="form-control" id="editStoreFooter" rows="2"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="submitEditStore()"><i class="fas fa-save"></i> حفظ التعديلات</button>
+        <button class="btn btn-outline" onclick="closeModal('editStoreModal')">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+  <script>
+    function loadStoresList() {
+      api('GET', '/stores').then(function(stores) {
+        var cardsHtml = '';
+        var tableHtml = '';
+
+        stores.forEach(function(s) {
+          var isS1 = s.id === 1;
+          var badgeClass = isS1 ? 's1' : 's2';
+          var statusBadge = s.status === 'active' 
+            ? '<span class="status status-completed">نشط</span>' 
+            : '<span class="status status-cancelled">معطل</span>';
+
+          cardsHtml += `
+            <div class="card" style="position:relative;border-top:4px solid ${isS1 ? '#10b981' : '#0ea5e9'}">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+                <div>
+                  <span class="store-badge ${badgeClass}"><i class="fas fa-store"></i> ${s.code}</span>
+                  <h3 style="font-size:16px;font-weight:700;margin-top:6px">${s.name}</h3>
+                </div>
+                ${statusBadge}
+              </div>
+              <div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6">
+                <div><i class="fas fa-map-marker-alt" style="width:16px;color:var(--primary)"></i> ${s.address || '—'}</div>
+                <div><i class="fas fa-phone" style="width:16px;color:var(--primary)"></i> ${s.phone || '—'}</div>
+                <div><i class="fas fa-receipt" style="width:16px;color:var(--primary)"></i> بادئة الفواتير: <strong>${s.invoice_prefix || 'INV'}</strong></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;background:var(--bg-hover);padding:12px;border-radius:8px;margin-bottom:16px">
+                <div>
+                  <div style="font-size:11px;color:var(--text-secondary)">إجمالي المخزون</div>
+                  <div style="font-size:15px;font-weight:700;color:var(--primary)">${(s.total_units || 0).toLocaleString()} <span style="font-size:11px">قطعة</span></div>
+                </div>
+                <div>
+                  <div style="font-size:11px;color:var(--text-secondary)">المبيعات</div>
+                  <div style="font-size:15px;font-weight:700;color:#10b981">${(s.total_sales || 0).toLocaleString()} <span style="font-size:11px">ر.ي</span></div>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-outline btn-sm" style="flex:1" onclick="openEditStoreModal(${s.id})"><i class="fas fa-edit"></i> تعديل</button>
+                <button class="btn btn-outline btn-sm" style="flex:1" onclick="toggleStoreStatus(${s.id})"><i class="fas fa-power-off"></i> ${s.status === 'active' ? 'تعطيل' : 'تفعيل'}</button>
+              </div>
+            </div>
+          `;
+
+          tableHtml += `
+            <tr>
+              <td><strong>#${s.id}</strong></td>
+              <td><strong>${s.name}</strong><br><span style="font-size:11px;color:var(--text-secondary)">${s.address || ''}</span></td>
+              <td><span class="store-badge ${badgeClass}">${s.code}</span></td>
+              <td>${s.phone || '—'}</td>
+              <td>${s.tax_number || '—'}</td>
+              <td><code>${s.invoice_prefix || 'INV'}</code></td>
+              <td>${statusBadge}</td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn btn-outline btn-icon btn-sm" title="تعديل" onclick="openEditStoreModal(${s.id})"><i class="fas fa-edit"></i></button>
+                  <button class="btn btn-outline btn-icon btn-sm" title="${s.status === 'active' ? 'تعطيل' : 'تفعيل'}" onclick="toggleStoreStatus(${s.id})"><i class="fas fa-power-off"></i></button>
+                </div>
+              </td>
+            </tr>
+          `;
+        });
+
+        document.getElementById('storesCardsContainer').innerHTML = cardsHtml;
+        document.getElementById('storesTableBody').innerHTML = tableHtml;
+      });
+    }
+
+    function openAddStoreModal() {
+      openModal('addStoreModal');
+    }
+
+    function submitAddStore() {
+      var name = document.getElementById('storeName').value.trim();
+      var code = document.getElementById('storeCode').value.trim();
+      var prefix = document.getElementById('storePrefix').value.trim();
+      var phone = document.getElementById('storePhone').value.trim();
+      var tax = document.getElementById('storeTax').value.trim();
+      var address = document.getElementById('storeAddress').value.trim();
+      var footer = document.getElementById('storeFooter').value.trim();
+
+      if (!name || !code) {
+        showToast('يرجى ملء اسم المحل ورمزه', 'error');
+        return;
+      }
+
+      DataStore.addStore({
+        name: name,
+        code: code,
+        invoice_prefix: prefix,
+        phone: phone,
+        tax_number: tax,
+        address: address,
+        invoice_footer: footer
+      }).then(function() {
+        closeModal('addStoreModal');
+        showToast('تمت إضافة المحل الجديد بنجاح');
+        loadStoresList();
+        if (window.initStoreSelector) window.initStoreSelector();
+      });
+    }
+
+    function openEditStoreModal(id) {
+      api('GET', '/stores/' + id).then(function(store) {
+        document.getElementById('editStoreId').value = store.id;
+        document.getElementById('editStoreName').value = store.name;
+        document.getElementById('editStorePrefix').value = store.invoice_prefix || '';
+        document.getElementById('editStorePhone').value = store.phone || '';
+        document.getElementById('editStoreTax').value = store.tax_number || '';
+        document.getElementById('editStoreAddress').value = store.address || '';
+        document.getElementById('editStoreFooter').value = store.invoice_footer || '';
+        openModal('editStoreModal');
+      });
+    }
+
+    function submitEditStore() {
+      var id = document.getElementById('editStoreId').value;
+      var name = document.getElementById('editStoreName').value.trim();
+      var prefix = document.getElementById('editStorePrefix').value.trim();
+      var phone = document.getElementById('editStorePhone').value.trim();
+      var tax = document.getElementById('editStoreTax').value.trim();
+      var address = document.getElementById('editStoreAddress').value.trim();
+      var footer = document.getElementById('editStoreFooter').value.trim();
+
+      DataStore.updateStore(id, {
+        name: name,
+        invoice_prefix: prefix,
+        phone: phone,
+        tax_number: tax,
+        address: address,
+        invoice_footer: footer
+      }).then(function() {
+        closeModal('editStoreModal');
+        showToast('تم حفظ تعديلات المحل');
+        loadStoresList();
+      });
+    }
+
+    function toggleStoreStatus(id) {
+      if (!confirm('هل تريد تغيير حالة تنشيط هذا المحل؟')) return;
+      DataStore.toggleStore(id).then(function(res) {
+        showToast(res.message);
+        loadStoresList();
+      });
+    }
+
+    DataStore.init().then(function() {
+      loadStoresList();
+    });
+  </script>
+</body>
+</html>

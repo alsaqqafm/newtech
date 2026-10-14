@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - نيوتك الطبية</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div>
+      <span class="sidebar-brand">نيوتك الطبية</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">الرئيسية</div>
+      <a class="nav-item active" data-page="index.html">
+        <i class="fas fa-th-large"></i>
+        <span>لوحة التحكم</span>
+      </a>
+
+      <div class="nav-section">الإدارة</div>
+      <a class="nav-item" data-page="products.html">
+        <i class="fas fa-box"></i>
+        <span>المنتجات</span>
+      </a>
+      <a class="nav-item" data-page="orders.html">
+        <i class="fas fa-shopping-cart"></i>
+        <span>الطلبات</span>
+        <span class="badge" id="ordersBadge">0</span>
+      </a>
+      <a class="nav-item" data-page="quotes.html">
+        <i class="fas fa-file-invoice"></i>
+        <span>عروض الأسعار</span>
+        <span class="badge" id="quotesBadge">0</span>
+      </a>
+      <a class="nav-item" data-page="partners.html">
+        <i class="fas fa-handshake"></i>
+        <span>الشركات</span>
+      </a>
+      <a class="nav-item" data-page="customers.html">
+        <i class="fas fa-users"></i>
+        <span>العملاء</span>
+      </a>
+
+      <div class="nav-section">التقارير</div>
+      <a class="nav-item" data-page="reports.html">
+        <i class="fas fa-chart-bar"></i>
+        <span>التقارير</span>
+      </a>
+
+      <div class="nav-section">النظام</div>
+      <a class="nav-item" data-page="users.html">
+        <i class="fas fa-user-shield"></i>
+        <span>المستخدمين</span>
+      </a>
+      <a class="nav-item" data-page="profile.html"><i class="fas fa-id-card"></i><span>الملف الشخصي</span></a>
+      <a class="nav-item" data-page="settings.html">
+        <i class="fas fa-cog"></i>
+        <span>الإعدادات</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-user-avatar">م أ</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">محمد أحمد</div>
+          <div class="sidebar-user-role">مدير النظام</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">لوحة التحكم</h1>
+        <div class="breadcrumb">
+          <a href="index.html">الرئيسية</a>
+          <i class="fas fa-chevron-left" style="font-size:8px"></i>
+          <span>لوحة التحكم</span>
+        </div>
+      </div>
+      <div class="topbar-left">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="بحث...">
+        </div>
+        <div style="position:relative">
+          <button class="icon-btn" id="notificationsBtn">
+            <i class="fas fa-bell"></i>
+            <span class="badge-count" id="notifCount" style="display:none"></span>
+          </button>
+          <div class="notifications-dropdown" id="notificationsDropdown">
+            <div class="notifications-header">
+              <h4>الإشعارات</h4>
+              <a href="#" class="mark-all-read" onclick="markAllRead();return false" style="font-size:12px;color:var(--primary)">تحديد الكل كمقروء</a>
+            </div>
+            <div id="notificationsList"></div>
+          </div>
+        </div>
+        <label class="toggle" title="الوضع الليلي">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="toggle-slider">
+            <span class="star"></span>
+            <span class="star"></span>
+            <span class="star"></span>
+          </span>
+        </label>
+        <div style="position:relative">
+          <button class="icon-btn" id="userBtn">
+            <i class="fas fa-user"></i>
+          </button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div>
+            <div class="user-dropdown-item"><i class="fas fa-cog"></i>الإعدادات</div>
+            <div class="user-dropdown-divider"></div>
+            <div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <!-- Store Notice / Context Banner -->
+      <div id="storeBanner" style="background:linear-gradient(135deg, rgba(2,132,199,0.1), rgba(16,185,129,0.1));border:1px solid rgba(2,132,199,0.25);border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:42px;height:42px;border-radius:10px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px">
+            <i class="fas fa-store-alt"></i>
+          </div>
+          <div>
+            <h3 id="currentStoreTitle" style="font-size:16px;font-weight:700;margin:0">لوحة التحكم - العرض الموحد (جميع المحلات والفروع)</h3>
+            <p id="currentStoreSubtitle" style="font-size:12px;color:var(--text-secondary);margin:4px 0 0 0">متابعة الأداء المالي، المخزون، والمبيعات لفرعي صنعاء وعدن لحظيًا</p>
+          </div>
+        </div>
+        <div id="storeActionsQuick" style="display:flex;gap:8px">
+          <a href="invoices.html" class="btn btn-primary btn-sm"><i class="fas fa-cash-register"></i> فاتورة بيع جديدة</a>
+          <a href="transfers.html" class="btn btn-outline btn-sm"><i class="fas fa-dolly"></i> تحويل بين المحلين</a>
+          <a href="inventory.html" class="btn btn-outline btn-sm"><i class="fas fa-warehouse"></i> جرد المخزون</a>
+        </div>
+      </div>
+
+      <!-- Main KPI Stats Cards -->
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-dollar-sign"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">إجمالي المبيعات</div>
+            <div class="stat-value" id="kpiSales">--</div>
+            <div class="stat-change up" id="kpiSalesNote"><i class="fas fa-file-invoice"></i> مبيعات معتمدة</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-chart-line"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">صافي الأرباح</div>
+            <div class="stat-value" id="kpiNetProfit">--</div>
+            <div class="stat-change up" id="kpiProfitNote"><i class="fas fa-calculator"></i> بعد خصم التكلفة والمصروفات</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="fas fa-boxes"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">إجمالي وحدات المخزون</div>
+            <div class="stat-value" id="kpiStockUnits">--</div>
+            <div class="stat-change" id="kpiStockNote"><i class="fas fa-layer-group"></i> عبر الفروع</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="fas fa-hand-holding-usd"></i></div>
+          <div class="stat-info">
+            <div class="stat-label">مديونيات العملاء</div>
+            <div class="stat-value" id="kpiDebts">--</div>
+            <div class="stat-change" id="kpiDebtsNote" style="color:var(--danger)"><i class="fas fa-clock"></i> مستحقات آجلة</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Store Comparison Cards (Shown when All Stores is active) -->
+      <div id="storesComparisonRow" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Charts Row -->
+      <div class="grid-3">
+        <div class="card" style="grid-column: span 2;">
+          <div class="card-header">
+            <span class="card-title">المبيعات الشهرية</span>
+            <span class="badge" style="background:var(--primary);color:#fff">ريال يمني</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container"><canvas id="salesChart"></canvas></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">توزيع المنتجات حسب الفئات</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container"><canvas id="productsChart"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Invoices & Inter-Store Transfers -->
+      <div class="grid-2">
+        <!-- Recent Invoices -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-file-invoice" style="margin-left:6px;color:var(--primary)"></i> آخر الفواتير والمبيعات</span>
+            <a href="invoices.html" class="btn btn-outline btn-sm">عرض كل الفواتير</a>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم الفاتورة</th>
+                  <th>المحل</th>
+                  <th>العميل</th>
+                  <th>المبلغ</th>
+                  <th>الحالة</th>
+                  <th>التاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="recentInvoicesBody">
+                <tr><td colspan="6" style="text-align:center;padding:20px">جاري تحميل الفواتير...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Inter-Store Transfers -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-dolly" style="margin-left:6px;color:var(--warning)"></i> حركة التحويل بين المحلين</span>
+            <a href="transfers.html" class="btn btn-outline btn-sm">إدارة التحويلات</a>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم التحويل</th>
+                  <th>من</th>
+                  <th>إلى</th>
+                  <th>العناصر</th>
+                  <th>الحالة</th>
+                  <th>التاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="recentTransfersBody">
+                <tr><td colspan="6" style="text-align:center;padding:20px">جاري تحميل التحويلات...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Low Stock Alerts & Top Products -->
+      <div class="grid-2" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-exclamation-triangle" style="margin-left:6px;color:var(--danger)"></i> تنبيهات المخزون الحرج</span>
+            <a href="inventory.html" class="btn btn-outline btn-sm">إدارة المخزون</a>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>الصنف</th>
+                  <th>المحل</th>
+                  <th>المتوفر</th>
+                  <th>الحد الأدنى</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody id="lowStockAlertsBody">
+                <tr><td colspan="5" style="text-align:center;padding:20px">لا توجد تنبيهات</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-boxes" style="margin-left:6px;color:var(--success)"></i> دليل الأصناف المعتمدة</span>
+            <a href="products.html" class="btn btn-outline btn-sm">دليل المنتجات</a>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>المنتج</th>
+                  <th>الفئة</th>
+                  <th>السعر</th>
+                  <th>الحالة</th>
+                </tr>
+              </thead>
+              <tbody id="topProductsBody">
+                <!-- Products loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/admin.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+      function formatNumber(num) {
+        return (num || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+
+      function formatCurrency(num) {
+        if (!num) return '0 ر.ي';
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M ر.ي';
+        if (num >= 1000) return (num / 1000).toFixed(0) + 'K ر.ي';
+        return formatNumber(num) + ' ر.ي';
+      }
+
+      function statusBadge(status) {
+        var map = {
+          'completed': '<span class="status status-completed">مكتمل</span>',
+          'paid': '<span class="status status-completed">مدفوعة بالكامل</span>',
+          'partial': '<span class="status status-processing">مدفوعة جزئيًا</span>',
+          'unpaid': '<span class="status status-cancelled">آجلة (غير مدفوعة)</span>',
+          'processing': '<span class="status status-processing">قيد التنفيذ</span>',
+          'pending': '<span class="status status-pending">قيد الانتظار</span>',
+          'approved': '<span class="status status-processing">معتمد</span>',
+          'in_transit': '<span class="status" style="background:rgba(245,158,11,0.15);color:#b45309;font-weight:700"><i class="fas fa-truck"></i> قيد النقل</span>',
+          'received': '<span class="status status-completed"><i class="fas fa-check"></i> تم الاستلام</span>',
+          'cancelled': '<span class="status status-cancelled">ملغي</span>'
+        };
+        return map[status] || ('<span class="status">' + status + '</span>');
+      }
+
+      async function loadDashboard() {
+        var storeId = getCurrentStoreId();
+        var isAll = !storeId || storeId === 'all';
+
+        // Update Banner Text
+        var titleEl = document.getElementById('currentStoreTitle');
+        var subEl = document.getElementById('currentStoreSubtitle');
+        if (isAll) {
+          titleEl.textContent = 'لوحة التحكم - العرض الموحد (جميع المحلات والفروع)';
+          subEl.textContent = 'متابعة الأداء المالي، المخزون، والتحويلات لفرعي صنعاء وعدن لحظيًا';
+        } else {
+          var store = DataStore.getStore(storeId);
+          var sName = store ? store.name : ('محل #' + storeId);
+          titleEl.textContent = 'لوحة التحكم - ' + sName;
+          subEl.textContent = 'متابعة حركة المبيعات، المخزون الخاص، والتحويلات لهذا المحل';
+        }
+
+        try {
+          // Fetch Reports & Stats
+          var repQ = !isAll ? '?store_id=' + storeId : '';
+          var [dashboardRep, stats, invoices, transfers, stores, alerts] = await Promise.all([
+            api('GET', '/reports/dashboard' + repQ).catch(function() { return {}; }),
+            api('GET', '/stats' + repQ).catch(function() { return {}; }),
+            api('GET', '/invoices' + repQ).catch(function() { return []; }),
+            api('GET', '/transfers' + repQ).catch(function() { return []; }),
+            api('GET', '/stores').catch(function() { return []; }),
+            api('GET', '/inventory/alerts' + repQ).catch(function() { return []; })
+          ]);
+
+          // 1. KPI Cards
+          var totalSales = dashboardRep.totalSales || stats.totalSales || 0;
+          var netProfit = dashboardRep.netProfit || 0;
+          var totalStock = 0;
+          if (stores && stores.length > 0) {
+            if (!isAll) {
+              var currS = stores.find(function(s) { return String(s.id) === String(storeId); });
+              totalStock = currS ? currS.total_units : 0;
+            } else {
+              totalStock = stores.reduce(function(sum, s) { return sum + (s.total_units || 0); }, 0);
+            }
+          }
+          var totalDebts = dashboardRep.totalDebts || 0;
+
+          document.getElementById('kpiSales').textContent = formatCurrency(totalSales);
+          document.getElementById('kpiNetProfit').textContent = formatCurrency(netProfit);
+          document.getElementById('kpiStockUnits').textContent = formatNumber(totalStock) + ' وحدة';
+          document.getElementById('kpiDebts').textContent = formatCurrency(totalDebts);
+
+          // 2. Stores Comparison Row (If All Stores)
+          var compRow = document.getElementById('storesComparisonRow');
+          if (isAll && stores && stores.length >= 2) {
+            compRow.style.display = 'grid';
+            compRow.innerHTML = stores.map(function(s) {
+              return `
+                <div class="card" style="border:1px solid rgba(2,132,199,0.2);background:var(--card-bg)">
+                  <div class="card-header" style="padding:14px 18px;border-bottom:1px solid var(--border-color)">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <span class="badge" style="background:var(--primary);color:#fff;font-size:12px;font-weight:700">${s.code}</span>
+                      <strong style="font-size:15px">${s.name}</strong>
+                    </div>
+                    <span style="font-size:12px;color:var(--text-secondary)"><i class="fas fa-map-marker-alt"></i> ${s.location || ''}</span>
+                  </div>
+                  <div class="card-body" style="padding:16px 18px">
+                    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:12px;text-align:center">
+                      <div style="background:rgba(2,132,199,0.06);padding:10px;border-radius:8px">
+                        <div style="font-size:11px;color:var(--text-secondary)">المخزون المتوفر</div>
+                        <div style="font-size:16px;font-weight:700;color:var(--primary)">${formatNumber(s.total_units || 0)} <span style="font-size:11px">وحدة</span></div>
+                      </div>
+                      <div style="background:rgba(16,185,129,0.06);padding:10px;border-radius:8px">
+                        <div style="font-size:11px;color:var(--text-secondary)">المبيعات</div>
+                        <div style="font-size:16px;font-weight:700;color:var(--success)">${formatCurrency(s.total_sales || 0)}</div>
+                      </div>
+                      <div style="background:rgba(245,158,11,0.06);padding:10px;border-radius:8px">
+                        <div style="font-size:11px;color:var(--text-secondary)">عدد الفواتير</div>
+                        <div style="font-size:16px;font-weight:700;color:var(--warning)">${s.invoice_count || 0}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          } else {
+            compRow.style.display = 'none';
+            compRow.innerHTML = '';
+          }
+
+          // 3. Recent Invoices
+          var invBody = document.getElementById('recentInvoicesBody');
+          if (Array.isArray(invoices) && invoices.length > 0) {
+            invBody.innerHTML = invoices.slice(0, 6).map(function(inv) {
+              var dateStr = inv.created_at ? inv.created_at.split(' ')[0] : '-';
+              return `
+                <tr>
+                  <td><a href="invoices.html?view=${inv.id}" style="font-weight:700;color:var(--primary)">${inv.invoice_number}</a></td>
+                  <td><span class="badge" style="background:var(--primary-light);color:var(--primary);font-size:11px">${inv.store_code || ('S' + inv.store_id)}</span></td>
+                  <td>${inv.customer_name || 'عميل نقدي'}</td>
+                  <td style="font-weight:700">${formatNumber(inv.total_amount)} ر.ي</td>
+                  <td>${statusBadge(inv.payment_status || inv.status)}</td>
+                  <td style="font-size:12px;color:var(--text-secondary)">${dateStr}</td>
+                </tr>
+              `;
+            }).join('');
+          } else {
+            invBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-secondary)">لا توجد فواتير مسجلة حتى الآن</td></tr>';
+          }
+
+          // 4. Recent Transfers
+          var transBody = document.getElementById('recentTransfersBody');
+          if (Array.isArray(transfers) && transfers.length > 0) {
+            transBody.innerHTML = transfers.slice(0, 6).map(function(t) {
+              var dateStr = t.created_at ? t.created_at.split(' ')[0] : '-';
+              return `
+                <tr>
+                  <td><strong style="color:var(--primary)">${t.transfer_number}</strong></td>
+                  <td><span class="badge" style="background:rgba(2,132,199,0.1);color:var(--primary)">${t.from_store_code || ('S' + t.from_store_id)}</span></td>
+                  <td><span class="badge" style="background:rgba(16,185,129,0.1);color:var(--success)">${t.to_store_code || ('S' + t.to_store_id)}</span></td>
+                  <td>${t.item_count || 1} صنف (${t.total_units || 0} وحدة)</td>
+                  <td>${statusBadge(t.status)}</td>
+                  <td style="font-size:12px;color:var(--text-secondary)">${dateStr}</td>
+                </tr>
+              `;
+            }).join('');
+          } else {
+            transBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-secondary)">لا توجد تحويلات بين المحلين حتى الآن</td></tr>';
+          }
+
+          // 5. Low Stock Alerts
+          var alertsBody = document.getElementById('lowStockAlertsBody');
+          if (Array.isArray(alerts) && alerts.length > 0) {
+            alertsBody.innerHTML = alerts.slice(0, 5).map(function(a) {
+              return `
+                <tr>
+                  <td><strong>${a.product_name}</strong></td>
+                  <td><span class="badge" style="background:var(--primary-light);color:var(--primary)">${a.store_code || ('S' + a.store_id)}</span></td>
+                  <td style="color:var(--danger);font-weight:700">${a.quantity}</td>
+                  <td>${a.min_quantity}</td>
+                  <td><span class="status status-cancelled">مخزون حرج</span></td>
+                </tr>
+              `;
+            }).join('');
+          } else {
+            alertsBody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--success)"><i class="fas fa-check-circle"></i> جميع الأصناف متوفرة فوق الحد الأدنى</td></tr>';
+          }
+
+          // 6. Top Products
+          var products = DataStore.getProducts();
+          var topBody = document.getElementById('topProductsBody');
+          if (products && products.length > 0) {
+            topBody.innerHTML = products.slice(0, 5).map(function(p, i) {
+              return `
+                <tr>
+                  <td>${i + 1}</td>
+                  <td><strong>${p.name}</strong></td>
+                  <td>${p.category || '-'}</td>
+                  <td>${formatNumber(p.price)} ر.ي</td>
+                  <td><span class="status status-active">معتمد</span></td>
+                </tr>
+              `;
+            }).join('');
+          }
+
+          // 7. Render Charts
+          var productsByCategory = {};
+          products.forEach(function(p) {
+            var cat = p.category || 'عام';
+            productsByCategory[cat] = (productsByCategory[cat] || 0) + 1;
+          });
+          var categoryData = Object.keys(productsByCategory).map(function(cat, i) {
+            var colors = ['#0284c7', '#10b981', '#f59e0b', '#dc2626', '#8b5cf6', '#06b6d4'];
+            return { label: cat, value: productsByCategory[cat], color: colors[i % colors.length] };
+          });
+          if (window.renderDoughnutChart) {
+            renderDoughnutChart('productsChart', categoryData.length > 0 ? categoryData : [{ label: 'أصناف', value: 1, color: '#0284c7' }]);
+          }
+
+          // Monthly Sales Chart
+          var monthNames = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+          var curMonth = new Date().getMonth();
+          var salesData = [];
+          for (var m = 0; m <= curMonth; m++) {
+            salesData.push({ label: monthNames[m], value: m === curMonth ? totalSales : Math.round(totalSales * 0.7) });
+          }
+          if (window.renderLineChart) {
+            renderLineChart('salesChart', salesData, { color: '#0284c7' });
+          }
+
+        } catch (err) {
+          console.error('Error loading dashboard:', err);
+        }
+      }
+
+      window.onStoreChange = function() {
+        loadDashboard();
+      };
+
+      DataStore.init().then(function() {
+        loadDashboard();
+        if (window.loadNotifications) window.loadNotifications();
+      }).catch(function(err) {
+        console.warn('DataStore.init error:', err);
+        loadDashboard();
+      });
+
+      window.redrawCharts = function() {
+        loadDashboard();
+      };
+
+    });
+  </script>
+</body>
+</html>
+

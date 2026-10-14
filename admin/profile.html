@@ -1,0 +1,295 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الملف الشخصي - لوحة التحكم</title>
+  <link rel="stylesheet" href="css/admin.css">
+  <script src="js/data.js"></script>
+  <script>
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = 'login.html';
+    }
+  </script>
+</head>
+<body>
+  <div class="mobile-overlay" id="mobileOverlay"></div>
+  <aside class="sidebar">
+    <div class="sidebar-header"><div class="sidebar-logo"><img src="../images/logo.png" alt="NT"></div><span class="sidebar-brand">نيوتك الطبية</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">الرئيسية</div>
+      <a class="nav-item" data-page="index.html"><i class="fas fa-th-large"></i><span>لوحة التحكم</span></a>
+      <div class="nav-section">الإدارة</div>
+      <a class="nav-item" data-page="products.html"><i class="fas fa-box"></i><span>المنتجات</span></a>
+      <a class="nav-item" data-page="orders.html"><i class="fas fa-shopping-cart"></i><span>الطلبات</span><span class="badge" id="ordersBadge">0</span></a>
+      <a class="nav-item" data-page="quotes.html"><i class="fas fa-file-invoice"></i><span>عروض الأسعار</span><span class="badge" id="quotesBadge">0</span></a>
+      <a class="nav-item" data-page="partners.html"><i class="fas fa-handshake"></i><span>الشركات</span></a>
+      <a class="nav-item" data-page="customers.html"><i class="fas fa-users"></i><span>العملاء</span></a>
+      <div class="nav-section">التقارير</div>
+      <a class="nav-item" data-page="reports.html"><i class="fas fa-chart-bar"></i><span>التقارير</span></a>
+      <div class="nav-section">النظام</div>
+      <a class="nav-item" data-page="users.html"><i class="fas fa-user-shield"></i><span>المستخدمين</span></a>
+      <a class="nav-item active" data-page="profile.html"><i class="fas fa-id-card"></i><span>الملف الشخصي</span></a>
+      <a class="nav-item" data-page="settings.html"><i class="fas fa-cog"></i><span>الإعدادات</span></a>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">م أ</div><div class="sidebar-user-info"><div class="sidebar-user-name">محمد أحمد</div><div class="sidebar-user-role">مدير النظام</div></div></div></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-right">
+        <button class="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1 class="page-title">الملف الشخصي</h1>
+        <div class="breadcrumb"><a href="index.html">الرئيسية</a><i class="fas fa-chevron-left" style="font-size:8px"></i><span>الملف الشخصي</span></div>
+      </div>
+      <div class="topbar-left">
+        <div style="position:relative"><button class="icon-btn" id="notificationsBtn"><i class="fas fa-bell"></i><span class="badge-count" id="notifCount" style="display:none"></span></button><div class="notifications-dropdown" id="notificationsDropdown"><div class="notifications-header"><h4>الإشعارات</h4><a href="#" class="mark-all-read" onclick="markAllRead();return false" style="font-size:12px;color:var(--primary)">تحديد الكل كمقروء</a></div><div id="notificationsList"></div></div></div>
+        <label class="toggle" title="الوضع الليلي"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"><span class="star"></span><span class="star"></span><span class="star"></span></span></label>
+        <div style="position:relative"><button class="icon-btn" id="userBtn"><i class="fas fa-user"></i></button><div class="user-dropdown" id="userDropdown"><div class="user-dropdown-item" data-action="profile"><i class="fas fa-user"></i>حسابي</div><div class="user-dropdown-item" onclick="window.location.href='settings.html'"><i class="fas fa-cog"></i>الإعدادات</div><div class="user-dropdown-divider"></div><div class="user-dropdown-item" style="color:var(--danger)" data-action="logout"><i class="fas fa-sign-out-alt"></i>تسجيل الخروج</div></div></div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <div class="grid-2" style="align-items:start">
+        <!-- Profile Card -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">معلومات الحساب</span></div>
+          <div class="card-body" style="text-align:center">
+            <div style="width:100px;height:100px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px;font-weight:700;margin:0 auto 16px" id="profileAvatar">م أ</div>
+            <h2 style="font-size:20px;margin-bottom:4px" id="profileName">محمد أحمد</h2>
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px" id="profileEmail">admin@newtechmed.com</div>
+            <div style="margin-bottom:16px">
+              <span class="status status-active" id="profileStatus" style="font-size:13px;padding:6px 16px">نشط</span>
+              <span class="status status-processing" id="profileRole" style="font-size:13px;padding:6px 16px;margin-right:8px">مدير النظام</span>
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary)">تاريخ التسجيل: <span id="profileJoined">جاري التحميل...</span></div>
+          </div>
+        </div>
+
+        <!-- Edit Profile Card -->
+        <div class="card">
+          <div class="card-header"><span class="card-title">تعديل الملف الشخصي</span></div>
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+              <div style="width:72px;height:72px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:700" id="editAvatar">م أ</div>
+              <div>
+                <div style="font-weight:500;margin-bottom:4px">صورة الملف الشخصي</div>
+                <div style="font-size:12px;color:var(--text-secondary);margin-bottom:8px">JPG, PNG بحد أقصى 2MB</div>
+                <input type="file" id="avatarInput" accept="image/*" style="display:none">
+                <button class="btn btn-outline btn-sm" onclick="document.getElementById('avatarInput').click()"><i class="fas fa-camera"></i> تغيير الصورة</button>
+              </div>
+            </div>
+            <div class="form-group"><label>الاسم</label><input type="text" class="form-control" id="editName" value=""></div>
+            <div class="form-group"><label>البريد الإلكتروني</label><input type="email" class="form-control" id="editEmail" value=""></div>
+            <div class="form-group"><label>الدور</label><input type="text" class="form-control" id="editRole" disabled style="background:var(--bg-main)"></div>
+            <button class="btn btn-primary" onclick="saveProfile()"><i class="fas fa-save"></i> حفظ التعديلات</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Change Password Card -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-header"><span class="card-title">تغيير كلمة المرور</span></div>
+        <div class="card-body">
+          <div style="max-width:500px">
+            <div class="form-group"><label>كلمة المرور الحالية</label><input type="password" class="form-control" id="currentPassword" placeholder="أدخل كلمة المرور الحالية"></div>
+            <div class="form-row">
+              <div class="form-group"><label>كلمة المرور الجديدة</label><input type="password" class="form-control" id="newPassword" placeholder="كلمة المرور الجديدة"></div>
+              <div class="form-group"><label>تأكيد كلمة المرور</label><input type="password" class="form-control" id="confirmPassword" placeholder="أعد إدخال كلمة المرور"></div>
+            </div>
+            <button class="btn btn-primary" onclick="changePassword()"><i class="fas fa-lock"></i> تحديث كلمة المرور</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Card -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-header"><span class="card-title">آخر النشاطات</span></div>
+        <div class="card-body">
+          <ul class="activity-list" id="profileActivity">
+            <li class="activity-item"><div class="activity-icon order"><i class="fas fa-circle"></i></div><div><div class="activity-text">جاري تحميل النشاطات...</div><div class="activity-time">الآن</div></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/admin.js"></script>
+  <script>
+    function loadProfile() {
+      var userJson = localStorage.getItem('adminUser');
+      if (!userJson) return;
+      var user = JSON.parse(userJson);
+
+      var parts = (user.name || 'م أ').split(' ');
+      var initials = parts.map(function(p) { return p.charAt(0); }).join(' ');
+
+      document.getElementById('profileAvatar').textContent = initials;
+      document.getElementById('profileName').textContent = user.name;
+      document.getElementById('profileEmail').textContent = user.email;
+      document.getElementById('editAvatar').textContent = initials;
+      document.getElementById('editName').value = user.name;
+      document.getElementById('editEmail').value = user.email;
+
+      var roleMap = { 'admin': 'مدير النظام', 'manager': 'مدير', 'editor': 'محرر' };
+      document.getElementById('profileRole').textContent = roleMap[user.role] || user.role;
+      document.getElementById('editRole').value = roleMap[user.role] || user.role;
+
+      var statusEl = document.getElementById('profileStatus');
+      if (user.status === 'active' || !user.status) {
+        statusEl.className = 'status status-active';
+        statusEl.textContent = 'نشط';
+      } else {
+        statusEl.className = 'status status-inactive';
+        statusEl.textContent = 'غير نشط';
+      }
+
+      var joinedEl = document.getElementById('profileJoined');
+      joinedEl.textContent = user.created_at ? formatDate(user.created_at) : '—';
+
+      // Update sidebar user info too
+      var userNameEl = document.querySelector('.sidebar-user-name');
+      var userRoleEl = document.querySelector('.sidebar-user-role');
+      var userAvatarEl = document.querySelector('.sidebar-user-avatar');
+      if (userNameEl) userNameEl.textContent = user.name;
+      if (userRoleEl) userRoleEl.textContent = roleMap[user.role] || user.role;
+      if (userAvatarEl) userAvatarEl.textContent = initials;
+    }
+
+    function saveProfile() {
+      var name = document.getElementById('editName').value.trim();
+      var email = document.getElementById('editEmail').value.trim();
+      if (!name) { showToast('الاسم مطلوب', 'error'); return; }
+      if (!email) { showToast('البريد الإلكتروني مطلوب', 'error'); return; }
+
+      var token = localStorage.getItem('adminToken');
+      fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ name: name, email: email })
+      })
+      .then(function(r) {
+        if (!r.ok) return r.json().then(function(e) { throw new Error(e.error || 'حدث خطأ'); });
+        return r.json();
+      })
+      .then(function(data) {
+        var user = JSON.parse(localStorage.getItem('adminUser') || '{}');
+        user.name = data.name;
+        user.email = data.email;
+        localStorage.setItem('adminUser', JSON.stringify(user));
+        loadProfile();
+        showToast('تم حفظ التعديلات بنجاح');
+      })
+      .catch(function(err) {
+        showToast(err.message, 'error');
+      });
+    }
+
+    function changePassword() {
+      var currentPassword = document.getElementById('currentPassword').value;
+      var newPassword = document.getElementById('newPassword').value;
+      var confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!currentPassword) { showToast('يرجى إدخال كلمة المرور الحالية', 'error'); return; }
+      if (!newPassword) { showToast('يرجى إدخال كلمة المرور الجديدة', 'error'); return; }
+      if (newPassword.length < 6) { showToast('كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل', 'error'); return; }
+      if (newPassword !== confirmPassword) { showToast('كلمة المرور الجديدة غير متطابقة مع التأكيد', 'error'); return; }
+
+      var token = localStorage.getItem('adminToken');
+      fetch('/api/profile/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ currentPassword: currentPassword, newPassword: newPassword })
+      })
+      .then(function(r) {
+        if (!r.ok) return r.json().then(function(e) { throw new Error(e.error || 'حدث خطأ'); });
+        return r.json();
+      })
+      .then(function() {
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+        showToast('تم تغيير كلمة المرور بنجاح');
+      })
+      .catch(function(err) {
+        showToast(err.message, 'error');
+      });
+    }
+
+    // Avatar preview
+    document.getElementById('avatarInput').addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('editAvatar').style.backgroundImage = 'url(' + ev.target.result + ')';
+          document.getElementById('editAvatar').style.backgroundSize = 'cover';
+          document.getElementById('editAvatar').textContent = '';
+          document.getElementById('profileAvatar').style.backgroundImage = 'url(' + ev.target.result + ')';
+          document.getElementById('profileAvatar').style.backgroundSize = 'cover';
+          document.getElementById('profileAvatar').textContent = '';
+          showToast('تم تغيير الصورة (ستظهر بعد الحفظ)', 'success');
+        };
+        reader.readAsDataURL(e.target.files[0]);
+        // Save avatar to localStorage
+        reader.onloadend = function() {
+          var token = localStorage.getItem('adminToken');
+          var dataUrl = reader.result;
+          fetch('/api/profile/avatar', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ avatar: dataUrl })
+          }).then(function(r) {
+            if (r.ok) { localStorage.setItem('adminAvatar', dataUrl); }
+          }).catch(function() {});
+        };
+      }
+    });
+
+    // Load activity
+    function loadActivity() {
+      var token = localStorage.getItem('adminToken');
+      fetch('/api/activity', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(logs) {
+        var user = JSON.parse(localStorage.getItem('adminUser') || '{}');
+        var myLogs = logs.filter(function(l) { return String(l.user_id) === String(user.id); }).slice(0, 10);
+        var list = document.getElementById('profileActivity');
+        if (myLogs.length === 0) {
+          list.innerHTML = '<li class="activity-item"><div class="activity-icon order"><i class="fas fa-info-circle"></i></div><div><div class="activity-text">لا توجد نشاطات حديثة</div></div></li>';
+          return;
+        }
+        list.innerHTML = myLogs.map(function(l) {
+          var actionMap = { 'login': 'تسجيل دخول', 'create': 'إضافة', 'update': 'تعديل', 'delete': 'حذف', 'toggle': 'تغيير حالة' };
+          var action = actionMap[l.action] || l.action;
+          var iconClass = l.action === 'login' ? 'order' : l.action === 'create' ? 'product' : l.action === 'delete' ? 'alert' : 'user';
+          var icon = l.action === 'login' ? 'sign-in-alt' : l.action === 'create' ? 'plus-circle' : l.action === 'delete' ? 'trash' : l.action === 'toggle' ? 'toggle-on' : 'edit';
+          var text = action + (l.entity_type ? ' في ' + l.entity_type : '') + (l.entity_id ? ' #' + l.entity_id : '');
+          var time = getTimeAgo(new Date(l.created_at));
+          return '<li class="activity-item"><div class="activity-icon ' + iconClass + '"><i class="fas fa-' + icon + '"></i></div><div><div class="activity-text">' + text + '</div><div class="activity-time">' + time + '</div></div></li>';
+        }).join('');
+      })
+      .catch(function() {});
+    }
+
+    function getTimeAgo(date) {
+      var seconds = Math.floor((new Date() - date) / 1000);
+      if (seconds < 60) return 'الآن';
+      var minutes = Math.floor(seconds / 60);
+      if (minutes < 60) return 'منذ ' + minutes + ' دقيقة';
+      var hours = Math.floor(minutes / 60);
+      if (hours < 24) return 'منذ ' + hours + ' ساعة';
+      var days = Math.floor(hours / 24);
+      return 'منذ ' + days + ' يوم';
+    }
+
+    // Init
+    loadProfile();
+    DataStore.init().then(function() {
+      if (window.loadNotifications) window.loadNotifications();
+      loadActivity();
+    }).catch(function(err) { console.warn('DataStore.init error:', err); });
+  </script>
+</body>
+</html>
