@@ -1,9 +1,0 @@
-{
-  "originalPath": "E:\\newtech-main\\database\\newtechmed.db",
-  "backupFile": "newtechmed_backup_pre_migration_2026-10-14T23-40-26-230Z.db",
-  "backupPath": "E:\\newtech-main\\backups\\newtechmed_backup_pre_migration_2026-10-14T23-40-26-230Z.db",
-  "createdAt": "2026-10-14T23:40:26.269Z",
-  "sizeBytes": 151552,
-  "tableCount": 22,
-  "verified": true
-}

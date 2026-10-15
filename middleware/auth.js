@@ -1,6 +1,6 @@
 var jwt = require('jsonwebtoken');
 
-var JWT_SECRET = 'newtechmed_secret_key_2026';
+var JWT_SECRET = process.env.JWT_SECRET || 'newtechmed_secret_key_2026';
 var JWT_EXPIRES = '7d';
 
 function authenticateToken(req, res, next) {

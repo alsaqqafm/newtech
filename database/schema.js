@@ -3,7 +3,7 @@ var bcrypt = require('bcryptjs');
 var fs = require('fs');
 var path = require('path');
 
-var DB_PATH = path.join(__dirname, 'newtechmed.db');
+var DB_PATH = process.env.DATABASE_PATH ? path.resolve(process.env.DATABASE_PATH) : path.join(__dirname, 'newtechmed.db');
 
 function createWrapper(SQL, fileData) {
   var db;
@@ -16,6 +16,10 @@ function createWrapper(SQL, fileData) {
   function save() {
     var data = db.export();
     var buffer = Buffer.from(data);
+    var dir = path.dirname(DB_PATH);
+    if (!fs.existsSync(dir)) {
+      try { fs.mkdirSync(dir, { recursive: true }); } catch (e) {}
+    }
     fs.writeFileSync(DB_PATH, buffer);
   }
 
