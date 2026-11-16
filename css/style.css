@@ -2249,14 +2249,22 @@ html, body {
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+        flex-shrink: 0;
+    }
+
+    .header-actions {
+        gap: 8px;
     }
     
     .admin-link,
-    .dark-mode-toggle,
-    .lang-toggle-btn {
+    .dark-mode-toggle {
         width: 34px;
         height: 34px;
         font-size: 13px;
+        flex-shrink: 0;
     }
     
     .hero {
@@ -4656,17 +4664,23 @@ body.dark-mode .shape {
 .lang-toggle-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     background: rgba(2, 132, 199, 0.08);
     border: 1px solid rgba(2, 132, 199, 0.2);
     color: #0284c7;
-    padding: 8px 14px;
-    border-radius: 20px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 18px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
+    white-space: nowrap;
+    text-decoration: none;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .lang-toggle-btn:hover {
@@ -4678,10 +4692,18 @@ body.dark-mode .shape {
 
 .lang-toggle-btn i {
     font-size: 14px;
+    line-height: 1;
+}
+
+.lang-toggle-btn .lang-code-text {
+    font-size: 12.5px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.3px;
 }
 
 body.dark-mode .lang-toggle-btn {
-    background: rgba(88, 166, 255, 0.1);
+    background: rgba(88, 166, 255, 0.12);
     border-color: rgba(88, 166, 255, 0.3);
     color: #58a6ff;
 }
@@ -4690,6 +4712,102 @@ body.dark-mode .lang-toggle-btn:hover {
     background: #1f6feb;
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(31, 111, 235, 0.4);
+}
+
+/* Responsive adjustments for Mobile & Tablets */
+@media (max-width: 768px) {
+    .header-actions {
+        gap: 8px;
+    }
+
+    .lang-toggle-btn {
+        height: 34px;
+        min-width: 58px;
+        padding: 0 10px;
+        font-size: 12px;
+        border-radius: 17px;
+        gap: 5px;
+    }
+
+    .lang-toggle-btn i {
+        font-size: 13px;
+    }
+
+    .lang-toggle-btn .lang-code-text {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-actions {
+        gap: 6px;
+    }
+
+    .admin-link,
+    .dark-mode-toggle {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .mobile-menu-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .lang-toggle-btn {
+        height: 32px;
+        min-width: 50px;
+        padding: 0 8px;
+        font-size: 11.5px;
+        border-radius: 16px;
+        gap: 4px;
+    }
+
+    .lang-toggle-btn i {
+        font-size: 12px;
+    }
+
+    .lang-toggle-btn .lang-code-text {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 360px) {
+    .header-actions {
+        gap: 4px;
+    }
+
+    .admin-link,
+    .dark-mode-toggle {
+        width: 29px;
+        height: 29px;
+        font-size: 11px;
+    }
+
+    .mobile-menu-btn {
+        width: 29px;
+        height: 29px;
+        font-size: 12px;
+    }
+
+    .lang-toggle-btn {
+        height: 29px;
+        min-width: 44px;
+        padding: 0 6px;
+        font-size: 10.5px;
+        border-radius: 14px;
+        gap: 3px;
+    }
+
+    .lang-toggle-btn i {
+        font-size: 11px;
+    }
+
+    .lang-toggle-btn .lang-code-text {
+        font-size: 10px;
+    }
 }
 
 html[lang="en"] {
