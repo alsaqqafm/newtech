@@ -700,6 +700,25 @@ function applyTranslations(lang) {
     }
   });
 
+  // Update alt attributes
+  document.querySelectorAll('[data-i18n-alt]').forEach(el => {
+    const key = el.getAttribute('data-i18n-alt');
+    if (dictionary[key] !== undefined) {
+      el.setAttribute('alt', dictionary[key]);
+    }
+  });
+
+  // Update bilingual images (e.g. Arabic banner vs English banner)
+  document.querySelectorAll('img[data-i18n-src-ar], img[data-i18n-src-en]').forEach(img => {
+    const srcAr = img.getAttribute('data-i18n-src-ar');
+    const srcEn = img.getAttribute('data-i18n-src-en');
+    if (currentLang === 'en' && srcEn) {
+      img.src = srcEn;
+    } else if (srcAr) {
+      img.src = srcAr;
+    }
+  });
+
   // Update language toggle text
   document.querySelectorAll('.lang-code-text').forEach(btn => {
     btn.textContent = currentLang === 'ar' ? 'EN' : 'عربي';

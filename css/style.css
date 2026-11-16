@@ -645,6 +645,16 @@ body.dark-mode .admin-link:hover {
     );
 }
 
+html[dir="ltr"] .hero-image-bg-full::after {
+    background: linear-gradient(
+        to right,
+        rgb(10, 74, 111) 0%,
+        rgba(2, 133, 199, 0.927) 35%,
+        rgba(6, 181, 212, 0.145) 65%,
+        rgba(6, 181, 212, 0.218) 100%
+    );
+}
+
 .hero-badge {
     display: inline-block;
     background: rgba(255, 255, 255, 0.15);
