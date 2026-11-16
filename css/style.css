@@ -28,33 +28,69 @@
    CSS Variables
    ======================================== */
 :root {
-    /* Brand Colors - Modern Medical Palette */
-    --primary-blue: #0284c7;
-    --primary-blue-light: #38bdf8;
-    --primary-blue-dark: #0c4a6e;
-    --primary-red: #dc2626;
-    --primary-red-light: #f87171;
+    /* ========================================================
+       Brand Colors - Extracted from Official New Tech Medical Logo
+       ======================================================== */
+    /* 1. Burgundy & Fuchsia / Pink (العنابي والوردي/الفوشيا) */
+    --brand-burgundy: #813c50;
+    --brand-burgundy-dark: #632a3b;
+    --brand-burgundy-light: #9a4860;
+    --brand-burgundy-soft: #fcf4f6;
+
+    --brand-fuchsia: #d64776;
+    --brand-fuchsia-dark: #ba3862;
+    --brand-fuchsia-light: #ea5a8b;
+    --brand-fuchsia-soft: #fdf2f7;
+
+    /* 2. Medical Blue & Shades (الأزرق وتدرجاته) */
+    --brand-blue: #0a95b7;
+    --brand-blue-dark: #076f8a;
+    --brand-blue-light: #22b4d8;
+    --brand-blue-soft: #eaf8fc;
+    --brand-powder-blue: #a5c1e0;
+
+    /* 3. Deep Navy (الكحلي للعناوين والنصوص) */
+    --brand-navy: #0f153d;
+    --brand-navy-light: #1b2354;
+    --brand-navy-dark: #0a0d26;
+
+    /* Semantic Mappings */
+    --primary-blue: var(--brand-blue);
+    --primary-blue-light: var(--brand-blue-light);
+    --primary-blue-dark: var(--brand-blue-dark);
+    --primary-red: var(--brand-fuchsia);
+    --primary-red-light: var(--brand-fuchsia-light);
+    --primary-burgundy: var(--brand-burgundy);
     --accent-cyan: #06b6d4;
     --accent-teal: #0d9488;
     --accent-emerald: #10b981;
     --accent-gold: #f59e0b;
-    --accent-purple: #8b5cf6;
-    --text-dark: #1e293b;
-    --text-secondary: #64748b;
+    --accent-purple: #813c50;
+
+    /* 4. Text & Neutral System */
+    --text-dark: #0f153d;
+    --text-primary: #0f153d;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
     --text-on-dark: #ffffff;
+
+    /* 5. Backgrounds (الأبيض والرمادي الفاتح) */
     --bg-white: #ffffff;
-    --bg-light: #f0f9ff;
-    --bg-gray: #e2e8f0;
+    --bg-light: #f8fafc;
+    --bg-gray: #f1f5f9;
+    --border-color: #e2e8f0;
     
-    /* Gradients */
-    --gradient-blue: linear-gradient(135deg, #0284c7 0%, #06b6d4 100%);
-    --gradient-red: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
-    --gradient-hero: linear-gradient(135deg, #0c4a6e 0%, #0284c7 40%, #06b6d4 100%);
-    --gradient-teal: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
-    --gradient-purple: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
+    /* Harmonious Brand Gradients */
+    --gradient-blue: linear-gradient(135deg, #0a95b7 0%, #22b4d8 100%);
+    --gradient-red: linear-gradient(135deg, #813c50 0%, #d64776 100%);
+    --gradient-burgundy: linear-gradient(135deg, #813c50 0%, #d64776 100%);
+    --gradient-fuchsia: linear-gradient(135deg, #d64776 0%, #ea5a8b 100%);
+    --gradient-hero: linear-gradient(135deg, #0f153d 0%, #16204c 45%, #0a95b7 100%);
+    --gradient-teal: linear-gradient(135deg, #0a95b7 0%, #0d9488 100%);
+    --gradient-purple: linear-gradient(135deg, #813c50 0%, #9a4860 100%);
     --gradient-emerald: linear-gradient(135deg, #059669 0%, #34d399 100%);
     --gradient-gold: linear-gradient(135deg, #d97706 0%, #fbbf24 100%);
-    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%);
     
     /* Typography */
     --font-arabic: 'Cairo', 'Tajawal', sans-serif;
@@ -65,12 +101,13 @@
     --container-padding: 0 20px;
     
     /* Shadows - Medical Professional */
-    --shadow-sm: 0 1px 3px rgba(2, 132, 199, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 14px rgba(2, 132, 199, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 10px 30px rgba(2, 132, 199, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
-    --shadow-xl: 0 20px 50px rgba(2, 132, 199, 0.2), 0 8px 20px rgba(0, 0, 0, 0.12);
-    --shadow-glow: 0 0 30px rgba(6, 182, 212, 0.3);
-    --shadow-3d: 0 8px 0 rgba(2, 132, 199, 0.2), 0 12px 30px rgba(0, 0, 0, 0.15);
+    --shadow-sm: 0 2px 6px rgba(15, 21, 61, 0.06);
+    --shadow-md: 0 6px 18px rgba(15, 21, 61, 0.09);
+    --shadow-lg: 0 12px 32px rgba(15, 21, 61, 0.12);
+    --shadow-xl: 0 20px 50px rgba(15, 21, 61, 0.16);
+    --shadow-glow: 0 0 30px rgba(10, 149, 183, 0.25);
+    --shadow-glow-fuchsia: 0 0 30px rgba(214, 71, 118, 0.25);
+    --shadow-3d: 0 8px 0 rgba(10, 149, 183, 0.18), 0 12px 30px rgba(15, 21, 61, 0.12);
     
     /* Transitions */
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -766,19 +803,19 @@ body.dark-mode .admin-link:hover {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #0284c7 0%, #06b6d4 50%, #0d9488 100%);
+    background: linear-gradient(135deg, var(--brand-blue) 0%, var(--brand-blue-light) 100%);
     color: var(--text-on-dark);
-    box-shadow: 0 4px 0 #0c4a6e, 0 6px 20px rgba(2, 132, 199, 0.35);
+    box-shadow: 0 4px 14px rgba(10, 149, 183, 0.35);
 }
 
 .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 0 #0c4a6e, 0 10px 30px rgba(2, 132, 199, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(10, 149, 183, 0.45);
 }
 
 .btn-primary:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 0 #0c4a6e, 0 3px 10px rgba(2, 132, 199, 0.3);
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(10, 149, 183, 0.3);
 }
 
 .btn-secondary {
@@ -830,7 +867,7 @@ body.dark-mode .admin-link:hover {
 .section-header h2 {
     font-size: 38px;
     font-weight: 900;
-    background: linear-gradient(135deg, #0284c7, #06b6d4);
+    background: linear-gradient(135deg, var(--brand-navy) 0%, var(--brand-blue) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -847,7 +884,7 @@ body.dark-mode .admin-link:hover {
     transform: translateX(-50%);
     width: 80px;
     height: 4px;
-    background: linear-gradient(90deg, #dc2626, #f97316);
+    background: linear-gradient(90deg, var(--brand-burgundy), var(--brand-fuchsia));
     border-radius: 4px;
 }
 
@@ -982,7 +1019,7 @@ body.dark-mode .admin-link:hover {
 }
 
 .about-highlight {
-    background: linear-gradient(135deg, #0284c7, #06b6d4);
+    background: linear-gradient(135deg, var(--brand-navy) 0%, var(--brand-blue) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1286,13 +1323,13 @@ body.dark-mode .admin-link:hover {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: linear-gradient(135deg, #dc2626, #ef4444);
+    background: linear-gradient(135deg, var(--brand-burgundy), var(--brand-fuchsia));
     color: var(--text-on-dark);
     padding: 6px 14px;
     border-radius: 10px;
     font-size: 12px;
     font-weight: 700;
-    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.3);
+    box-shadow: 0 3px 10px rgba(214, 71, 118, 0.3);
 }
 
 .product-info {
@@ -1490,7 +1527,7 @@ body.dark-mode .admin-link:hover {
    - Glassmorphism effect on cards
    ======================================== */
 .why-section {
-    background: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #06b6d4 100%);
+    background: linear-gradient(135deg, var(--brand-navy) 0%, #16204c 50%, var(--brand-blue-dark) 100%);
     color: var(--text-on-dark);
     position: relative;
     overflow: hidden;
@@ -1719,7 +1756,7 @@ body.dark-mode .admin-link:hover {
 
 .contact-form h3 {
     font-size: 24px;
-    background: linear-gradient(135deg, #0284c7, #06b6d4);
+    background: linear-gradient(135deg, var(--brand-navy) 0%, var(--brand-blue) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1855,7 +1892,7 @@ body.dark-mode .admin-link:hover {
    - Copyright notice
    ======================================== */
 .footer {
-    background: linear-gradient(135deg, #0c1929 0%, #0f2942 50%, #0c4a6e 100%);
+    background: linear-gradient(135deg, var(--brand-navy-dark) 0%, var(--brand-navy) 50%, #16204c 100%);
     color: #ffffff;
     padding: 70px 0 0;
     margin-top: auto;
@@ -1870,7 +1907,7 @@ body.dark-mode .admin-link:hover {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #0284c7, #06b6d4, #10b981, #06b6d4, #0284c7);
+    background: linear-gradient(90deg, var(--brand-burgundy), var(--brand-fuchsia), var(--brand-blue), var(--brand-burgundy));
     background-size: 200% 100%;
     animation: footerLine 4s linear infinite;
 }
@@ -2227,24 +2264,28 @@ body.dark-mode .admin-link:hover {
      * Partner/Agency cards
    ======================================== */
 body.dark-mode {
-    --primary-blue: #58a6ff;
-    --primary-blue-light: #79c0ff;
-    --primary-blue-dark: #0d4194;
-    --primary-red: #f85149;
-    --primary-red-light: #ffa198;
-    --accent-cyan: #39d2c0;
+    --brand-burgundy: #9a4860;
+    --brand-fuchsia: #ea5a8b;
+    --brand-blue: #22b4d8;
+    --brand-navy: #f1f5f9;
+    --primary-blue: #22b4d8;
+    --primary-blue-light: #5cd0ec;
+    --primary-blue-dark: #0a95b7;
+    --primary-red: #ea5a8b;
+    --primary-red-light: #f48ab0;
+    --accent-cyan: #22b4d8;
     --accent-teal: #2dd4bf;
     --accent-emerald: #34d399;
     --accent-gold: #fbbf24;
-    --accent-purple: #a78bfa;
-    --text-dark: #e6edf3;
-    --text-secondary: #8b949e;
+    --accent-purple: #9a4860;
+    --text-dark: #f1f5f9;
+    --text-secondary: #94a3b8;
     --text-on-dark: #ffffff;
-    --bg-white: #0d1117;
-    --bg-light: #161b22;
-    --bg-gray: #30363d;
-    --gradient-hero: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #1a2332 100%);
-    --gradient-blue: linear-gradient(135deg, #0d4194 0%, #1f6feb 100%);
+    --bg-white: #0a0d24;
+    --bg-light: #121838;
+    --bg-gray: #1e264f;
+    --gradient-hero: linear-gradient(135deg, #07091a 0%, #0f153d 50%, #16204c 100%);
+    --gradient-blue: linear-gradient(135deg, #0a95b7 0%, #22b4d8 100%);
     --gradient-teal: linear-gradient(135deg, #0d9488 0%, #2dd4bf 100%);
     --gradient-purple: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
     --gradient-emerald: linear-gradient(135deg, #059669 0%, #34d399 100%);

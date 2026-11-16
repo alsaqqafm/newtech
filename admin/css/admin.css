@@ -1,26 +1,30 @@
 @import url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css');
 
 :root {
-  --primary: #0284c7;
-  --primary-light: #38bdf8;
-  --primary-dark: #0c4a6e;
+  /* Brand Unified Admin Palette */
+  --primary: #0a95b7;
+  --primary-light: #22b4d8;
+  --primary-dark: #076f8a;
+  --brand-burgundy: #813c50;
+  --brand-fuchsia: #d64776;
+  --brand-navy: #0f153d;
   --success: #10b981;
   --warning: #f59e0b;
-  --danger: #dc2626;
-  --info: #06b6d4;
+  --danger: #d64776;
+  --info: #0a95b7;
 
-  --bg-main: #f0f9ff;
+  --bg-main: #f8fafc;
   --bg-card: #ffffff;
-  --bg-sidebar: #0c4a6e;
+  --bg-sidebar: #0f153d;
   --bg-topbar: #ffffff;
-  --text-primary: #1e293b;
-  --text-secondary: #64748b;
+  --text-primary: #0f153d;
+  --text-secondary: #475569;
   --text-sidebar: #94a3b8;
   --text-sidebar-active: #ffffff;
   --border-color: #e2e8f0;
-  --shadow-sm: 0 1px 3px rgba(2, 132, 199, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 14px rgba(2, 132, 199, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 30px rgba(2, 132, 199, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 2px 6px rgba(15, 21, 61, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 6px 18px rgba(15, 21, 61, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 12px 32px rgba(15, 21, 61, 0.12), 0 4px 10px rgba(0, 0, 0, 0.06);
 
   --sidebar-width: 260px;
   --sidebar-collapsed: 70px;
@@ -90,8 +94,10 @@ a { text-decoration: none; color: inherit; }
 .sidebar-logo img {
   width: 100%;
   height: 100%;
-  border-radius: 10px;
-  object-fit: cover;
+  border-radius: 8px;
+  object-fit: contain;
+  background: #ffffff;
+  padding: 2px;
 }
 
 .sidebar-brand {

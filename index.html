@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="نيوتك الطبية للاستيراد - شريككم في الرعاية الصحية. متخصصون في استيراد وتوزيع المعدات الطبية والأدوية والمستلزمات الطبية في اليمن">
-    <meta name="keywords" content="معدات طبية, أدوية, مستلزمات طبية, استيراد, اليمن, نيوتك">
-    <title>نيوتك الطبية | New Tech Medical Import</title>
+    <meta name="description" content="نيوتك الطبية للاستيراد - شريككم الموثوق في الرعاية الصحية. استيراد وتوزيع الأجهزة الطبية والمختبرية والأدوية ومستلزمات الأسنان والمستلزمات الطبية في اليمن">
+    <meta name="keywords" content="أجهزة طبية, مختبرات, أدوية, مستلزمات طبية, طب الأسنان, استيراد, اليمن, نيوتك الطبية">
+    <title>نيوتك الطبية للاستيراد | New Tech Medical Corp</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231a5fb4' width='100' height='100' rx='20'/><text x='50' y='65' font-size='40' font-weight='bold' fill='white' text-anchor='middle' font-family='Arial'>NT</text></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f153d' width='100' height='100' rx='20'/><circle cx='50' cy='50' r='34' fill='%230a95b7'/><circle cx='62' cy='38' r='16' fill='%23d64776'/><text x='50' y='65' font-size='32' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>NT</text></svg>">
     
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
@@ -35,13 +35,13 @@
     <div class="top-bar">
         <div class="container">
             <div class="top-bar-content">
-                <span><i class="fas fa-truck"></i> <span data-i18n="topbar_delivery">توصيل سريع لجميع المحافظات اليمنية</span></span>
-                <span><i class="fas fa-phone"></i> <span data-i18n="topbar_call">اتصل بنا: +967 772 000 577</span></span>
+                <span><i class="fas fa-truck-fast"></i> <span data-i18n="topbar_delivery">توصيل سريع وموثوق لجميع المحافظات اليمنية</span></span>
+                <span><i class="fas fa-phone-volume"></i> <span data-i18n="topbar_call">اتصل بنا: +967 772 000 577</span></span>
             </div>
             <div class="top-bar-social">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
             </div>
         </div>
     </div>
@@ -49,8 +49,8 @@
     <!-- Header -->
     <header class="header" id="header">
         <div class="container">
-            <a href="index.html" class="logo">
-                <img src="images/logo.png" alt="New Tech Medical" class="logo-img">
+            <a href="index.html" class="logo" title="New Tech Medical Import">
+                <img src="images/logo.png" alt="New Tech Medical Corp" class="logo-img">
             </a>
             
             <nav class="nav-menu" id="navMenu">
@@ -64,16 +64,16 @@
             
             <div class="header-actions">
                 <a href="admin/login.html" class="admin-link" title="لوحة التحكم" data-i18n-title="admin_panel">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-shield-halved"></i>
                 </a>
-                <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="تبديل الوضع">
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="تبديل الوضع الليلي / النهاري">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="lang-toggle-btn" onclick="toggleLanguage()" title="Language / اللغة">
+                <button class="lang-toggle-btn" onclick="toggleLanguage()" title="Language / تغيير اللغة">
                     <i class="fas fa-globe"></i>
                     <span class="lang-code-text">EN</span>
                 </button>
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="القائمة">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
@@ -81,428 +81,456 @@
     </header>
 
     <main class="main-content">
-    <!-- Hero Section -->
-    <section class="hero" id="hero">
-        <div class="hero-image-bg-full">
-            <img src="images/main2.png" alt="New Tech Medical">
-        </div>
-        <div class="hero-wrapper">
-            <div class="hero-content">
-                <span class="hero-badge">🏥 شريككم الموثوق في الرعاية الصحية</span>
-                <h1>شريككم في <span>الرعاية الصحية</span></h1>
-                <p class="subtitle">مورد الأدوية · المستلزمات الطبية · المعدات الطبية</p>
-                <p class="tagline">معاً... نعيدكم بالتميز!!</p>
-                
-                <div class="hero-buttons">
-                    <a href="pages/products.html" class="btn btn-primary"><i class="fas fa-box-open"></i> اكتشف منتجاتنا</a>
-                    <a href="pages/contact.html" class="btn btn-secondary"><i class="fas fa-envelope"></i> تواصل معنا</a>
-                </div>
-                
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" data-target="2012">0</span>
-                        <span class="stat-label">تأسست</span>
+        <!-- 1. Hero Section -->
+        <section class="hero" id="hero">
+            <div class="hero-image-bg-full">
+                <img src="images/main2.png" alt="New Tech Medical Hero Background">
+            </div>
+            <div class="hero-wrapper">
+                <div class="hero-content">
+                    <span class="hero-badge" data-i18n="hero_badge">🏥 شريككم المعتمد في الرعاية الصحية والحلول الطبية</span>
+                    <h1><span data-i18n="hero_title_1">شريككم في </span><span class="hero-title-highlight" data-i18n="hero_title_2">الرعاية الصحية</span></h1>
+                    <p class="subtitle" data-i18n="hero_subtitle">استيراد وتوزيع الأجهزة الطبية والمختبرية · الأدوية والمستحضرات · أجهزة الأسنان · المستلزمات الطبية</p>
+                    <p class="tagline" data-i18n="hero_tagline">معاً... نعدكم بالتميز والارتقاء بالرعاية الصحية</p>
+                    
+                    <div class="hero-buttons">
+                        <a href="pages/products.html" class="btn btn-primary"><i class="fas fa-box-open"></i> <span data-i18n="btn_discover_products">اكتشف المنتجات</span></a>
+                        <a href="pages/contact.html" class="btn btn-secondary"><i class="fas fa-paper-plane"></i> <span data-i18n="btn_request_quote">طلب عرض سعر</span></a>
                     </div>
-                    <div class="stat-item">
-                        <span class="stat-number" data-target="14">0</span>
-                        <span class="stat-label">سنوات الخبرة</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" data-target="10">0</span>
-                        <span class="stat-label">شركاء دوليون</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" data-target="4">0</span>
-                        <span class="stat-label">أقسام رئيسية</span>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="2012">0</span>
+                            <span class="stat-label" data-i18n="stat_founded">تأسست الشركة</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="14">0</span>
+                            <span class="stat-label" data-i18n="stat_experience">سنوات الخبرة</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="10">0</span>
+                            <span class="stat-label" data-i18n="stat_partners">شركاء دوليون</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" data-target="4">0</span>
+                            <span class="stat-label" data-i18n="stat_departments">قطاعات متخصصة</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- About Section -->
-    <section class="section about-section" id="about">
-        <div class="container">
-            <div class="about-content">
-                <div class="about-image slide-in-right">
-                    <img src="images/main2.png" alt="نيوتك الطبية - شريككم في الرعاية الصحية" style="width: 100%; height: 400px; object-fit: cover; object-position: center; display: block;">
-                    <div class="about-image-overlay">
-                        <span>منذ عام 2012</span>
-                    </div>
-                </div>
-                
-                <div class="about-text slide-in-left">
-                    <h3>من نحن؟</h3>
-                    <p>نيوتك الطبية للاستيراد هي شركة يمنية متخصصة في استيراد وتوزيع المعدات الطبية والأدوية والمستلزمات الطبية. تأسست الشركة عام 2012 ومسجلة بوزارة الصحة وغرفة التجارة والصناعة في جمهورية اليمن.</p>
-                    <p>نعمل بشراكة مع أكبر الشركات العالمية في مجال المعدات الطبية لتقديم أفضل الحلول لقطاع الرعاية الصحية في اليمن.</p>
-                    
-                    <div class="about-features">
-                        <div class="about-feature">
-                            <div class="about-feature-icon" style="background: linear-gradient(135deg, #0284c7, #06b6d4);">
-                                <i class="fas fa-certificate"></i>
-                            </div>
-                            <div class="about-feature-text">
-                                <h4>مرخصة رسمياً</h4>
-                                <p>مسجلة بوزارة الصحة</p>
-                            </div>
-                        </div>
-                        
-                        <div class="about-feature">
-                            <div class="about-feature-icon" style="background: linear-gradient(135deg, #059669, #34d399);">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <div class="about-feature-text">
-                                <h4>شركاء دوليون</h4>
-                                <p>+10 شركاء عالميين</p>
-                            </div>
-                        </div>
-                        
-                        <div class="about-feature">
-                            <div class="about-feature-icon" style="background: linear-gradient(135deg, #7c3aed, #a78bfa);">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="about-feature-text">
-                                <h4>فريق متخصص</h4>
-                                <p>خبرة +14 عاماً</p>
-                            </div>
-                        </div>
-                        
-                        <div class="about-feature">
-                            <div class="about-feature-icon" style="background: linear-gradient(135deg, #dc2626, #f97316);">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                            <div class="about-feature-text">
-                                <h4>توصيل سريع</h4>
-                                <p>لجميع المحافظات</p>
-                            </div>
+        <!-- 2. About Company Overview -->
+        <section class="section about-section" id="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-image slide-in-right">
+                        <img src="images/main2.png" alt="نيوتك الطبية - شريككم في الرعاية الصحية" style="width: 100%; height: 420px; object-fit: cover; object-position: center; display: block; border-radius: 16px;">
+                        <div class="about-image-overlay">
+                            <span data-i18n="since_2012">منذ عام 2012</span>
                         </div>
                     </div>
                     
-                    <a href="pages/about.html" class="btn btn-primary" style="margin-top: 30px;"><i class="fas fa-info-circle"></i> اعرف المزيد</a>
+                    <div class="about-text slide-in-left">
+                        <span class="section-tag" data-i18n="about_badge">عن نيوتك الطبية</span>
+                        <h3 data-i18n="about_title">من نحن؟</h3>
+                        <p class="about-description" data-i18n="about_subtitle">شركة نيوتك الطبية للاستيراد (New Tech Medical Corp) هي شركة يمنية رائدة متخصصة في استيراد وتوزيع الأجهزة الطبية والمختبرية، الأدوية والمستحضرات الطبية، ومستلزمات طب الأسنان والمستلزمات الطبية في الجمهورية اليمنية. تأسست عام 2012 ومسجلة رسمياً لدى وزارة الصحة العامة والسكان والغرفة التجارية والصناعية.</p>
+                        <p class="about-description" data-i18n="about_desc2">نعمل بشراكات استراتيجية مع كبرى الشركات والمصانع العالمية لتقديم أحدث التجهيزات والحلول التقنية المعتمدة للمستشفيات، المراكز التشخيصية، والعيادات في مختلف محافظات اليمن مع ضمان أعلى معايير الجودة وخدمات ما بعد البيع.</p>
+                        
+                        <div class="about-features">
+                            <div class="about-feature">
+                                <div class="about-feature-icon" style="background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-light)); color: #fff;">
+                                    <i class="fas fa-stamp"></i>
+                                </div>
+                                <div class="about-feature-text">
+                                    <h4 data-i18n="about_feat1_title">مرخصة رسمياً</h4>
+                                    <p data-i18n="about_feat1_desc">مسجلة بوزارة الصحة والغرفة التجارية</p>
+                                </div>
+                            </div>
+                            
+                            <div class="about-feature">
+                                <div class="about-feature-icon" style="background: linear-gradient(135deg, var(--brand-burgundy), var(--brand-fuchsia)); color: #fff;">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <div class="about-feature-text">
+                                    <h4 data-i18n="about_feat2_title">شركاء عالميون</h4>
+                                    <p data-i18n="about_feat2_desc">تمثيل مصنعين دوليين معتمدين</p>
+                                </div>
+                            </div>
+                            
+                            <div class="about-feature">
+                                <div class="about-feature-icon" style="background: linear-gradient(135deg, var(--brand-navy), #253366); color: #fff;">
+                                    <i class="fas fa-user-doctor"></i>
+                                </div>
+                                <div class="about-feature-text">
+                                    <h4 data-i18n="about_feat3_title">فريق هندسي متخصص</h4>
+                                    <p data-i18n="about_feat3_desc">خبرة متراكمة تتجاوز 14 عاماً</p>
+                                </div>
+                            </div>
+                            
+                            <div class="about-feature">
+                                <div class="about-feature-icon" style="background: linear-gradient(135deg, #0d9488, var(--brand-blue)); color: #fff;">
+                                    <i class="fas fa-truck-ramp-box"></i>
+                                </div>
+                                <div class="about-feature-text">
+                                    <h4 data-i18n="about_feat4_title">لوجستيات متكاملة</h4>
+                                    <p data-i18n="about_feat4_desc">توزيع آمن وسلسلة تبريد للمحافظات</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <a href="pages/about.html" class="btn btn-primary" style="margin-top: 25px;"><i class="fas fa-info-circle"></i> <span data-i18n="btn_learn_more">اعرف المزيد عن مسيرتنا</span></a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Services Section -->
-    <section class="section services-section" id="services">
-        <div class="section-3d-icons">
-            <div class="sec-3d-icon s3d-1"><i class="fas fa-truck-medical"></i></div>
-            <div class="sec-3d-icon s3d-2"><i class="fas fa-wrench"></i></div>
-            <div class="sec-3d-icon s3d-3"><i class="fas fa-hospital-user"></i></div>
-            <div class="sec-3d-icon s3d-4"><i class="fas fa-user-nurse"></i></div>
-            <div class="sec-3d-icon s3d-5"><i class="fas fa-stethoscope"></i></div>
+        <!-- Wave Divider -->
+        <div class="section-divider divider-to-white">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path d="M0,40 C360,80 720,0 1080,50 C1260,70 1380,20 1440,40 L1440,80 L0,80 Z" fill="var(--bg-light)"/>
+            </svg>
         </div>
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>خدماتنا</h2>
-                <p>نقدم مجموعة متكاملة من الخدمات لدعم قطاع الرعاية الصحية في اليمن</p>
+
+        <!-- 3. The 4 Company Divisions (القطاعات الأربعة) -->
+        <section class="section departments-section" id="departments" style="background: var(--bg-light);">
+            <div class="section-3d-icons">
+                <div class="sec-3d-icon dept3d-1"><i class="fas fa-microscope"></i></div>
+                <div class="sec-3d-icon dept3d-2"><i class="fas fa-capsules"></i></div>
+                <div class="sec-3d-icon dept3d-3"><i class="fas fa-tooth"></i></div>
+                <div class="sec-3d-icon dept3d-4"><i class="fas fa-syringe"></i></div>
+                <div class="sec-3d-icon dept3d-5"><i class="fas fa-hospital"></i></div>
             </div>
-            
-            <div class="services-grid">
-                <div class="service-card fade-in">
-                    <div class="service-icon" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); color: #0284c7;">
-                        <i class="fas fa-truck-medical"></i>
-                    </div>
-                    <h3>التوزيع واللوجستيات</h3>
-                    <p>توزيع احترافي وسريع لجميع المنتجات الطبية إلى جميع المحافظات اليمنية</p>
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="departments_title">القطاعات الرئيسية للشركة</h2>
+                    <p data-i18n="departments_subtitle">أربعة قطاعات متخصصة ومتكاملة لتلبية كافة متطلبات المنظومة الصحية والطبية في اليمن</p>
                 </div>
                 
-                <div class="service-card fade-in">
-                    <div class="service-icon" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); color: #059669;">
-                        <i class="fas fa-wrench"></i>
+                <div class="departments-grid">
+                    <!-- Division 1 -->
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-blue-soft);">
+                            <i class="fas fa-microscope" style="color: var(--brand-blue);"></i>
+                        </div>
+                        <h3 data-i18n="dept1_title">الأجهزة الطبية والمختبرية</h3>
+                        <p data-i18n="dept1_desc">أجهزة التحاليل المناعية الآلية، محللات غازات الدم، أجهزة الإلكتروليت، وأجهزة وكواشف التخثر من أفضل المصنعين العالميين.</p>
                     </div>
-                    <h3>الدعم الفني والصيانة</h3>
-                    <p>فريق متخصص لتقديم الدعم الفني وصيانة المعدات الطبية على مدار الساعة</p>
+                    
+                    <!-- Division 2 -->
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-burgundy-soft);">
+                            <i class="fas fa-pills" style="color: var(--brand-burgundy);"></i>
+                        </div>
+                        <h3 data-i18n="dept2_title">الأدوية والمستحضرات الطبية</h3>
+                        <p data-i18n="dept2_desc">أدوية ومستحضرات صيدلانية معتمدة ومسجلة وفق معايير الهيئة العليا للأدوية ووزارة الصحة العامة والسكان.</p>
+                    </div>
+                    
+                    <!-- Division 3 -->
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-fuchsia-soft);">
+                            <i class="fas fa-tooth" style="color: var(--brand-fuchsia);"></i>
+                        </div>
+                        <h3 data-i18n="dept3_title">أجهزة ومستلزمات طب الأسنان</h3>
+                        <p data-i18n="dept3_desc">أحدث تجهيزات عيادات ومختبرات الأسنان، أدوات الجراحة، والمواد الاستهلاكية السنية المتطورة.</p>
+                    </div>
+                    
+                    <!-- Division 4 -->
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: #eef2ff;">
+                            <i class="fas fa-hand-holding-medical" style="color: var(--brand-navy);"></i>
+                        </div>
+                        <h3 data-i18n="dept4_title">المستلزمات الطبية</h3>
+                        <p data-i18n="dept4_desc">تشكيلة واسعة من المستلزمات الطبية الاستهلاكية والمحاليل التشخيصية لغرف العمليات والمستشفيات.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wave Divider -->
+        <div class="section-divider">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path d="M0,0 C480,80 960,0 1440,40 L1440,80 L0,80 Z" fill="var(--bg-white)"/>
+            </svg>
+        </div>
+
+        <!-- 4. Featured Products Section -->
+        <section class="section products-section" id="products">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="products_title">منتجاتنا المميزة</h2>
+                    <p data-i18n="products_subtitle">أحدث التقنيات والأجهزة الطبية والمخبرية من كبرى المصانع العالمية</p>
                 </div>
                 
-                <div class="service-card fade-in">
-                    <div class="service-icon" style="background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626;">
-                        <i class="fas fa-hospital-user"></i>
+                <div class="products-grid" id="homeProductsGrid">
+                    <div style="text-align:center;padding:40px;color:var(--text-secondary);grid-column:1/-1;">
+                        <i class="fas fa-spinner fa-spin"></i> جاري تحميل المنتجات...
                     </div>
-                    <h3>دعم المؤسسات الصحية</h3>
-                    <p>دعم شامل للمستشفيات والعيادات والمختبرات بأحدث المعدات والتقنيات</p>
+                </div>
+                
+                <div style="text-align: center; margin-top: 40px;">
+                    <a href="pages/products.html" class="btn btn-outline"><i class="fas fa-th-large"></i> <span data-i18n="btn_all_products">عرض كافة المنتجات</span></a>
                 </div>
             </div>
-            <div style="text-align:center;margin-top:30px">
-                <a href="pages/services.html" class="btn btn-primary"><i class="fas fa-arrow-left"></i> عرض المزيد</a>
-            </div>
+        </section>
+
+        <!-- Wave Divider -->
+        <div class="section-divider">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path d="M0,40 C360,100 720,0 1080,60 C1260,80 1380,30 1440,40 L1440,100 L0,100 Z" fill="var(--bg-light)"/>
+            </svg>
         </div>
-    </section>
 
-    <!-- Wave Divider -->
-    <div class="section-divider">
-        <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-            <path d="M0,40 C360,100 720,0 1080,60 C1260,80 1380,30 1440,40 L1440,100 L0,100 Z" fill="var(--bg-white)"/>
-        </svg>
-    </div>
-
-    <!-- Products Section -->
-    <section class="section products-section" id="products">
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>المنتجات الرئيسية</h2>
-                <p>نقدم أحدث المعدات والأجهزة الطبية من أفضل العلامات التجارية العالمية</p>
+        <!-- 5. Partners & Manufacturers Section -->
+        <section class="section partners-section" id="partners" style="background: var(--bg-light);">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="partners_title">الشركات والوكالات العالمية</h2>
+                    <p data-i18n="partners_subtitle">شراكات معتمدة مع نخبة من المصنعين العالميين في التكنولوجيا والتشخيص الطبي</p>
+                </div>
             </div>
             
-            <div class="products-grid" id="homeProductsGrid">
-                <div style="text-align:center;padding:40px;color:var(--text-secondary);"><i class="fas fa-spinner fa-spin"></i> جاري تحميل المنتجات...</div>
+            <div class="partners-marquee">
+                <div class="partners-track" id="homePartnersTrack">
+                    <div style="text-align:center;padding:40px;color:var(--text-secondary);width:100%;">
+                        <i class="fas fa-spinner fa-spin"></i> جاري تحميل الوكالات...
+                    </div>
+                </div>
             </div>
-            
-            <div id="pagination" class="pagination"></div>
             
             <div style="text-align: center; margin-top: 40px;">
-                <a href="pages/products.html" class="btn btn-outline"><i class="fas fa-th-large"></i> عرض جميع المنتجات</a>
+                <a href="pages/partners.html" class="btn btn-outline"><i class="fas fa-handshake"></i> <span data-i18n="btn_all_partners">عرض جميع الشركاء</span></a>
             </div>
+        </section>
+
+        <!-- Wave Divider -->
+        <div class="section-divider divider-to-white">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
+                <path d="M0,0 C480,80 960,0 1440,40 L1440,80 L0,80 Z" fill="var(--bg-white)"/>
+            </svg>
         </div>
-    </section>
 
-    <!-- Wave Divider -->
-    <div class="section-divider divider-to-white">
-        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-            <path d="M0,0 C480,80 960,0 1440,40 L1440,80 L0,80 Z" fill="var(--bg-white)"/>
-        </svg>
-    </div>
-
-    <!-- Agencies Section -->
-    <section class="section partners-section" id="partners">
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>الشركات والوكالات العالمية</h2>
-                <p>نفخر بالتمثيل الحصري لأكبر الشركات العالمية المتخصصة في المعدات الطبية</p>
+        <!-- 6. Core Services Section (5 Services) -->
+        <section class="section services-section" id="services">
+            <div class="section-3d-icons">
+                <div class="sec-3d-icon s3d-1"><i class="fas fa-truck-medical"></i></div>
+                <div class="sec-3d-icon s3d-2"><i class="fas fa-wrench"></i></div>
+                <div class="sec-3d-icon s3d-3"><i class="fas fa-file-signature"></i></div>
+                <div class="sec-3d-icon s3d-4"><i class="fas fa-briefcase"></i></div>
+                <div class="sec-3d-icon s3d-5"><i class="fas fa-headset"></i></div>
             </div>
-        </div>
-        
-        <div class="partners-marquee">
-            <div class="partners-track" id="homePartnersTrack">
-                <div style="text-align:center;padding:40px;color:var(--text-secondary);width:100%;"><i class="fas fa-spinner fa-spin"></i> جاري تحميل الوكالات...</div>
-            </div>
-        </div>
-        
-        <div style="text-align: center; margin-top: 40px;">
-            <a href="pages/partners.html" class="btn btn-outline"><i class="fas fa-building"></i> عرض جميع الوكالات</a>
-        </div>
-    </section>
-
-    <!-- Wave Divider -->
-    <div class="section-divider">
-        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-            <path d="M0,60 C320,0 640,80 960,20 C1120,0 1300,50 1440,30 L1440,80 L0,80 Z" fill="var(--bg-white)"/>
-        </svg>
-    </div>
-
-    <!-- Why Choose Us Section -->
-    <section class="section why-section" id="why">
-        <div class="section-3d-icons section-3d-light">
-            <div class="sec-3d-icon why3d-1"><i class="fas fa-medal"></i></div>
-            <div class="sec-3d-icon why3d-2"><i class="fas fa-trophy"></i></div>
-            <div class="sec-3d-icon why3d-3"><i class="fas fa-graduation-cap"></i></div>
-            <div class="sec-3d-icon why3d-4"><i class="fas fa-handshake"></i></div>
-            <div class="sec-3d-icon why3d-5"><i class="fas fa-star"></i></div>
-            <div class="sec-3d-icon why3d-6"><i class="fas fa-certificate"></i></div>
-        </div>
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>لماذا نحن؟</h2>
-                <p>نقدم أفضل الحلول لاحتياجاتكم الطبية بمعايير عالمية</p>
-            </div>
-            
-            <div class="why-grid">
-                <div class="why-card fade-in">
-                    <div class="why-icon" style="color: #fbbf24;">
-                        <i class="fas fa-award"></i>
-                    </div>
-                    <h3>خبرة +14 عاماً</h3>
-                    <p>أكثر من 14 عاماً من الخبرة في مجال المعدات الطبية والتمثيل الدولي</p>
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="services_title">خدماتنا الأساسية</h2>
+                    <p data-i18n="services_subtitle">نقدم حلولاً متكاملة وشاملة لدعم المؤسسات الطبية والرعاية الصحية في اليمن</p>
                 </div>
                 
-                <div class="why-card fade-in">
-                    <div class="why-icon" style="color: #34d399;">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h3>نمو مستمر</h3>
-                    <p>ننمو باستمرار لخدمة قطاع الرعاية الصحية في اليمن</p>
-                </div>
-                
-                <div class="why-card fade-in">
-                    <div class="why-icon" style="color: #38bdf8;">
-                        <i class="fas fa-shield-halved"></i>
-                    </div>
-                    <h3>معايير تنظيمية</h3>
-                    <p>نلتزم بأعلى المعايير التنظيمية والجودة العالمية</p>
-                </div>
-                
-                <div class="why-card fade-in">
-                    <div class="why-icon" style="color: #c084fc;">
-                        <i class="fas fa-puzzle-piece"></i>
-                    </div>
-                    <h3>حلول متكاملة</h3>
-                    <p>نقدم حلولاً شاملة تشمل المعدات والتدريب والصيانة</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Wave Divider -->
-    <div class="section-divider divider-to-blue">
-        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-            <path d="M0,40 C360,80 720,0 1080,50 C1260,70 1380,20 1440,40 L1440,0 L0,0 Z" fill="var(--bg-white)"/>
-        </svg>
-    </div>
-
-    <!-- Departments Section -->
-    <section class="section departments-section" id="departments">
-        <div class="section-3d-icons">
-            <div class="sec-3d-icon dept3d-1"><i class="fas fa-flask"></i></div>
-            <div class="sec-3d-icon dept3d-2"><i class="fas fa-capsules"></i></div>
-            <div class="sec-3d-icon dept3d-3"><i class="fas fa-teeth"></i></div>
-            <div class="sec-3d-icon dept3d-4"><i class="fas fa-band-aid"></i></div>
-            <div class="sec-3d-icon dept3d-5"><i class="fas fa-syringe"></i></div>
-        </div>
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>أقسامنا الرئيسية</h2>
-                <p>أربعة أقسام متخصصة لتلبية جميع احتياجاتكم الطبية</p>
-            </div>
-            
-            <div class="departments-grid">
-                <div class="department-card fade-in">
-                    <div class="department-icon" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd);">
-                        <i class="fas fa-microscope" style="color: #0284c7;"></i>
-                    </div>
-                    <h3>المعدات الطبية والمختبرات</h3>
-                    <p>أجهزة ومعدات مختبرية متطورة من أفضل العلامات التجارية العالمية</p>
-                </div>
-                
-                <div class="department-card fade-in">
-                    <div class="department-icon" style="background: linear-gradient(135deg, #fee2e2, #fecaca);">
-                        <i class="fas fa-pills" style="color: #dc2626;"></i>
-                    </div>
-                    <h3>الأدوية والعلاجات</h3>
-                    <p>أدوية ومعالجات طبية معتمدة من هيئات الدواء العالمية</p>
-                </div>
-                
-                <div class="department-card fade-in">
-                    <div class="department-icon" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">
-                        <i class="fas fa-tooth" style="color: #059669;"></i>
-                    </div>
-                    <h3>معدات الأسنان وملحقاتها</h3>
-                    <p>تجهيزات وأدوات طب الأسنان الحديثة والمتطورة</p>
-                </div>
-                
-                <div class="department-card fade-in">
-                    <div class="department-icon" style="background: linear-gradient(135deg, #ede9fe, #ddd6fe);">
-                        <i class="fas fa-hand-holding-medical" style="color: #7c3aed;"></i>
-                    </div>
-                    <h3>المستلزمات الطبية</h3>
-                    <p>مستلزمات طبية متنوعة بأعلى معايير الجودة</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Wave Divider -->
-    <div class="section-divider">
-        <svg viewBox="0 0 1440 80" preserveAspectRatio="none">
-            <path d="M0,20 C480,80 960,0 1440,40 L1440,80 L0,80 Z" fill="var(--bg-light)"/>
-        </svg>
-    </div>
-
-    <!-- Contact Section -->
-    <section class="section contact-section" id="contact">
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>تواصل معنا</h2>
-                <p>نحن هنا لمساعدتك. تواصل معنا اليوم</p>
-            </div>
-            
-            <div class="contact-grid">
-                <div class="contact-form fade-in">
-                    <h3>أرسل لنا رسالة</h3>
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <label for="name">الاسم الكامل</label>
-                            <input type="text" id="name" name="name" required>
+                <div class="services-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+                    <!-- Service 1 -->
+                    <div class="service-card fade-in">
+                        <div class="service-icon" style="background: var(--brand-blue-soft); color: var(--brand-blue);">
+                            <i class="fas fa-truck-fast"></i>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="email">البريد الإلكتروني</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="phone">رقم الهاتف</label>
-                            <input type="tel" id="phone" name="phone" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="subject">الموضوع</label>
-                            <select id="subject" name="subject">
-                                <option value="">اختر الموضوع</option>
-                                <option value="quote">طلب عرض سعر</option>
-                                <option value="info">استفسار عام</option>
-                                <option value="support">الدعم الفني</option>
-                                <option value="other">أخرى</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="message">الرسالة</label>
-                            <textarea id="message" name="message" required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-paper-plane"></i> إرسال الرسالة</button>
-                    </form>
-                </div>
-                
-                <div class="contact-info slide-in-left">
-                    <div class="contact-info-card">
-                        <div class="contact-info-icon" style="background: linear-gradient(135deg, #0284c7, #06b6d4);">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <div class="contact-info-content">
-                            <h4>المقر الرئيسي</h4>
-                            <p>صنعاء، اليمن - شارع الجزائر، تقاطع شارع بغداد</p>
-                        </div>
+                        <h3 data-i18n="service1_title">التوزيع واللوجستيات</h3>
+                        <p data-i18n="service1_desc">شبكة توزيع لوجستية سريعة تغطي جميع المحافظات اليمنية، مع مستودعات نموذجية مرخصة ونظام رقابة لسلسلة التبريد لضمان سلامة الأدوية والمحاليل الحساسة.</p>
                     </div>
                     
-                    <div class="contact-info-card">
-                        <div class="contact-info-icon" style="background: linear-gradient(135deg, #059669, #34d399);">
-                            <i class="fas fa-phone-alt"></i>
+                    <!-- Service 2 -->
+                    <div class="service-card fade-in">
+                        <div class="service-icon" style="background: var(--brand-fuchsia-soft); color: var(--brand-fuchsia);">
+                            <i class="fas fa-chart-line"></i>
                         </div>
-                        <div class="contact-info-content">
-                            <h4>الهاتف</h4>
-                            <p><a href="tel:+967772000577">+967 772 000 577</a></p>
-                        </div>
+                        <h3 data-i18n="service2_title">التسويق والتمثيل التجاري</h3>
+                        <p data-i18n="service2_desc">تمثيل معتمد لكبرى الشركات والمصانع العالمية، وبناء حضور تجاري قوي وتسويق المنتجات الطبية بمعايير علمية وأخلاقية رفيعة.</p>
                     </div>
                     
-                    <div class="contact-info-card">
-                        <div class="contact-info-icon" style="background: linear-gradient(135deg, #16a34a, #4ade80);">
-                            <i class="fab fa-whatsapp"></i>
+                    <!-- Service 3 -->
+                    <div class="service-card fade-in">
+                        <div class="service-icon" style="background: #f0fdf4; color: #16a34a;">
+                            <i class="fas fa-file-circle-check"></i>
                         </div>
-                        <div class="contact-info-content">
-                            <h4>الواتساب</h4>
-                            <p><a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer">+967 711 559 753</a></p>
+                        <h3 data-i18n="service3_title">التسجيل والشؤون التنظيمية</h3>
+                        <p data-i18n="service3_desc">إدارة متكاملة لملفات تسجيل الأدوية والأجهزة الطبية لدى الهيئة العليا للأدوية والمستلزمات الطبية ووزارة الصحة العامة وفق القوانين واللوائح النافذة.</p>
+                    </div>
+
+                    <!-- Service 4 -->
+                    <div class="service-card fade-in">
+                        <div class="service-icon" style="background: #fff7ed; color: #ea580c;">
+                            <i class="fas fa-handshake-angle"></i>
                         </div>
+                        <h3 data-i18n="service4_title">المناقصات والمشاريع الطبية</h3>
+                        <p data-i18n="service4_desc">تجهيز وتوريد المناقصات الطبية للقطاعين الحكومي والخاص والمنظمات الدولية، وتأثيث المختبرات والمستشفيات بأحدث النظم الطبية المتكاملة.</p>
+                    </div>
+
+                    <!-- Service 5 -->
+                    <div class="service-card fade-in">
+                        <div class="service-icon" style="background: var(--brand-burgundy-soft); color: var(--brand-burgundy);">
+                            <i class="fas fa-screwdriver-wrench"></i>
+                        </div>
+                        <h3 data-i18n="service5_title">التركيب والصيانة والدعم الفني</h3>
+                        <p data-i18n="service5_desc">فريق هندسي متخصص ومؤهل لتقديم خدمات التركيب، المعايرة الدقيقة، الصيانة الدورية والوقائية، والاستجابة للطوارئ مع توفير قطع الغيار الأصلية والضمان.</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 35px;">
+                    <a href="pages/services.html" class="btn btn-primary"><i class="fas fa-arrow-left"></i> <span data-i18n="btn_all_services">عرض تفاصيل الخدمات</span></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Why Choose Us (Strengths & Accreditations) -->
+        <section class="section why-section" id="why">
+            <div class="section-3d-icons section-3d-light">
+                <div class="sec-3d-icon why3d-1"><i class="fas fa-medal"></i></div>
+                <div class="sec-3d-icon why3d-2"><i class="fas fa-award"></i></div>
+                <div class="sec-3d-icon why3d-3"><i class="fas fa-shield-halved"></i></div>
+                <div class="sec-3d-icon why3d-4"><i class="fas fa-handshake"></i></div>
+                <div class="sec-3d-icon why3d-5"><i class="fas fa-certificate"></i></div>
+            </div>
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="why_title" style="color: #fff; -webkit-text-fill-color: #fff;">لماذا تختار نيوتك الطبية؟</h2>
+                    <p data-i18n="why_subtitle" style="color: rgba(255,255,255,0.85);">نلتزم بأعلى معايير الموثوقية المهنية وجودة التوريد الطبي</p>
+                </div>
+                
+                <div class="why-grid">
+                    <div class="why-card fade-in">
+                        <div class="why-icon" style="color: #fbbf24;">
+                            <i class="fas fa-award"></i>
+                        </div>
+                        <h3 data-i18n="why1_title">خبرة تزيد عن 14 عاماً</h3>
+                        <p data-i18n="why1_desc">خبرة متراكمة في استيراد وتوزيع الأجهزة والحلول الطبية منذ عام 2012، وفهم عميق لاحتياجات السوق اليمني.</p>
                     </div>
                     
-                    <div class="contact-info-card">
-                        <div class="contact-info-icon" style="background: linear-gradient(135deg, #dc2626, #f97316);">
-                            <i class="fas fa-envelope"></i>
+                    <div class="why-card fade-in">
+                        <div class="why-icon" style="color: #38bdf8;">
+                            <i class="fas fa-shield-halved"></i>
                         </div>
-                        <div class="contact-info-content">
-                            <h4>البريد الإلكتروني</h4>
-                            <p><a href="mailto:info@new-techmedical.com">info@new-techmedical.com</a></p>
-                        </div>
+                        <h3 data-i18n="why2_title">تراخيص واعتمادات رسمية</h3>
+                        <p data-i18n="why2_desc">الشركة مرخصة ومسجلة رسمياً لدى وزارة الصحة والغرفة التجارية وتلتزم بالمعايير الدوائية والتنظيمية.</p>
                     </div>
                     
-                    <div class="map-container" style="border-radius: 15px; overflow: hidden; box-shadow: var(--shadow-sm);">
-                        <iframe src="https://maps.google.com/maps?q=Sanaa,Yemen&t=&z=14&ie=UTF8&iwloc=&output=embed" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <div class="why-card fade-in">
+                        <div class="why-icon" style="color: #f472b6;">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h3 data-i18n="why3_title">شركاء ومصنعون عالميون</h3>
+                        <p data-i18n="why3_desc">شراكات معتمدة ومباشرة مع أفضل المصنعين في ألمانيا والصين لتوفير منتجات أصلية ذات موثوقية عالية.</p>
+                    </div>
+                    
+                    <div class="why-card fade-in">
+                        <div class="why-icon" style="color: #34d399;">
+                            <i class="fas fa-wrench"></i>
+                        </div>
+                        <h3 data-i18n="why4_title">دعم فني وضمان متكامل</h3>
+                        <p data-i18n="why4_desc">مهندسون متخصصون، قطع غيار أصلية متوفرة، وتدريب مستمر للكوادر الطبية والمخبرية على تشغيل الأجهزة.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+
+        <!-- 8. Contact & Request a Quote Section -->
+        <section class="section contact-section" id="contact">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="contact_title">تواصل معنا</h2>
+                    <p data-i18n="contact_subtitle">نسعد بتواصلكم عبر أي من قنوات الاتصال الرسمية أو إرسال طلب عرض سعر مباشر</p>
+                </div>
+                
+                <div class="contact-grid">
+                    <div class="contact-form fade-in">
+                        <h3 data-i18n="send_msg_title">أرسل لنا استفسارك أو طلبك</h3>
+                        <form id="contactForm">
+                            <div class="form-group">
+                                <label for="name" data-i18n="form_name">الاسم الكامل *</label>
+                                <input type="text" id="name" name="name" required placeholder="أدخل اسمك الكريم" data-i18n-placeholder="form_name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="email" data-i18n="form_email">البريد الإلكتروني *</label>
+                                <input type="email" id="email" name="email" required placeholder="example@domain.com" data-i18n-placeholder="form_email">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone" data-i18n="form_phone">رقم الهاتف *</label>
+                                <input type="tel" id="phone" name="phone" required placeholder="+967 ..." data-i18n-placeholder="form_phone">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="subject" data-i18n="form_subject">الموضوع *</label>
+                                <select id="subject" name="subject" required>
+                                    <option value="طلب عرض سعر" data-i18n="form_subject_quote">طلب عرض سعر</option>
+                                    <option value="استفسار عن منتج أو جهاز" data-i18n="form_subject_info">استفسار عن منتج أو جهاز</option>
+                                    <option value="الدعم الفني والصيانة" data-i18n="form_subject_support">الدعم الفني والصيانة</option>
+                                    <option value="شراكة وتوكيل تجاري" data-i18n="form_subject_partnership">شراكة وتوكيل تجاري</option>
+                                    <option value="أخرى" data-i18n="form_subject_other">أخرى</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message" data-i18n="form_message">نص الرسالة أو تفاصيل الطلب *</label>
+                                <textarea id="message" name="message" rows="4" required placeholder="اكتب تفاصيل طلبكم هنا..." data-i18n-placeholder="form_message"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-paper-plane"></i> <span data-i18n="btn_send">إرسال الرسالة</span>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="contact-info slide-in-left">
+                        <div class="contact-info-card">
+                            <div class="contact-info-icon" style="background: linear-gradient(135deg, var(--brand-navy), #253366);">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="contact-info-content">
+                                <h4 data-i18n="contact_hq">المقر الرئيسي للإدارة</h4>
+                                <p data-i18n="contact_hq_val">صنعاء، اليمن - شارع الجزائر، تقاطع شارع بغداد</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-card">
+                            <div class="contact-info-icon" style="background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-light));">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <div class="contact-info-content">
+                                <h4 data-i18n="contact_showroom">المعرض والمكتب التجاري</h4>
+                                <p data-i18n="contact_showroom_val">شارع الستين - مقابل المستشفى الألماني، صنعاء</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-info-card">
+                            <div class="contact-info-icon" style="background: linear-gradient(135deg, var(--brand-burgundy), var(--brand-fuchsia));">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-info-content">
+                                <h4 data-i18n="contact_phone">الهاتف المباشر</h4>
+                                <p><a href="tel:+967772000577" dir="ltr">+967 772 000 577</a></p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-info-card">
+                            <div class="contact-info-icon" style="background: linear-gradient(135deg, #16a34a, #22c55e);">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="contact-info-content">
+                                <h4 data-i18n="contact_whatsapp">واتساب المبيعات والدعم</h4>
+                                <p><a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer" dir="ltr">+967 711 559 753</a></p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-info-card">
+                            <div class="contact-info-icon" style="background: linear-gradient(135deg, #0284c7, #06b6d4);">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-info-content">
+                                <h4 data-i18n="contact_email">البريد الإلكتروني الرسمي</h4>
+                                <p><a href="mailto:info@new-techmedical.com">info@new-techmedical.com</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -512,45 +540,45 @@
                 <div class="footer-about">
                     <a href="index.html" class="logo">
                         <img src="images/logo.png" alt="New Tech Medical" class="logo-img">
-                        <div class="logo-text">
-                            <span class="en">NEW TECH MEDICAL</span>
-                            <span class="ar">نيوتك الطبية للاستيراد</span>
-                        </div>
                     </a>
-                    <p>شريككم الموثوق في الرعاية الصحية. نقدم أفضل المعدات والأدوية والمستلزمات الطبية من أكبر الشركات العالمية.</p>
+                    <p data-i18n="footer_desc">شركة نيوتك الطبية للاستيراد - شريككم الموثوق في الرعاية الصحية. استيراد وتوزيع الأجهزة والمعدات الطبية والمخبرية، الأدوية، مستلزمات طب الأسنان والمستلزمات الطبية في اليمن.</p>
                     <div class="footer-social">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
                 
                 <div class="footer-links">
-                    <h4>روابط سريعة</h4>
+                    <h4 data-i18n="footer_quick_links">روابط سريعة</h4>
                     <ul>
-                        <li><a href="index.html">الرئيسية</a></li>
-                        <li><a href="pages/about.html">من نحن</a></li>
-                        <li><a href="pages/products.html">المنتجات</a></li>
-                        <li><a href="pages/services.html">الخدمات</a></li>
-                        <li><a href="pages/partners.html">الشركات والوكالات</a></li>
-                        <li><a href="pages/contact.html">تواصل معنا</a></li>
+                        <li><a href="index.html" data-i18n="nav_home">الرئيسية</a></li>
+                        <li><a href="pages/about.html" data-i18n="nav_about">من نحن</a></li>
+                        <li><a href="pages/products.html" data-i18n="nav_products">المنتجات</a></li>
+                        <li><a href="pages/services.html" data-i18n="nav_services">الخدمات</a></li>
+                        <li><a href="pages/partners.html" data-i18n="nav_partners">الشركات والوكالات</a></li>
+                        <li><a href="pages/contact.html" data-i18n="nav_contact">تواصل معنا</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-contact">
-                    <h4>معلومات الاتصال</h4>
+                    <h4 data-i18n="footer_contact_info">بيانات التواصل</h4>
                     <ul>
                         <li>
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>صنعاء، اليمن - شارع الجزائر</span>
+                            <span data-i18n="contact_hq_val">صنعاء، اليمن - شارع الجزائر، تقاطع شارع بغداد</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-store"></i>
+                            <span data-i18n="contact_showroom_val">شارع الستين - مقابل المستشفى الألماني، صنعاء</span>
                         </li>
                         <li>
                             <i class="fas fa-phone-alt"></i>
-                            <span>+967 772 000 577</span>
+                            <span dir="ltr">+967 772 000 577</span>
                         </li>
                         <li>
                             <i class="fab fa-whatsapp"></i>
-                            <span>+967 711 559 753</span>
+                            <span dir="ltr">+967 711 559 753</span>
                         </li>
                         <li>
                             <i class="fas fa-envelope"></i>
@@ -560,52 +588,51 @@
                 </div>
                 
                 <div class="footer-hours">
-                    <h4>ساعات العمل</h4>
-                    <p>الأحد - الخميس</p>
-                    <p class="highlight">8:00 صباحاً - 4:00 مساءً</p>
-                    <p style="margin-top: 15px;">الجمعة - السبت</p>
-                    <p class="highlight">مغلق</p>
+                    <h4 data-i18n="footer_hours_title">أوقات الدوام</h4>
+                    <p data-i18n="contact_hours_val">الأحد - الخميس: 8:00 صباحاً - 4:00 مساءً</p>
+                    <p class="highlight" style="margin-top: 15px;" data-i18n="contact_hours_closed">الجمعة والسبت: عطلة أسبوعية</p>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2026 New Tech Medical Import. جميع الحقوق محفوظة.</p>
+                <p data-i18n="footer_rights">&copy; 2026 شركة نيوتك الطبية للاستيراد. جميع الحقوق محفوظة.</p>
             </div>
         </div>
     </footer>
 
     <!-- Scroll to Top -->
-    <button class="scroll-top" id="scrollTop">
+    <button class="scroll-top" id="scrollTop" aria-label="للأعلى">
         <i class="fas fa-arrow-up"></i>
     </button>
-
 
     <!-- Quote Modal -->
     <div class="modal-overlay" id="quoteModal">
         <div class="modal">
-            <button class="modal-close" onclick="closeQuoteModal()">
+            <button class="modal-close" onclick="closeQuoteModal()" aria-label="إغلاق">
                 <i class="fas fa-times"></i>
             </button>
-            <h3><i class="fas fa-paper-plane"></i> طلب عرض سعر</h3>
-            <p id="quoteProductName" style="margin-bottom: 20px; color: var(--primary-blue); font-weight: 600;"></p>
+            <h3><i class="fas fa-paper-plane" style="color: var(--brand-blue);"></i> <span data-i18n="quote_modal_title">طلب عرض سعر</span></h3>
+            <p id="quoteProductName" style="margin-bottom: 20px; color: var(--brand-blue); font-weight: 700;"></p>
             <form id="quoteForm">
                 <div class="form-group">
-                    <label for="quoteName">الاسم الكامل</label>
-                    <input type="text" id="quoteName" name="quoteName" required>
+                    <label for="quoteName" data-i18n="quote_name_label">الاسم الكامل *</label>
+                    <input type="text" id="quoteName" name="quoteName" required placeholder="الاسم الكريم">
                 </div>
                 <div class="form-group">
-                    <label for="quoteEmail">البريد الإلكتروني</label>
-                    <input type="email" id="quoteEmail" name="quoteEmail" required>
+                    <label for="quoteEmail" data-i18n="quote_email_label">البريد الإلكتروني *</label>
+                    <input type="email" id="quoteEmail" name="quoteEmail" required placeholder="example@domain.com">
                 </div>
                 <div class="form-group">
-                    <label for="quotePhone">رقم الهاتف</label>
-                    <input type="tel" id="quotePhone" name="quotePhone" required>
+                    <label for="quotePhone" data-i18n="quote_phone_label">رقم الهاتف *</label>
+                    <input type="tel" id="quotePhone" name="quotePhone" required placeholder="+967 ...">
                 </div>
                 <div class="form-group">
-                    <label for="quoteMessage">رسالتك</label>
-                    <textarea id="quoteMessage" name="quoteMessage" rows="3"></textarea>
+                    <label for="quoteMessage" data-i18n="quote_message_label">ملاحظات إضافية أو الكمية المطلوبة</label>
+                    <textarea id="quoteMessage" name="quoteMessage" rows="3" placeholder="تفاصيل الطلب..."></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">إرسال طلب العرض</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-check-circle"></i> <span data-i18n="btn_submit_quote">إرسال طلب عرض السعر</span>
+                </button>
             </form>
         </div>
     </div>
@@ -613,33 +640,34 @@
     <!-- Product Details Modal -->
     <div class="modal-overlay" id="productDetailsModal">
         <div class="modal product-details-modal">
-            <button class="modal-close" onclick="closeProductDetails()"><i class="fas fa-times"></i></button>
+            <button class="modal-close" onclick="closeProductDetails()" aria-label="إغلاق"><i class="fas fa-times"></i></button>
             <div class="product-details-content">
                 <div class="product-details-image">
-                    <img id="detailProductImage" src="" alt="" style="width: 100%; height: 250px; object-fit: contain; border-radius: 10px; background: var(--bg-gray); padding: 10px;">
+                    <img id="detailProductImage" src="" alt="Product Detail" style="width: 100%; height: 260px; object-fit: contain; border-radius: 10px; background: var(--bg-gray); padding: 12px;">
                 </div>
                 <div class="product-details-info">
-                    <h2 id="detailProductName" style="color: var(--primary-blue); margin-bottom: 5px;"></h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 5px;"><strong>الوكيل:</strong> <span id="detailProductAgent"></span></p>
-                    <p style="color: var(--text-secondary); margin-bottom: 5px;"><strong>الفئة:</strong> <span id="detailProductCategory"></span></p>
-                    <p id="detailProductPriceRow" style="color: var(--primary-blue); font-size: 18px; font-weight: 700; margin-bottom: 15px; display: none;"><span id="detailProductPrice"></span></p>
-                    <p id="detailProductDescription" style="color: var(--text-dark); line-height: 1.8; margin-bottom: 15px;"></p>
+                    <h2 id="detailProductName" style="color: var(--brand-navy); margin-bottom: 6px;"></h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 6px;"><strong data-i18n="product_manufacturer">الشركة المصنعة:</strong> <span id="detailProductAgent"></span></p>
+                    <p style="color: var(--text-secondary); margin-bottom: 6px;"><strong data-i18n="product_category">الفئة:</strong> <span id="detailProductCategory"></span></p>
+                    <p id="detailProductPriceRow" style="color: var(--brand-blue); font-size: 18px; font-weight: 700; margin-bottom: 12px; display: none;"><span id="detailProductPrice"></span></p>
+                    <p id="detailProductDescription" style="color: var(--text-dark); line-height: 1.8; margin-bottom: 14px;"></p>
                     
-                    <h4 style="margin-bottom: 8px;"><i class="fas fa-star" style="color: var(--primary-red);"></i> المميزات:</h4>
-                    <ul id="detailProductFeatures" style="list-style: none; padding: 0; margin-bottom: 15px;"></ul>
+                    <h4 style="margin-bottom: 8px;"><i class="fas fa-circle-check" style="color: var(--brand-blue);"></i> <span data-i18n="modal_features_title">المميزات الرئيسية:</span></h4>
+                    <ul id="detailProductFeatures" style="list-style: none; padding: 0; margin-bottom: 14px;"></ul>
                     
-                    <h4 style="margin-bottom: 8px;"><i class="fas fa-cog" style="color: var(--primary-blue);"></i> المواصفات:</h4>
-                    <ul id="detailProductSpecs" style="list-style: none; padding: 0; margin-bottom: 20px;"></ul>
+                    <h4 style="margin-bottom: 8px;"><i class="fas fa-sliders" style="color: var(--brand-fuchsia);"></i> <span data-i18n="modal_specs_title">المواصفات الفنية:</span></h4>
+                    <ul id="detailProductSpecs" style="list-style: none; padding: 0; margin-bottom: 18px;"></ul>
                     
-                    <button id="detailQuoteBtn" class="btn btn-primary" style="width: 100%;"><i class="fas fa-paper-plane"></i> طلب عرض سعر</button>
+                    <button id="detailQuoteBtn" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-paper-plane"></i> <span data-i18n="btn_get_quote">طلب عرض سعر</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Translations JS -->
+    <!-- Scripts -->
     <script src="js/translations.js"></script>
-    <!-- Main JS -->
     <script src="js/main.js"></script>
 </body>
 </html>

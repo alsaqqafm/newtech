@@ -271,21 +271,22 @@ function initContactForm() {
             });
             
             if (!data.name || !data.email || !data.phone || !data.message) {
-                alert('يرجى ملء جميع الحقول المطلوبة');
+                alert(typeof t === 'function' ? t('alert_fill_required') : 'يرجى ملء جميع الحقول المطلوبة');
                 return;
             }
             
             const submitBtn = contactForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'جاري الإرسال...';
+            const originalHtml = submitBtn.innerHTML;
+            const isEn = document.documentElement.lang === 'en';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (isEn ? 'Sending...' : 'جاري الإرسال...');
             submitBtn.disabled = true;
 
             const contactData = {
                 name: data.name,
                 email: data.email,
                 phone: data.phone,
-                product: (contactForm.querySelector('#subject') || {}).value || 'استفسار عام',
-                message: data.message,
+                product: (contactForm.querySelector('#subject') || {}).value || (data.company ? data.company : 'استفسار عام'),
+                message: (data.company ? '[منشأة: ' + data.company + '] ' : '') + data.message,
                 status: 'new'
             };
             
@@ -294,16 +295,16 @@ function initContactForm() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(contactData)
             }).then(function(r) {
-                if (!r.ok) throw new Error('Failed');
+                if (!r.ok) throw new Error('Failed to send contact request');
                 return r.json();
             }).then(function() {
-                alert('تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.');
+                alert(typeof t === 'function' ? t('alert_contact_success') : 'تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.');
                 contactForm.reset();
-            }).catch(function() {
-                alert('تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.');
-                contactForm.reset();
+            }).catch(function(err) {
+                console.error('Contact submit error:', err);
+                alert(typeof t === 'function' ? t('alert_error') : 'حدث خطأ أثناء الإرسال، يرجى المحاولة لاحقاً');
             }).finally(function() {
-                submitBtn.textContent = originalText;
+                submitBtn.innerHTML = originalHtml;
                 submitBtn.disabled = false;
             });
         });
@@ -316,9 +317,10 @@ function initContactForm() {
 function openQuoteModal(productName) {
     const modal = document.getElementById('quoteModal');
     const productNameElement = document.getElementById('quoteProductName');
+    const isEn = document.documentElement.lang === 'en';
     
     if (modal && productNameElement) {
-        productNameElement.textContent = 'المنتج: ' + productName;
+        productNameElement.textContent = (isEn ? 'Product: ' : 'المنتج المطلوب: ') + productName;
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
@@ -368,20 +370,27 @@ function initQuoteForm() {
             });
             
             if (!data.quoteName || !data.quoteEmail || !data.quotePhone) {
-                alert('يرجى ملء جميع الحقول المطلوبة');
+                alert(typeof t === 'function' ? t('alert_fill_required') : 'يرجى ملء جميع الحقول المطلوبة');
                 return;
             }
             
             const submitBtn = quoteForm.querySelector('button[type="submit"]');
-            const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+            const originalHtml = submitBtn.innerHTML;
+            const isEn = document.documentElement.lang === 'en';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (isEn ? 'Sending...' : 'جاري الإرسال...');
             submitBtn.disabled = true;
             
+            var productName = (document.getElementById('quoteProductName')?.textContent || '')
+                .replace(/^المنتج المطلوب:\s*/, '')
+                .replace(/^المنتج:\s*/, '')
+                .replace(/^Product:\s*/, '')
+                .trim() || 'طلب عام';
+
             var newQuote = {
                 name: data.quoteName,
                 email: data.quoteEmail,
                 phone: data.quotePhone,
-                product: data.quoteProduct || document.getElementById('quoteProductName')?.textContent.replace('المنتج: ', '') || 'غير محدد',
+                product: productName,
                 message: data.quoteMessage || ''
             };
 
@@ -390,18 +399,17 @@ function initQuoteForm() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newQuote)
             }).then(function(r) {
-                if (!r.ok) throw new Error('Failed');
+                if (!r.ok) throw new Error('Failed to submit quote');
                 return r.json();
             }).then(function() {
-                alert('تم إرسال طلب عرض السعر بنجاح! سنتواصل معك قريباً.');
+                alert(typeof t === 'function' ? t('alert_quote_success') : 'تم إرسال طلب عرض السعر بنجاح! سنتواصل معك قريباً.');
                 quoteForm.reset();
                 closeQuoteModal();
-            }).catch(function() {
-                alert('تم إرسال طلب عرض السعر بنجاح! سنتواصل معك قريباً.');
-                quoteForm.reset();
-                closeQuoteModal();
+            }).catch(function(err) {
+                console.error('Quote submit error:', err);
+                alert(typeof t === 'function' ? t('alert_error') : 'حدث خطأ أثناء إرسال طلب عرض السعر');
             }).finally(function() {
-                submitBtn.innerHTML = originalText;
+                submitBtn.innerHTML = originalHtml;
                 submitBtn.disabled = false;
             });
         });
@@ -491,36 +499,39 @@ function initOrderForm() {
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     var cart = getCart();
-    if (cart.length === 0) { alert('السلة فارغة'); return; }
+    var isEn = document.documentElement.lang === 'en';
+    if (cart.length === 0) { 
+      alert(typeof t === 'function' ? t('cart_empty') : (isEn ? 'Cart is empty' : 'السلة فارغة')); 
+      return; 
+    }
     var name = document.getElementById('orderName').value.trim();
     var phone = document.getElementById('orderPhone').value.trim();
     var notes = document.getElementById('orderNotes').value.trim();
-    if (!name) { alert('يرجى إدخال الاسم'); return; }
-    if (!phone) { alert('يرجى إدخال رقم الهاتف'); return; }
-    var productsStr = cart.map(function(item) { return item.name; }).join('، ');
+    if (!name || !phone) { 
+      alert(typeof t === 'function' ? t('alert_fill_required') : (isEn ? 'Please fill required fields' : 'يرجى ملء جميع الحقول المطلوبة')); 
+      return; 
+    }
+    var productsStr = cart.map(function(item) { return item.name; }).join(', ');
     var submitBtn = form.querySelector('button[type="submit"]');
     var originalHtml = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + (isEn ? 'Submitting...' : 'جاري الإرسال...');
     submitBtn.disabled = true;
     fetch('/api/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ customer_name: name, phone: phone, products: productsStr, notes: notes, status: 'pending' })
     }).then(function(r) {
-      if (!r.ok) throw new Error('Failed');
+      if (!r.ok) throw new Error('Order submission failed');
       return r.json();
     }).then(function() {
-      alert('تم إرسال الطلب بنجاح! سنتواصل معك قريباً.');
+      alert(typeof t === 'function' ? t('alert_order_success') : 'تم إرسال طلبكم بنجاح! سنتواصل معكم قريباً.');
       localStorage.removeItem('orderCart');
       updateCartBadge();
       form.reset();
       closeOrderModal();
-    }).catch(function() {
-      alert('تم إرسال الطلب بنجاح! سنتواصل معك قريباً.');
-      localStorage.removeItem('orderCart');
-      updateCartBadge();
-      form.reset();
-      closeOrderModal();
+    }).catch(function(err) {
+      console.error('Order submit error:', err);
+      alert(typeof t === 'function' ? t('alert_error') : 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة لاحقاً');
     }).finally(function() {
       submitBtn.innerHTML = originalHtml;
       submitBtn.disabled = false;
@@ -587,7 +598,21 @@ function toggleLanguage() {
     if (typeof applyTranslations === 'function') {
         applyTranslations(newLang);
     }
-    location.reload();
+    if (document.getElementById('productsGrid') && typeof renderProducts === 'function') {
+        renderProducts();
+    }
+    if (document.getElementById('homeProductsGrid') && typeof loadHomeProducts === 'function') {
+        loadHomeProducts();
+    }
+    if (document.getElementById('homePartnersTrack') && typeof loadHomePartners === 'function') {
+        loadHomePartners();
+    }
+    if (document.getElementById('partnersContainer') && typeof loadAllPartners === 'function') {
+        loadAllPartners();
+    }
+    if (typeof updateCartBadge === 'function') {
+        updateCartBadge();
+    }
 }
 
 // Make function globally available
@@ -684,15 +709,20 @@ function renderProducts() {
         if (image && !image.startsWith('http') && !image.startsWith('data:')) {
             image = imgBase + image.replace(/^\.\.\//, '');
         }
-        var badgeHtml = '';
-        if (p.category === 'POCT') badgeHtml = '<span class="product-badge">POCT</span>';
-        else if (p.category === 'غازات الدم') badgeHtml = '<span class="product-badge">' + (isEn ? 'Blood Gas' : 'غازات الدم') + '</span>';
-        else if (p.category === 'كواشف التخثر') badgeHtml = '<span class="product-badge">' + (isEn ? 'Reagents' : 'كواشف') + '</span>';
-        var priceCurrency = isEn ? 'YR' : 'ر.ي';
+        var badgeCategory = p.category || '';
+        if (isEn) {
+            if (badgeCategory === 'تحاليل مناعية') badgeCategory = 'Immunoassay';
+            else if (badgeCategory === 'غازات الدم') badgeCategory = 'Blood Gas';
+            else if (badgeCategory === 'الإلكتروليت') badgeCategory = 'Electrolytes';
+            else if (badgeCategory === 'أجهزة التخثر') badgeCategory = 'Coagulation';
+            else if (badgeCategory === 'كواشف التخثر') badgeCategory = 'Reagents';
+        }
+        var badgeHtml = badgeCategory ? '<span class="product-badge">' + badgeCategory + '</span>' : '';
+        var priceCurrency = isEn ? 'YER' : 'ر.ي';
         var priceHtml = p.price > 0 ? '<p class="product-price"><i class="fas fa-tag"></i> ' + formatNumber(p.price) + ' ' + priceCurrency + '</p>' : '';
-        var btnAddOrder = dict['btn_add_order'] || 'أضف للطلب';
-        var btnGetQuote = dict['btn_get_quote'] || 'عرض سعر';
-        var btnDetails = dict['btn_details'] || 'التفاصيل';
+        var btnAddOrder = dict['btn_add_order'] || (isEn ? 'Add to Order' : 'أضف للطلب');
+        var btnGetQuote = dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'طلب عرض سعر');
+        var btnDetails = dict['btn_details'] || (isEn ? 'Details' : 'التفاصيل');
 
         return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
             '<div class="product-image">' +
@@ -987,22 +1017,40 @@ var partnerColors = ['#0284c7', '#dc2626', '#10b981', '#f59e0b', '#8b5cf6', '#0d
 function loadHomeProducts() {
     var grid = document.getElementById('homeProductsGrid');
     if (!grid) return;
+    var isEn = document.documentElement.lang === 'en';
+    var dict = typeof translations !== 'undefined' ? (translations[isEn ? 'en' : 'ar'] || {}) : {};
+
     fetch('/api/products').then(function(r) { return r.json(); }).then(function(products) {
-        if (!products.length) { grid.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-secondary);grid-column:1/-1;">لا توجد منتجات حالياً</p>'; return; }
+        if (!products.length) { 
+            grid.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-secondary);grid-column:1/-1;">' + (dict['no_products'] || 'لا توجد منتجات حالياً') + '</p>'; 
+            return; 
+        }
         var shown = products.filter(function(p) { return p.active !== 0 && p.status === 'متوفر'; }).slice(0, 4);
         grid.innerHTML = shown.map(function(p) {
             var name = p.name || '';
             var agent = p.agent || '';
             var desc = p.description || '';
+            if (isEn && typeof productTranslations !== 'undefined' && productTranslations[name]) {
+                desc = productTranslations[name].description || desc;
+            }
             var image = p.image || '';
             if (image && !image.startsWith('http') && !image.startsWith('data:')) {
                 image = imgBase + image.replace(/^\.\.\//, '');
             }
-            var badgeHtml = '';
-            if (p.category === 'POCT') badgeHtml = '<span class="product-badge">POCT</span>';
-            else if (p.category === 'غازات الدم') badgeHtml = '<span class="product-badge">غازات الدم</span>';
-            else if (p.category === 'كواشف التخثر') badgeHtml = '<span class="product-badge">كواشف</span>';
-            var priceHtml2 = p.price > 0 ? '<p class="product-price" style="font-size:13px;font-weight:600;color:var(--primary-blue);margin-bottom:8px"><i class="fas fa-tag"></i> ' + formatNumber(p.price) + ' ر.ي</p>' : '';
+            var badgeCategory = p.category || '';
+            if (isEn) {
+                if (badgeCategory === 'تحاليل مناعية') badgeCategory = 'Immunoassay';
+                else if (badgeCategory === 'غازات الدم') badgeCategory = 'Blood Gas';
+                else if (badgeCategory === 'الإلكتروليت') badgeCategory = 'Electrolytes';
+                else if (badgeCategory === 'أجهزة التخثر') badgeCategory = 'Coagulation';
+                else if (badgeCategory === 'كواشف التخثر') badgeCategory = 'Reagents';
+            }
+            var badgeHtml = badgeCategory ? '<span class="product-badge">' + badgeCategory + '</span>' : '';
+            var priceHtml2 = p.price > 0 ? '<p class="product-price" style="font-size:13px;font-weight:600;color:var(--primary-blue);margin-bottom:8px"><i class="fas fa-tag"></i> ' + formatNumber(p.price) + ' ' + (isEn ? 'YER' : 'ر.ي') + '</p>' : '';
+            var btnAddOrder = dict['btn_add_order'] || (isEn ? 'Add to Order' : 'أضف للطلب');
+            var btnGetQuote = dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'عرض سعر');
+            var btnDetails = dict['btn_details'] || (isEn ? 'Details' : 'التفاصيل');
+
             return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
                 '<div class="product-image">' +
                     '<img src="' + image + '" alt="' + name + '" onerror="this.onerror=null;this.style.display=\'none\';">' +
@@ -1012,35 +1060,43 @@ function loadHomeProducts() {
                     '<h3>' + name + '</h3>' +
                     '<p class="product-agent">' + agent + '</p>' +
                     priceHtml2 +
-                    '<p>' + desc.substring(0, 80) + (desc.length > 80 ? '...' : '') + '</p>' +
+                    '<p>' + desc.substring(0, 85) + (desc.length > 85 ? '...' : '') + '</p>' +
                     '<div class="product-btn-group">' +
-                        '<button class="product-btn product-btn-order" onclick="addToCart(' + p.id + ',\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-cart-plus"></i> أضف للطلب</button>' +
-                        '<button class="product-btn product-btn-outline" onclick="openQuoteModal(\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-paper-plane"></i> عرض سعر</button>' +
+                        '<button class="product-btn product-btn-order" onclick="addToCart(' + p.id + ',\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-cart-plus"></i> ' + btnAddOrder + '</button>' +
+                        '<button class="product-btn product-btn-outline" onclick="openQuoteModal(\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-paper-plane"></i> ' + btnGetQuote + '</button>' +
                     '</div>' +
-                    '<button class="product-btn product-btn-details" onclick="openProductDetailsById(' + p.id + ')" style="margin-top:6px"><i class="fas fa-info-circle"></i> التفاصيل</button>' +
+                    '<button class="product-btn product-btn-details" onclick="openProductDetailsById(' + p.id + ')" style="margin-top:6px"><i class="fas fa-info-circle"></i> ' + btnDetails + '</button>' +
                 '</div>' +
             '</div>';
         }).join('');
         initCardTilt();
         updateCartBadge();
     }).catch(function() {
-        grid.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-secondary);grid-column:1/-1;">تعذر تحميل المنتجات</p>';
+        grid.innerHTML = '<p style="text-align:center;padding:40px;color:var(--text-secondary);grid-column:1/-1;">' + (dict['no_products'] || 'تعذر تحميل المنتجات') + '</p>';
     });
 }
 
 function loadHomePartners() {
     var track = document.getElementById('homePartnersTrack');
     if (!track) return;
+    var isEn = document.documentElement.lang === 'en';
     fetch('/api/partners').then(function(r) { return r.json(); }).then(function(partners) {
         if (!partners.length) { track.innerHTML = ''; return; }
         var html = partners.map(function(p, i) {
             var icon = partnerIcons[i % partnerIcons.length];
             var color = partnerColors[i % partnerColors.length];
+            var name = p.name;
+            var country = p.country || '';
+            var specialty = p.specialty || '';
+            if (isEn && typeof partnerTranslations !== 'undefined' && partnerTranslations[name]) {
+                country = partnerTranslations[name].country || country;
+                specialty = partnerTranslations[name].specialty || specialty;
+            }
             return '<div class="partner-item">' +
                 '<div style="text-align: center; font-weight: 600;">' +
                     '<i class="fas ' + icon + '" style="font-size: 30px; color: ' + color + '; margin-bottom: 10px; display: block;"></i>' +
-                    p.name +
-                    '<small style="display: block; color: var(--text-secondary);">' + (p.country || '') + ' - ' + (p.specialty || '') + '</small>' +
+                    name +
+                    '<small style="display: block; color: var(--text-secondary); font-size: 12px; margin-top: 4px;">' + (country ? country + ' - ' : '') + specialty + '</small>' +
                 '</div>' +
             '</div>';
         }).join('');
@@ -1051,15 +1107,20 @@ function loadHomePartners() {
 function loadAllProducts() {
     var grid = document.getElementById('productsGrid');
     if (!grid) return;
+    var isEn = document.documentElement.lang === 'en';
+    var dict = typeof translations !== 'undefined' ? (translations[isEn ? 'en' : 'ar'] || {}) : {};
     fetch('/api/products').then(function(r) { return r.json(); }).then(function(products) {
         var active = products.filter(function(p) { return p.active !== 0; });
         allProductsCache = active;
         filteredProducts = active;
-        if (!products.length) { grid.innerHTML = '<p style="text-align:center;padding:60px;color:var(--text-secondary);grid-column:1/-1;">لا توجد منتجات حالياً</p>'; return; }
+        if (!products.length) { 
+            grid.innerHTML = '<p style="text-align:center;padding:60px;color:var(--text-secondary);grid-column:1/-1;">' + (dict['no_products'] || 'لا توجد منتجات حالياً') + '</p>'; 
+            return; 
+        }
         currentPage = 1;
         renderProducts();
     }).catch(function() {
-        grid.innerHTML = '<p style="text-align:center;padding:60px;color:var(--text-secondary);grid-column:1/-1;">تعذر تحميل المنتجات</p>';
+        grid.innerHTML = '<p style="text-align:center;padding:60px;color:var(--text-secondary);grid-column:1/-1;">' + (dict['no_products'] || 'تعذر تحميل المنتجات') + '</p>';
     });
 }
 
@@ -1091,8 +1152,8 @@ function loadAllPartners() {
                 return '<span class="coverage-item">' + s.trim() + '</span>';
             }).filter(function(s) { return s.length > 10; }).join('');
             if (!coverageItems) coverageItems = '<span class="coverage-item">' + specialty + '</span>';
-            var agentTag = dict['exclusive_agent'] || 'وكيل حصري في اليمن';
-            var fieldsTitle = dict['fields_title'] || 'المجالات:';
+            var agentTag = dict['partner_type'] || (isEn ? 'Authorized Agency / Global Partner' : 'وكالة معتمدة / شريك دولي');
+            var fieldsTitle = dict['fields_title'] || (isEn ? 'Specialties:' : 'المجالات:');
 
             return '<div class="agency-card-modern visible">' +
                 '<div class="acm-top" style="background: linear-gradient(135deg, ' + color + ' 0%, ' + color + 'cc 100%)"></div>' +
@@ -1118,7 +1179,7 @@ function loadAllPartners() {
         }).join('');
         initCardTilt();
     }).catch(function() {
-        container.innerHTML = '<p style="text-align:center;padding:60px;color:var(--text-secondary);">تعذر تحميل الوكالات</p>';
+        container.innerHTML = '<p style="text-align:center;padding:60px;color:var(--text-secondary);">' + (dict['no_partners'] || 'تعذر تحميل الوكالات') + '</p>';
     });
 }
 
@@ -1128,11 +1189,34 @@ function loadAllPartners() {
 function openProductDetailsById(productId) {
     var modal = document.getElementById('productDetailsModal');
     if (!modal) return;
+    var isEn = document.documentElement.lang === 'en';
+    var dict = typeof translations !== 'undefined' ? (translations[isEn ? 'en' : 'ar'] || {}) : {};
+
     fetch('/api/products/' + productId).then(function(r) { return r.json(); }).then(function(product) {
         if (!product || product.error || product.active === 0) { closeProductDetails(); return; }
-        document.getElementById('detailProductName').textContent = product.name;
-        document.getElementById('detailProductAgent').textContent = product.agent || '';
-        document.getElementById('detailProductCategory').textContent = product.category || '';
+        
+        var name = product.name || '';
+        var desc = product.description || '';
+        var category = product.category || '';
+        var features = [];
+        var specs = [];
+
+        if (isEn && typeof productTranslations !== 'undefined' && productTranslations[name]) {
+            var pt = productTranslations[name];
+            desc = pt.description || desc;
+            category = pt.category || category;
+            if (pt.features) features = pt.features;
+            if (pt.specs) specs = pt.specs;
+        }
+
+        if (features.length === 0 && product.features) {
+            features = product.features.split('|');
+        }
+
+        document.getElementById('detailProductName').textContent = name;
+        document.getElementById('detailProductAgent').textContent = product.agent || (isEn ? 'New Tech Medical' : 'نيوتك الطبية');
+        document.getElementById('detailProductCategory').textContent = category || (isEn ? 'Medical Equipment' : 'أجهزة طبية');
+        
         var img = document.getElementById('detailProductImage');
         var imgSrc = product.image || '';
         if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {
@@ -1142,40 +1226,51 @@ function openProductDetailsById(productId) {
         img.onerror = function() {
             this.onerror = null;
             this.src = '';
-            this.alt = product.name;
+            this.alt = name;
             this.style.background = 'linear-gradient(135deg, #f0f7ff, #e3f2fd)';
         };
-        document.getElementById('detailProductDescription').textContent = product.description || '';
+
+        document.getElementById('detailProductDescription').textContent = desc;
+        
         var featuresList = document.getElementById('detailProductFeatures');
         var specsList = document.getElementById('detailProductSpecs');
 
-        var features = [];
-        if (product.features) {
-            features = product.features.split('|');
+        if (features.length > 0) {
+            featuresList.innerHTML = features.map(function(f) {
+                return '<li><i class="fas fa-check-circle" style="color: var(--brand-blue);"></i> ' + f.trim() + '</li>';
+            }).join('');
+            if (featuresList.previousElementSibling) featuresList.previousElementSibling.style.display = 'block';
+        } else {
+            featuresList.innerHTML = '';
+            if (featuresList.previousElementSibling) featuresList.previousElementSibling.style.display = 'none';
         }
-        featuresList.innerHTML = features.map(function(f) {
-            return '<li><i class="fas fa-check-circle" style="color: var(--primary-blue);"></i> ' + f.trim() + '</li>';
-        }).join('');
 
         var priceRow = document.getElementById('detailProductPriceRow');
         var priceEl = document.getElementById('detailProductPrice');
         if (product.price > 0) {
             priceRow.style.display = 'block';
-            priceEl.textContent = formatNumber(product.price) + ' ر.ي';
+            priceEl.textContent = formatNumber(product.price) + ' ' + (isEn ? 'YER' : 'ر.ي');
         } else {
             priceRow.style.display = 'none';
         }
 
-        var specs = [];
-        if (product.category) specs.push('الفئة: ' + product.category);
-        if (product.model) specs.push('الطراز: ' + product.model);
-        if (product.agent) specs.push('الوكيل: ' + product.agent);
-        if (product.status) specs.push('الحالة: ' + product.status);
-        if (product.keywords) specs.push('الكلمات المفتاحية: ' + product.keywords);
+        if (specs.length === 0) {
+            if (category) specs.push((isEn ? 'Category: ' : 'الفئة: ') + category);
+            if (product.model) specs.push((isEn ? 'Model: ' : 'الطراز: ') + product.model);
+            if (product.agent) specs.push((isEn ? 'Manufacturer: ' : 'الشركة المصنعة: ') + product.agent);
+            if (product.status) specs.push((isEn ? 'Availability: ' : 'الحالة: ') + (isEn ? (product.status === 'متوفر' ? 'Available' : product.status) : product.status));
+        }
+
         specsList.innerHTML = specs.map(function(s) {
-            return '<li><i class="fas fa-cog" style="color: var(--primary-red);"></i> ' + s + '</li>';
+            return '<li><i class="fas fa-cog" style="color: var(--brand-fuchsia);"></i> ' + s + '</li>';
         }).join('');
-        document.getElementById('detailQuoteBtn').setAttribute('onclick', "closeProductDetails(); openQuoteModal('" + (product.name || '').replace(/'/g, "\\'") + "');");
+
+        var detailQuoteBtn = document.getElementById('detailQuoteBtn');
+        if (detailQuoteBtn) {
+            detailQuoteBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ' + (dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'طلب عرض سعر'));
+            detailQuoteBtn.setAttribute('onclick', "closeProductDetails(); openQuoteModal('" + name.replace(/'/g, "\\'") + "');");
+        }
+
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
     }).catch(function() {});

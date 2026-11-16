@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="خدمات نيوتك الطبية - دعم فني، صيانة، توزيع، وتمثيل دولي">
-    <title>الخدمات | نيوتك الطبية</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231a5fb4' width='100' height='100' rx='20'/><text x='50' y='65' font-size='40' font-weight='bold' fill='white' text-anchor='middle' font-family='Arial'>NT</text></svg>">
+    <meta name="description" content="خدمات شركة نيوتك الطبية للاستيراد - التوزيع، الصيانة والدعم الفني، التسجيل والشؤون التنظيمية، المناقصات، والتجهيزات الطبية">
+    <title>خدماتنا | نيوتك الطبية للاستيراد</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f153d' width='100' height='100' rx='20'/><circle cx='50' cy='50' r='34' fill='%230a95b7'/><circle cx='62' cy='38' r='16' fill='%23d64776'/><text x='50' y='65' font-size='32' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>NT</text></svg>">
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
@@ -28,13 +28,13 @@
     <div class="top-bar">
         <div class="container">
             <div class="top-bar-content">
-                <span><i class="fas fa-truck"></i> توصيل سريع لجميع المحافظات اليمنية</span>
-                <span><i class="fas fa-phone"></i> اتصل بنا: +967 772 000 577</span>
+                <span><i class="fas fa-truck-fast"></i> <span data-i18n="topbar_delivery">توصيل سريع وموثوق لجميع المحافظات اليمنية</span></span>
+                <span><i class="fas fa-phone-volume"></i> <span data-i18n="topbar_call">اتصل بنا: +967 772 000 577</span></span>
             </div>
             <div class="top-bar-social">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
             </div>
         </div>
     </div>
@@ -42,7 +42,7 @@
     <!-- Header -->
     <header class="header" id="header">
         <div class="container">
-            <a href="../index.html" class="logo">
+            <a href="../index.html" class="logo" title="New Tech Medical">
                 <img src="../images/logo.png" alt="New Tech Medical" class="logo-img">
             </a>
             <nav class="nav-menu" id="navMenu">
@@ -55,16 +55,16 @@
             </nav>
             <div class="header-actions">
                 <a href="../admin/login.html" class="admin-link" title="لوحة التحكم" data-i18n-title="admin_panel">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-shield-halved"></i>
                 </a>
                 <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="تبديل الوضع">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="lang-toggle-btn" onclick="toggleLanguage()" title="Language / اللغة">
+                <button class="lang-toggle-btn" onclick="toggleLanguage()" title="Language / تغيير اللغة">
                     <i class="fas fa-globe"></i>
                     <span class="lang-code-text">EN</span>
                 </button>
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="القائمة">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
@@ -72,140 +72,116 @@
     </header>
 
     <main class="main-content">
-    <!-- Page Banner -->
-    <section class="page-banner">
-        <div class="section-3d-icons section-3d-light">
-            <div class="sec-3d-icon banner3d-1"><i class="fas fa-truck-medical"></i></div>
-            <div class="sec-3d-icon banner3d-2"><i class="fas fa-wrench"></i></div>
-            <div class="sec-3d-icon banner3d-3"><i class="fas fa-hospital-user"></i></div>
-            <div class="sec-3d-icon banner3d-4"><i class="fas fa-user-nurse"></i></div>
-            <div class="sec-3d-icon banner3d-5"><i class="fas fa-stethoscope"></i></div>
-            <div class="sec-3d-icon banner3d-6"><i class="fas fa-notes-medical"></i></div>
-        </div>
-        <div class="container">
-            <h1>خدماتنا</h1>
-            <p>نقدم مجموعة متكاملة من الخدمات لدعم قطاع الرعاية الصحية</p>
-        </div>
-    </section>
+        <!-- Page Banner -->
+        <section class="page-banner">
+            <div class="section-3d-icons section-3d-light">
+                <div class="sec-3d-icon banner3d-1"><i class="fas fa-truck"></i></div>
+                <div class="sec-3d-icon banner3d-2"><i class="fas fa-wrench"></i></div>
+                <div class="sec-3d-icon banner3d-3"><i class="fas fa-file-signature"></i></div>
+                <div class="sec-3d-icon banner3d-4"><i class="fas fa-briefcase"></i></div>
+                <div class="sec-3d-icon banner3d-5"><i class="fas fa-headset"></i></div>
+            </div>
+            <div class="container">
+                <h1 data-i18n="services_title">خدماتنا الأساسية</h1>
+                <p data-i18n="services_subtitle">نقدم حلولاً متكاملة وشاملة لدعم المؤسسات الطبية والرعاية الصحية في اليمن</p>
+            </div>
+        </section>
 
-    <!-- Services Detail -->
-    <section class="section" style="position: relative;">
-        <div class="section-3d-icons">
-            <div class="sec-3d-icon s3d-1"><i class="fas fa-truck"></i></div>
-            <div class="sec-3d-icon s3d-2"><i class="fas fa-wrench"></i></div>
-            <div class="sec-3d-icon s3d-3"><i class="fas fa-hospital-user"></i></div>
-            <div class="sec-3d-icon s3d-4"><i class="fas fa-chart-line"></i></div>
-            <div class="sec-3d-icon s3d-5"><i class="fas fa-file-contract"></i></div>
-        </div>
-        <div class="container">
-            <div class="services-detail-grid">
-                <!-- Service 1 -->
-                <div class="service-card-detailed fade-in">
-                    <div class="scd-top" style="background: linear-gradient(135deg, #0284c7, #06b6d4)"></div>
-                    <div class="scd-body">
-                        <div class="scd-icon" style="background: linear-gradient(135deg, #e0f2fe, #bae6fd);color:#0284c7"><i class="fas fa-truck"></i></div>
-                        <h3>التوزيع واللوجستيات</h3>
-                        <p>نقدم خدمة توزيع احترافية وسريعة لجميع المنتجات الطبية إلى جميع المحافظات اليمنية. نمتلك شبكة لوجستيات متطورة تضمن وصول المنتجات بأمان وكفاءة عالية.</p>
-                        <ul class="scd-benefits">
-                            <li><i class="fas fa-check-circle" style="color:#0284c7"></i> تغطية شاملة لجميع المحافظات</li>
-                            <li><i class="fas fa-check-circle" style="color:#0284c7"></i> مخازن مجهزة بأحدث المعايير</li>
-                            <li><i class="fas fa-check-circle" style="color:#0284c7"></i> نظام تبريد مراقب للمنتجات الحساسة</li>
-                            <li><i class="fas fa-check-circle" style="color:#0284c7"></i> تتبع مباشر للشحنات</li>
-                        </ul>
+        <!-- Services Detail Grid -->
+        <section class="section" style="position: relative;">
+            <div class="container">
+                <div class="services-detail-grid">
+                    <!-- Service 1: Logistics & Distribution -->
+                    <div class="service-card-detailed fade-in">
+                        <div class="scd-top" style="background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-light))"></div>
+                        <div class="scd-body">
+                            <div class="scd-icon" style="background: var(--brand-blue-soft); color: var(--brand-blue);"><i class="fas fa-truck-fast"></i></div>
+                            <h3 data-i18n="service1_title">التوزيع واللوجستيات</h3>
+                            <p data-i18n="service1_desc">شبكة توزيع لوجستية سريعة تغطي جميع المحافظات اليمنية، مع مستودعات نموذجية مرخصة ونظام رقابة لسلسلة التبريد لضمان سلامة الأدوية والمحاليل الحساسة.</p>
+                            <ul class="scd-benefits">
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-blue)"></i> تغطية شاملة لكافة المحافظات والمستشفيات</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-blue)"></i> مستودعات مركزية مجهزة وفق اشتراطات GSDP</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-blue)"></i> رقابة مستمرة لسلسلة التبريد (Cold-Chain)</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-blue)"></i> تتبع مباشر وتسليم دقيق للشحنات الطبية</li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Service 2 -->
-                <div class="service-card-detailed fade-in">
-                    <div class="scd-top" style="background: linear-gradient(135deg, #0d9488, #06b6d4)"></div>
-                    <div class="scd-body">
-                        <div class="scd-icon" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);color:#0d9488"><i class="fas fa-wrench"></i></div>
-                        <h3>الدعم الفني والصيانة</h3>
-                        <p>فريق متخصص من المهندسين والفنيين المدربين على صيانة جميع أنواع المعدات الطبية. نقدم دعماً فنياً على مدار الساعة لضمان تشغيل المعدات بكفاءة.</p>
-                        <ul class="scd-benefits">
-                            <li><i class="fas fa-check-circle" style="color:#0d9488"></i> فريق فني متخصص ومدرب</li>
-                            <li><i class="fas fa-check-circle" style="color:#0d9488"></i> دعم فني على مدار الساعة</li>
-                            <li><i class="fas fa-check-circle" style="color:#0d9488"></i> قطع غيار أصلية</li>
-                            <li><i class="fas fa-check-circle" style="color:#0d9488"></i> صيانة دورية ووقائية</li>
-                        </ul>
+                    
+                    <!-- Service 2: Marketing & Commercial Representation -->
+                    <div class="service-card-detailed fade-in">
+                        <div class="scd-top" style="background: linear-gradient(135deg, var(--brand-burgundy), var(--brand-fuchsia))"></div>
+                        <div class="scd-body">
+                            <div class="scd-icon" style="background: var(--brand-fuchsia-soft); color: var(--brand-fuchsia);"><i class="fas fa-chart-line"></i></div>
+                            <h3 data-i18n="service2_title">التسويق والتمثيل التجاري</h3>
+                            <p data-i18n="service2_desc">تمثيل معتمد لكبرى الشركات والمصانع العالمية، وبناء حضور تجاري قوي وتسويق المنتجات الطبية بمعايير علمية وأخلاقية رفيعة.</p>
+                            <ul class="scd-benefits">
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-fuchsia)"></i> تمثيل معتمد لكبرى الشركات الطبية العالمية</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-fuchsia)"></i> خطط تسويق علمية موجهة للكوادر المتخصصة</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-fuchsia)"></i> ندوات وورش تعريفية بالتقنيات الحديثة</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-fuchsia)"></i> شراكات مستدامة مع الأطباء والمختبرات</li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Service 3 -->
-                <div class="service-card-detailed fade-in">
-                    <div class="scd-top" style="background: linear-gradient(135deg, #dc2626, #f97316)"></div>
-                    <div class="scd-body">
-                        <div class="scd-icon" style="background: linear-gradient(135deg, #fee2e2, #fecaca);color:#dc2626"><i class="fas fa-hospital"></i></div>
-                        <h3>دعم المؤسسات الصحية</h3>
-                        <p>ندعم المستشفيات والعيادات والمختبرات بأحدث المعدات والتقنيات الطبية. نقدم استشارات متخصصة لاختيار أفضل الحلول المناسبة لاحتياجات كل مؤسسة.</p>
-                        <ul class="scd-benefits">
-                            <li><i class="fas fa-check-circle" style="color:#dc2626"></i> استشارات متخصصة</li>
-                            <li><i class="fas fa-check-circle" style="color:#dc2626"></i> تخطيط وتصميم المختبرات</li>
-                            <li><i class="fas fa-check-circle" style="color:#dc2626"></i> تدريب الكوادر الطبية</li>
-                            <li><i class="fas fa-check-circle" style="color:#dc2626"></i> حلول متكاملة حسب الاحتياج</li>
-                        </ul>
+                    
+                    <!-- Service 3: Regulatory Affairs & Registration -->
+                    <div class="service-card-detailed fade-in">
+                        <div class="scd-top" style="background: linear-gradient(135deg, #0d9488, var(--brand-blue))"></div>
+                        <div class="scd-body">
+                            <div class="scd-icon" style="background: #f0fdf4; color: #16a34a;"><i class="fas fa-file-circle-check"></i></div>
+                            <h3 data-i18n="service3_title">التسجيل والشؤون التنظيمية</h3>
+                            <p data-i18n="service3_desc">إدارة متكاملة لملفات تسجيل الأدوية والأجهزة الطبية لدى الهيئة العليا للأدوية والمستلزمات الطبية ووزارة الصحة العامة وفق القوانين واللوائح النافذة.</p>
+                            <ul class="scd-benefits">
+                                <li><i class="fas fa-circle-check" style="color: #16a34a"></i> إعداد ملفات التسجيل الفنية (CTD Files)</li>
+                                <li><i class="fas fa-circle-check" style="color: #16a34a"></i> متابعة التراخيص والموافقات الرسمية</li>
+                                <li><i class="fas fa-circle-check" style="color: #16a34a"></i> الامتثال الكامل لتعليمات الهيئة العليا للأدوية</li>
+                                <li><i class="fas fa-circle-check" style="color: #16a34a"></i> تجديد الاعتمادات والتحديث الدوري للملفات</li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Service 4 -->
-                <div class="service-card-detailed fade-in">
-                    <div class="scd-top" style="background: linear-gradient(135deg, #f59e0b, #fbbf24)"></div>
-                    <div class="scd-body">
-                        <div class="scd-icon" style="background: linear-gradient(135deg, #fef3c7, #fde68a);color:#d97706"><i class="fas fa-chart-line"></i></div>
-                        <h3>التسويق والتمثيل</h3>
-                        <p>نمثل حصرياً أكبر العلامات التجارية العالمية في مجال المعدات الطبية في السوق اليمني. نضمن توفير منتجات أصلية بأسعار تنافسية.</p>
-                        <ul class="scd-benefits">
-                            <li><i class="fas fa-check-circle" style="color:#d97706"></i> تمثيل حصري لعلامات عالمية</li>
-                            <li><i class="fas fa-check-circle" style="color:#d97706"></i> منتجات أصلية معتمدة</li>
-                            <li><i class="fas fa-check-circle" style="color:#d97706"></i> أسعار تنافسية</li>
-                            <li><i class="fas fa-check-circle" style="color:#d97706"></i> ضمانات على جميع المنتجات</li>
-                        </ul>
+                    
+                    <!-- Service 4: Tenders & Medical Projects -->
+                    <div class="service-card-detailed fade-in">
+                        <div class="scd-top" style="background: linear-gradient(135deg, #d97706, #fbbf24)"></div>
+                        <div class="scd-body">
+                            <div class="scd-icon" style="background: #fff7ed; color: #ea580c;"><i class="fas fa-handshake-angle"></i></div>
+                            <h3 data-i18n="service4_title">المناقصات والمشاريع الطبية</h3>
+                            <p data-i18n="service4_desc">تجهيز وتوريد المناقصات الطبية للقطاعين الحكومي والخاص والمنظمات الدولية، وتأثيث المختبرات والمستشفيات بأحدث النظم الطبية المتكاملة.</p>
+                            <ul class="scd-benefits">
+                                <li><i class="fas fa-circle-check" style="color: #ea580c"></i> خبرة طويلة في مناقصات وزارة الصحة والمنظمات</li>
+                                <li><i class="fas fa-circle-check" style="color: #ea580c"></i> تقديم عروض فنية ومالية تنافسية متكاملة</li>
+                                <li><i class="fas fa-circle-check" style="color: #ea580c"></i> تجهيز أقسام العمليات والمختبرات بالكامل</li>
+                                <li><i class="fas fa-circle-check" style="color: #ea580c"></i> التزام دقيق بجداول التوريد والمواصفات المعتمدة</li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                
-                <!-- Service 5 -->
-                <div class="service-card-detailed fade-in">
-                    <div class="scd-top" style="background: linear-gradient(135deg, #7c3aed, #a78bfa)"></div>
-                    <div class="scd-body">
-                        <div class="scd-icon" style="background: linear-gradient(135deg, #ede9fe, #ddd6fe);color:#7c3aed"><i class="fas fa-clipboard-list"></i></div>
-                        <h3>المناقصات والمشاريع</h3>
-                        <p>نشارك في المناقصات الحكومية ومشاريع التطوير الصحي لتمكين المؤسسات الصحية من الحصول على أحدث المعدات بأفضل الأسعار.</p>
-                        <ul class="scd-benefits">
-                            <li><i class="fas fa-check-circle" style="color:#7c3aed"></i> خبرة واسعة في المناقصات</li>
-                            <li><i class="fas fa-check-circle" style="color:#7c3aed"></i> عروض متكاملة وشاملة</li>
-                            <li><i class="fas fa-check-circle" style="color:#7c3aed"></i> متابعة التنفيذ والتركيب</li>
-                            <li><i class="fas fa-check-circle" style="color:#7c3aed"></i> ضمانات طويلة الأجل</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Service 6 -->
-                <div class="service-card-detailed fade-in">
-                    <div class="scd-top" style="background: linear-gradient(135deg, #0284c7, #8b5cf6)"></div>
-                    <div class="scd-body">
-                        <div class="scd-icon" style="background: linear-gradient(135deg, #e0f2fe, #c7d2fe);color:#0284c7"><i class="fas fa-file-alt"></i></div>
-                        <h3>الشؤون التنظيمية</h3>
-                        <p>نساعد في الحصول على التراخيص والموافقات التنظيمية للمنتجات الطبية من الجهات المختصة في جمهورية اليمن.</p>
-                        <ul class="scd-benefits">
-                            <li><i class="fas fa-check-circle" style="color:#0284c7"></i> تسجيل المنتجات الطبية</li>
-                            <li><i class="fas fa-check-circle" style="color:#0284c7"></i> الحصول على التراخيص</li>
-                            <li><i class="fas fa-check-circle" style="color:#0284c7"></i> المتابعة مع الجهات الرسمية</li>
-                            <li><i class="fas fa-check-circle" style="color:#0284c7"></i> الامتثال للمعايير الدولية</li>
-                        </ul>
+                    
+                    <!-- Service 5: Installation, Maintenance & Support -->
+                    <div class="service-card-detailed fade-in">
+                        <div class="scd-top" style="background: linear-gradient(135deg, var(--brand-navy), var(--brand-blue))"></div>
+                        <div class="scd-body">
+                            <div class="scd-icon" style="background: var(--brand-burgundy-soft); color: var(--brand-burgundy);"><i class="fas fa-screwdriver-wrench"></i></div>
+                            <h3 data-i18n="service5_title">التركيب والصيانة والدعم الفني</h3>
+                            <p data-i18n="service5_desc">فريق هندسي متخصص ومؤهل لتقديم خدمات التركيب، المعايرة الدقيقة، الصيانة الدورية والوقائية، والاستجابة للطوارئ مع توفير قطع الغيار الأصلية والضمان.</p>
+                            <ul class="scd-benefits">
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-navy)"></i> مهندسون طبيون معتمدون من المصنعين</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-navy)"></i> عقود صيانة دورية ووقائية مبرمجة</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-navy)"></i> توفر دائم لقطع الغيار الأصلية والملحقات</li>
+                                <li><i class="fas fa-circle-check" style="color: var(--brand-navy)"></i> تدريب عملي للكوادر الطبية والمخبرية</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- CTA Section -->
-    <section class="section" style="background: var(--gradient-blue); color: white; text-align: center;">
-        <div class="container">
-            <h2 style="font-size: 32px; margin-bottom: 20px;">هل تحتاج استشارة مجانية؟</h2>
-            <p style="font-size: 18px; margin-bottom: 30px; opacity: 0.9;">تواصل معنا اليوم للحصول على استشارة مجانية حول احتياجاتك الطبية</p>
-            <a href="contact.html" class="btn btn-primary" style="background: var(--bg-white); color: var(--primary-blue);"><i class="fas fa-phone-alt"></i> تواصل معنا</a>
-        </div>
-    </section>
+        <!-- CTA Section -->
+        <section class="section" style="background: linear-gradient(135deg, var(--brand-navy) 0%, #16204c 50%, var(--brand-blue-dark) 100%); color: white; text-align: center;">
+            <div class="container">
+                <h2 style="font-size: 32px; margin-bottom: 18px; color: #fff;" data-i18n="cta_title">هل تبحث عن حلول وتجهيزات طبية متكاملة لمنشأتك؟</h2>
+                <p style="font-size: 18px; margin-bottom: 30px; opacity: 0.9; max-width: 700px; margin-left: auto; margin-right: auto;" data-i18n="cta_desc">فريقنا الهندسي والطبي جاهز لمساعدتكم في دراسة الاحتياج وتقديم أفضل الحلول وعروض الأسعار المناسبة.</p>
+                <a href="contact.html" class="btn btn-primary" style="background: var(--bg-white); color: var(--brand-navy);"><i class="fas fa-paper-plane"></i> <span data-i18n="btn_request_quote">طلب عرض سعر</span></a>
+            </div>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -215,46 +191,58 @@
                 <div class="footer-about">
                     <a href="../index.html" class="logo">
                         <img src="../images/logo.png" alt="New Tech Medical" class="logo-img">
-                        <div class="logo-text">
-                            <span class="en">NEW TECH MEDICAL</span>
-                            <span class="ar">نيوتك الطبية للاستيراد</span>
-                        </div>
                     </a>
-                    <p>شريككم الموثوق في الرعاية الصحية.</p>
+                    <p data-i18n="footer_desc">شركة نيوتك الطبية للاستيراد - شريككم الموثوق في الرعاية الصحية. استيراد وتوزيع الأجهزة والمعدات الطبية والمخبرية، الأدوية، مستلزمات طب الأسنان والمستلزمات الطبية في اليمن.</p>
                 </div>
+                
                 <div class="footer-links">
-                    <h4>روابط سريعة</h4>
+                    <h4 data-i18n="footer_quick_links">روابط سريعة</h4>
                     <ul>
-                        <li><a href="../index.html">الرئيسية</a></li>
-                        <li><a href="about.html">من نحن</a></li>
-                        <li><a href="products.html">المنتجات</a></li>
-                        <li><a href="services.html">الخدمات</a></li>
-                        <li><a href="partners.html">الشركات والوكالات</a></li>
-                        <li><a href="contact.html">تواصل معنا</a></li>
+                        <li><a href="../index.html" data-i18n="nav_home">الرئيسية</a></li>
+                        <li><a href="about.html" data-i18n="nav_about">من نحن</a></li>
+                        <li><a href="products.html" data-i18n="nav_products">المنتجات</a></li>
+                        <li><a href="services.html" data-i18n="nav_services">الخدمات</a></li>
+                        <li><a href="partners.html" data-i18n="nav_partners">الشركات والوكالات</a></li>
+                        <li><a href="contact.html" data-i18n="nav_contact">تواصل معنا</a></li>
                     </ul>
                 </div>
+                
                 <div class="footer-contact">
-                    <h4>معلومات الاتصال</h4>
+                    <h4 data-i18n="footer_contact_info">بيانات التواصل</h4>
                     <ul>
-                        <li><i class="fas fa-map-marker-alt"></i><span>صنعاء، اليمن</span></li>
-                        <li><i class="fas fa-phone-alt"></i><span>+967 772 000 577</span></li>
-                        <li><i class="fab fa-whatsapp"></i><span>+967 711 559 753</span></li>
-                        <li><i class="fas fa-envelope"></i><span>info@new-techmedical.com</span></li>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span data-i18n="contact_hq_val">صنعاء، اليمن - شارع الجزائر، تقاطع شارع بغداد</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-phone-alt"></i>
+                            <span dir="ltr">+967 772 000 577</span>
+                        </li>
+                        <li>
+                            <i class="fab fa-whatsapp"></i>
+                            <span dir="ltr">+967 711 559 753</span>
+                        </li>
+                        <li>
+                            <i class="fas fa-envelope"></i>
+                            <span>info@new-techmedical.com</span>
+                        </li>
                     </ul>
                 </div>
+                
                 <div class="footer-hours">
-                    <h4>ساعات العمل</h4>
-                    <p>الأحد - الخميس</p>
-                    <p class="highlight">8:00 صباحاً - 4:00 مساءً</p>
+                    <h4 data-i18n="footer_hours_title">أوقات الدوام</h4>
+                    <p data-i18n="contact_hours_val">الأحد - الخميس: 8:00 صباحاً - 4:00 مساءً</p>
+                    <p class="highlight" style="margin-top: 15px;" data-i18n="contact_hours_closed">الجمعة والسبت: عطلة أسبوعية</p>
                 </div>
             </div>
+            
             <div class="footer-bottom">
-                <p>&copy; 2026 New Tech Medical Import. جميع الحقوق محفوظة.</p>
+                <p data-i18n="footer_rights">&copy; 2026 شركة نيوتك الطبية للاستيراد. جميع الحقوق محفوظة.</p>
             </div>
         </div>
     </footer>
 
-    <button class="scroll-top" id="scrollTop">
+    <button class="scroll-top" id="scrollTop" aria-label="للأعلى">
         <i class="fas fa-arrow-up"></i>
     </button>
 

@@ -41,12 +41,12 @@ module.exports = function (db) {
     }
   });
 
-  router.post('/', authenticateToken, function (req, res) {
+  router.post('/', optionalAuth, function (req, res) {
     try {
       var { customer_id, customer_name, phone, products, amount, status, notes, store_id } = req.body;
       if (!customer_name) return res.status(400).json({ error: 'اسم العميل مطلوب' });
 
-      var targetStoreId = store_id || req.user.store_id || 1;
+      var targetStoreId = store_id || (req.user && req.user.store_id) || 1;
 
       var result = db.prepare('INSERT INTO orders (customer_id, customer_name, phone, products, amount, status, notes, store_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').run(
         customer_id || null, customer_name, phone || '', products || '', amount || 0, status || 'pending', notes || '', targetStoreId

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="تعرف على نيوتك الطبية - تاريخنا، رؤيتنا، رسالتنا، وفريق العمل">
-    <title>من نحن | نيوتك الطبية</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231a5fb4' width='100' height='100' rx='20'/><text x='50' y='65' font-size='40' font-weight='bold' fill='white' text-anchor='middle' font-family='Arial'>NT</text></svg>">
+    <meta name="description" content="تعرف على نيوتك الطبية للاستيراد - تاريخنا، رؤيتنا، رسالتنا، واعتماداتنا في قطاع الرعاية الصحية باليمن">
+    <title>من نحن | نيوتك الطبية للاستيراد</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f153d' width='100' height='100' rx='20'/><circle cx='50' cy='50' r='34' fill='%230a95b7'/><circle cx='62' cy='38' r='16' fill='%23d64776'/><text x='50' y='65' font-size='32' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>NT</text></svg>">
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
@@ -28,13 +28,13 @@
     <div class="top-bar">
         <div class="container">
             <div class="top-bar-content">
-                <span><i class="fas fa-truck"></i> توصيل سريع لجميع المحافظات اليمنية</span>
-                <span><i class="fas fa-phone"></i> اتصل بنا: +967 772 000 577</span>
+                <span><i class="fas fa-truck-fast"></i> <span data-i18n="topbar_delivery">توصيل سريع وموثوق لجميع المحافظات اليمنية</span></span>
+                <span><i class="fas fa-phone-volume"></i> <span data-i18n="topbar_call">اتصل بنا: +967 772 000 577</span></span>
             </div>
             <div class="top-bar-social">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp"></i></a>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
             </div>
         </div>
     </div>
@@ -42,7 +42,7 @@
     <!-- Header -->
     <header class="header" id="header">
         <div class="container">
-            <a href="../index.html" class="logo">
+            <a href="../index.html" class="logo" title="New Tech Medical">
                 <img src="../images/logo.png" alt="New Tech Medical" class="logo-img">
             </a>
             <nav class="nav-menu" id="navMenu">
@@ -55,16 +55,16 @@
             </nav>
             <div class="header-actions">
                 <a href="../admin/login.html" class="admin-link" title="لوحة التحكم" data-i18n-title="admin_panel">
-                    <i class="fas fa-lock"></i>
+                    <i class="fas fa-shield-halved"></i>
                 </a>
                 <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="تبديل الوضع">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="lang-toggle-btn" onclick="toggleLanguage()" title="Language / اللغة">
+                <button class="lang-toggle-btn" onclick="toggleLanguage()" title="Language / تغيير اللغة">
                     <i class="fas fa-globe"></i>
                     <span class="lang-code-text">EN</span>
                 </button>
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="القائمة">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
@@ -72,239 +72,209 @@
     </header>
 
     <main class="main-content">
-    <!-- Page Banner -->
-    <section class="page-banner">
-        <div class="section-3d-icons section-3d-light">
-            <div class="sec-3d-icon banner3d-1"><i class="fas fa-user-md"></i></div>
-            <div class="sec-3d-icon banner3d-2"><i class="fas fa-heartbeat"></i></div>
-            <div class="sec-3d-icon banner3d-3"><i class="fas fa-hospital"></i></div>
-            <div class="sec-3d-icon banner3d-4"><i class="fas fa-stethoscope"></i></div>
-            <div class="sec-3d-icon banner3d-5"><i class="fas fa-notes-medical"></i></div>
-            <div class="sec-3d-icon banner3d-6"><i class="fas fa-syringe"></i></div>
-        </div>
-        <div class="container">
-            <h1>من نحن</h1>
-            <p>تعرف على نيوتك الطبية وقصتنا</p>
-        </div>
-    </section>
+        <!-- Page Banner -->
+        <section class="page-banner">
+            <div class="section-3d-icons section-3d-light">
+                <div class="sec-3d-icon banner3d-1"><i class="fas fa-hospital"></i></div>
+                <div class="sec-3d-icon banner3d-2"><i class="fas fa-heartbeat"></i></div>
+                <div class="sec-3d-icon banner3d-3"><i class="fas fa-microscope"></i></div>
+                <div class="sec-3d-icon banner3d-4"><i class="fas fa-stethoscope"></i></div>
+                <div class="sec-3d-icon banner3d-5"><i class="fas fa-award"></i></div>
+            </div>
+            <div class="container">
+                <h1 data-i18n="about_page_title">من نحن</h1>
+                <p data-i18n="about_page_subtitle">تعرف على نيوتك الطبية وقصتنا ورسالتنا في خدمة القطاع الطبي اليمني</p>
+            </div>
+        </section>
 
-    <!-- About Content -->
-    <section class="section">
-        <div class="section-3d-icons">
-            <div class="sec-3d-icon s3d-1"><i class="fas fa-certificate"></i></div>
-            <div class="sec-3d-icon s3d-2"><i class="fas fa-globe"></i></div>
-            <div class="sec-3d-icon s3d-3"><i class="fas fa-users"></i></div>
-            <div class="sec-3d-icon s3d-4"><i class="fas fa-truck"></i></div>
-        </div>
-        <div class="container">
-            <div class="about-content">
-                <div class="about-image slide-in-right">
-                    <img src="../images/main2.png" alt="نيوتك الطبية - شريككم في الرعاية الصحية" style="width: 100%; height: 400px; object-fit: cover; object-position: center; display: block;">
-                    <div class="about-image-overlay">
-                        <span>منذ عام 2012</span>
+        <!-- About Content -->
+        <section class="section">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-image slide-in-right">
+                        <img src="../images/main2.png" alt="نيوتك الطبية - شريككم في الرعاية الصحية" style="width: 100%; height: 420px; object-fit: cover; object-position: center; display: block; border-radius: 16px;">
+                        <div class="about-image-overlay">
+                            <span data-i18n="since_2012">منذ عام 2012</span>
+                        </div>
                     </div>
-                </div>
-                
-                <div class="about-text slide-in-left">
-                    <h3>من نحن؟</h3>
-                    <p>نيوتك الطبية للاستيراد هي شركة يمنية متخصصة في استيراد وتوزيع المعدات الطبية والأدوية والمستلزمات الطبية. تأسست الشركة عام 2012 ومسجلة بوزارة الصحة وغرفة التجارة والصناعة في جمهورية اليمن.</p>
-                    <p>نعمل بشراكة مع أكبر الشركات العالمية في مجال المعدات الطبية لتقديم أفضل الحلول لقطاع الرعاية الصحية في اليمن.</p>
                     
-                    <div class="about-features">
-                        <div class="about-feature">
-                            <div class="about-feature-icon">
-                                <i class="fas fa-certificate"></i>
-                            </div>
-                            <div class="about-feature-text">
-                                <h4>مرخصة رسمياً</h4>
-                                <p>مسجلة بوزارة الصحة</p>
-                            </div>
-                        </div>
+                    <div class="about-text slide-in-left">
+                        <span class="section-tag" data-i18n="about_badge">عن نيوتك الطبية</span>
+                        <h3 data-i18n="about_title">من نحن؟</h3>
+                        <p class="about-description" data-i18n="about_subtitle">شركة نيوتك الطبية للاستيراد (New Tech Medical Corp) هي شركة يمنية متخصصة في استيراد وتوزيع المعدات الطبية والمخبرية، الأدوية والمستحضرات الطبية، ومستلزمات طب الأسنان والمستلزمات الطبية. تأسست الشركة عام 2012 ومسجلة رسمياً لدى وزارة الصحة العامة والسكان والغرفة التجارية والصناعية في جمهورية اليمن.</p>
+                        <p class="about-description" data-i18n="about_desc2">نعمل بشراكات استراتيجية مع أكبر الشركات العالمية في مجال المعدات الطبية والتشخيصية لتقديم أفضل الحلول لقطاع الرعاية الصحية في اليمن مع التزام مطلق بخدمات الصيانة والدعم الفني.</p>
                         
-                        <div class="about-feature">
-                            <div class="about-feature-icon">
-                                <i class="fas fa-globe"></i>
+                        <div class="about-features">
+                            <div class="about-feature">
+                                <div class="about-feature-icon" style="background: linear-gradient(135deg, var(--brand-blue), var(--brand-blue-light)); color: #fff;">
+                                    <i class="fas fa-stamp"></i>
+                                </div>
+                                <div class="about-feature-text">
+                                    <h4 data-i18n="about_feat1_title">مرخصة رسمياً</h4>
+                                    <p data-i18n="about_feat1_desc">مسجلة بوزارة الصحة والغرفة التجارية</p>
+                                </div>
                             </div>
-                            <div class="about-feature-text">
-                                <h4>شركاء دوليون</h4>
-                                <p>+10 شركاء عالميين</p>
+                            
+                            <div class="about-feature">
+                                <div class="about-feature-icon" style="background: linear-gradient(135deg, var(--brand-burgundy), var(--brand-fuchsia)); color: #fff;">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <div class="about-feature-text">
+                                    <h4 data-i18n="about_feat2_title">شركاء دوليون</h4>
+                                    <p data-i18n="about_feat2_desc">تمثيل مصنعين دوليين معتمدين</p>
+                                </div>
+                            </div>
+                            
+                            <div class="about-feature">
+                                <div class="about-feature-icon" style="background: linear-gradient(135deg, var(--brand-navy), #253366); color: #fff;">
+                                    <i class="fas fa-user-doctor"></i>
+                                </div>
+                                <div class="about-feature-text">
+                                    <h4 data-i18n="about_feat3_title">فريق هندسي متخصص</h4>
+                                    <p data-i18n="about_feat3_desc">خبرة متراكمة تتجاوز 14 عاماً</p>
+                                </div>
+                            </div>
+                            
+                            <div class="about-feature">
+                                <div class="about-feature-icon" style="background: linear-gradient(135deg, #0d9488, var(--brand-blue)); color: #fff;">
+                                    <i class="fas fa-truck-fast"></i>
+                                </div>
+                                <div class="about-feature-text">
+                                    <h4 data-i18n="about_feat4_title">لوجستيات متكاملة</h4>
+                                    <p data-i18n="about_feat4_desc">توزيع آمن وسلسلة تبريد للمحافظات</p>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="about-feature">
-                            <div class="about-feature-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <div class="about-feature-text">
-                                <h4>فريق متخصص</h4>
-                                <p>خبرة +14 عاماً</p>
-                            </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vision & Mission -->
+        <section class="section" style="background: var(--bg-light); position: relative;">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="vision_title">رؤيتنا ورسالتنا</h2>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
+                    <div class="service-card fade-in" style="text-align: center; padding: 40px 30px;">
+                        <div class="service-icon" style="background: var(--gradient-blue); margin: 0 auto 20px;">
+                            <i class="fas fa-eye" style="color: white;"></i>
                         </div>
-                        
-                        <div class="about-feature">
-                            <div class="about-feature-icon">
-                                <i class="fas fa-truck"></i>
-                            </div>
-                            <div class="about-feature-text">
-                                <h4>توصيل سريع</h4>
-                                <p>لجميع المحافظات</p>
-                            </div>
+                        <h3 data-i18n="vision_title">رؤيتنا</h3>
+                        <p data-i18n="vision_desc">أن نكون الشركة الرائدة والأولى خياراً في اليمن لاستيراد وتوفير الحلول والمعدات الطبية المتقدمة والارتقاء بمستوى الخدمات الصحية والتشخيصية.</p>
+                    </div>
+                    
+                    <div class="service-card fade-in" style="text-align: center; padding: 40px 30px;">
+                        <div class="service-icon" style="background: var(--gradient-burgundy); margin: 0 auto 20px;">
+                            <i class="fas fa-bullseye" style="color: white;"></i>
                         </div>
+                        <h3 data-i18n="mission_title">رسالتنا</h3>
+                        <p data-i18n="mission_desc">تقديم تقنيات ومنتجات طبية ذات جودة عالية مع توفير أفضل خدمات الدعم الفني والصيانة لضمان أقصى استفادة للمستشفيات والمراكز الطبية في اليمن.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Vision & Mission -->
-    <section class="section" style="background: var(--bg-light); position: relative;">
-        <div class="section-3d-icons">
-            <div class="sec-3d-icon s3d-1"><i class="fas fa-eye"></i></div>
-            <div class="sec-3d-icon s3d-2"><i class="fas fa-bullseye"></i></div>
-            <div class="sec-3d-icon s3d-3"><i class="fas fa-compass"></i></div>
-            <div class="sec-3d-icon s3d-4"><i class="fas fa-flag"></i></div>
-        </div>
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>رؤيتنا ورسالتنا</h2>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px;">
-                <div class="service-card fade-in" style="text-align: center;">
-                    <div class="service-icon" style="background: var(--gradient-blue);">
-                        <i class="fas fa-eye" style="color: white;"></i>
-                    </div>
-                    <h3>رؤيتنا</h3>
-                    <p>أن نكون الشركة الرائدة في استيراد وتوزيع المعدات الطبية في اليمن، ونساهم في تطوير قطاع الرعاية الصحية بتقديم أحدث التقنيات والأجهزة الطبية.</p>
+        <!-- Goals -->
+        <section class="section" style="position: relative;">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="goals_title">أهدافنا الاستراتيجية</h2>
                 </div>
                 
-                <div class="service-card fade-in" style="text-align: center;">
-                    <div class="service-icon" style="background: var(--gradient-red);">
-                        <i class="fas fa-bullseye" style="color: white;"></i>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px;">
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-blue-soft);">
+                            <i class="fas fa-award" style="color: var(--brand-blue);"></i>
+                        </div>
+                        <h3 data-i18n="goal1_title">التميز في الخدمة</h3>
+                        <p data-i18n="goal1_desc">تقديم خدمة استثنائية لعملائنا من خلال فريق متخصص ومدرب على أحدث المعدات الطبية.</p>
                     </div>
-                    <h3>رسالتنا</h3>
-                    <p>تقديم حلول طبية متكاملة وعالية الجودة للمؤسسات الصحية في اليمن من خلال شراكات استراتيجية مع الشركات العالمية، مع ضمان أعلى معايير الجودة والخدمة.</p>
+                    
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-burgundy-soft);">
+                            <i class="fas fa-handshake" style="color: var(--brand-burgundy);"></i>
+                        </div>
+                        <h3 data-i18n="goal2_title">بناء شراكات استراتيجية</h3>
+                        <p data-i18n="goal2_desc">توسيع شبكتنا من الشركاء الدوليين لتقديم أحدث التقنيات الطبية المعتمدة للسوق اليمني.</p>
+                    </div>
+                    
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-fuchsia-soft);">
+                            <i class="fas fa-heart-pulse" style="color: var(--brand-fuchsia);"></i>
+                        </div>
+                        <h3 data-i18n="goal3_title">الارتقاء بالرعاية الصحية</h3>
+                        <p data-i18n="goal3_desc">المساهمة الفاعلة في تطوير المنظومة الصحية والمخبرية في اليمن وتوفير الحلول التشخيصية الحديثة.</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Goals -->
-    <section class="section" style="position: relative;">
-        <div class="section-3d-icons">
-            <div class="sec-3d-icon s3d-1"><i class="fas fa-medal"></i></div>
-            <div class="sec-3d-icon s3d-2"><i class="fas fa-handshake"></i></div>
-            <div class="sec-3d-icon s3d-3"><i class="fas fa-heart"></i></div>
-            <div class="sec-3d-icon s3d-4"><i class="fas fa-star"></i></div>
-        </div>
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>أهدافنا</h2>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
-                <div class="department-card fade-in">
-                    <div class="department-icon">
-                        <i class="fas fa-medal" style="color: var(--primary-blue);"></i>
-                    </div>
-                    <h3>التميز في الخدمة</h3>
-                    <p>تقديم خدمة استثنائية لعملائنا من خلال فريق متخصص ومدرب على أحدث المعدات.</p>
+        <!-- Management Team -->
+        <section class="section" style="background: var(--bg-light); position: relative;">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="management_title">فريق الإدارة</h2>
+                    <p data-i18n="management_subtitle">قيادة متخصصة بخبرة واسعة في المجال الطبي والتسويق الدوائي</p>
                 </div>
                 
-                <div class="department-card fade-in">
-                    <div class="department-icon">
-                        <i class="fas fa-handshake" style="color: var(--primary-red);"></i>
+                <div style="max-width: 620px; margin: 0 auto;">
+                    <div class="service-card fade-in" style="text-align: center; padding: 40px 30px;">
+                        <div class="service-icon" style="background: linear-gradient(135deg, var(--brand-navy), var(--brand-blue)); margin: 0 auto 20px; width: 100px; height: 100px; border-radius: 50%;">
+                            <i class="fas fa-user-doctor" style="color: white; font-size: 42px;"></i>
+                        </div>
+                        <h3 style="font-size: 22px; color: var(--brand-navy); margin-bottom: 6px;">Dr. Ameen Ghaleb Alodeny</h3>
+                        <p style="color: var(--brand-blue); font-weight: 700; margin-bottom: 12px;" data-i18n="gm_role">المدير العام</p>
+                        <p data-i18n="gm_desc">متخصص في طب التشخيص المخبري (Laboratory Diagnostic Medicine) مع خبرة تزيد عن 10 سنوات في التسويق الطبي وتطوير الأعمال.</p>
                     </div>
-                    <h3>بناء شراكات استراتيجية</h3>
-                    <p>توسيع شبكتنا من الشركاء الدوليين لتقديم أحدث التقنيات الطبية.</p>
-                </div>
-                
-                <div class="department-card fade-in">
-                    <div class="department-icon">
-                        <i class="fas fa-heart" style="color: var(--accent-cyan);"></i>
-                    </div>
-                    <h3>تحسين الرعاية الصحية</h3>
-                    <p>المساهمة في تطوير قطاع الرعاية الصحية في اليمن من خلال توفير المعدات الحديثة.</p>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Management Team -->
-    <section class="section" style="background: var(--bg-light); position: relative;">
-        <div class="section-3d-icons">
-            <div class="sec-3d-icon s3d-1"><i class="fas fa-user-md"></i></div>
-            <div class="sec-3d-icon s3d-2"><i class="fas fa-user-nurse"></i></div>
-            <div class="sec-3d-icon s3d-3"><i class="fas fa-stethoscope"></i></div>
-            <div class="sec-3d-icon s3d-4"><i class="fas fa-clinic-medical"></i></div>
-        </div>
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>فريق الإدارة</h2>
-                <p>قيادة متخصصة بخبرة واسعة في المجال الطبي</p>
-            </div>
-            
-            <div style="max-width: 600px; margin: 0 auto;">
-                <div class="service-card fade-in" style="text-align: center;">
-                    <div class="service-icon" style="background: var(--gradient-blue); margin: 0 auto 20px; width: 120px; height: 120px;">
-                        <i class="fas fa-user-md" style="color: white; font-size: 50px;"></i>
-                    </div>
-                    <h3>Dr. Ameen Ghaleb Alodeny</h3>
-                    <p style="color: var(--primary-blue); font-weight: 600; margin-bottom: 10px;">المدير العام</p>
-                    <p>متخصص في طب التشخيص المخبري (Laboratory Diagnostic Medicine) مع خبرة تزيد عن 10 سنوات في التسويق الطبي وتطوير الأعمال.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Certifications -->
-    <section class="section" style="position: relative;">
-        <div class="section-3d-icons">
-            <div class="sec-3d-icon s3d-1"><i class="fas fa-certificate"></i></div>
-            <div class="sec-3d-icon s3d-2"><i class="fas fa-file-alt"></i></div>
-            <div class="sec-3d-icon s3d-3"><i class="fas fa-award"></i></div>
-            <div class="sec-3d-icon s3d-4"><i class="fas fa-check-double"></i></div>
-        </div>
-        <div class="container">
-            <div class="section-header fade-in">
-                <h2>الشهادات والتسجيلات</h2>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px;">
-                <div class="department-card fade-in">
-                    <div class="department-icon">
-                        <i class="fas fa-certificate" style="color: var(--primary-blue);"></i>
-                    </div>
-                    <h3>تسجيل وزارة الصحة</h3>
-                    <p>مسجلة رسمياً بوزارة الصحة اليمنية</p>
+        <!-- Certifications -->
+        <section class="section" style="position: relative;">
+            <div class="container">
+                <div class="section-header fade-in">
+                    <h2 data-i18n="certs_title">الشهادات والتراخيص الرسمية</h2>
                 </div>
                 
-                <div class="department-card fade-in">
-                    <div class="department-icon">
-                        <i class="fas fa-file-alt" style="color: var(--primary-red);"></i>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-blue-soft);">
+                            <i class="fas fa-certificate" style="color: var(--brand-blue);"></i>
+                        </div>
+                        <h3 data-i18n="cert1_title">تسجيل وزارة الصحة</h3>
+                        <p data-i18n="cert1_desc">مسجلة رسمياً لدى وزارة الصحة العامة والسكان</p>
                     </div>
-                    <h3>غرفة التجارة</h3>
-                    <p>عضوية في غرفة التجارة والصناعة</p>
-                </div>
-                
-                <div class="department-card fade-in">
-                    <div class="department-icon">
-                        <i class="fas fa-award" style="color: var(--accent-cyan);"></i>
+                    
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-burgundy-soft);">
+                            <i class="fas fa-file-contract" style="color: var(--brand-burgundy);"></i>
+                        </div>
+                        <h3 data-i18n="cert2_title">الغرفة التجارية</h3>
+                        <p data-i18n="cert2_desc">عضوية الغرفة التجارية والصناعية بأمانة العاصمة</p>
                     </div>
-                    <h3>شهادات الجودة</h3>
-                    <p>معايير جودة عالمية معتمدة</p>
-                </div>
-                
-                <div class="department-card fade-in">
-                    <div class="department-icon">
-                        <i class="fas fa-check-double" style="color: var(--primary-red);"></i>
+                    
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: var(--brand-fuchsia-soft);">
+                            <i class="fas fa-award" style="color: var(--brand-fuchsia);"></i>
+                        </div>
+                        <h3 data-i18n="cert3_title">معايير الجودة</h3>
+                        <p data-i18n="cert3_desc">الالتزام بأعلى معايير الجودة والسلامة الدوائية</p>
                     </div>
-                    <h3>تراخيص الاستيراد</h3>
-                    <p>تراخيص رسمية لاستيراد المعدات الطبية</p>
+                    
+                    <div class="department-card fade-in">
+                        <div class="department-icon" style="background: #eef2ff;">
+                            <i class="fas fa-check-double" style="color: var(--brand-navy);"></i>
+                        </div>
+                        <h3 data-i18n="cert4_title">تراخيص الاستيراد</h3>
+                        <p data-i18n="cert4_desc">تراخيص نظامية لاستيراد الأجهزة والمستلزمات الطبية</p>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
     </main>
 
     <!-- Footer -->
@@ -314,40 +284,36 @@
                 <div class="footer-about">
                     <a href="../index.html" class="logo">
                         <img src="../images/logo.png" alt="New Tech Medical" class="logo-img">
-                        <div class="logo-text">
-                            <span class="en">NEW TECH MEDICAL</span>
-                            <span class="ar">نيوتك الطبية للاستيراد</span>
-                        </div>
                     </a>
-                    <p>شريككم الموثوق في الرعاية الصحية. نقدم أفضل المعدات والأدوية والمستلزمات الطبية من أكبر الشركات العالمية.</p>
+                    <p data-i18n="footer_desc">شركة نيوتك الطبية للاستيراد - شريككم الموثوق في الرعاية الصحية. استيراد وتوزيع الأجهزة والمعدات الطبية والمخبرية، الأدوية، مستلزمات طب الأسنان والمستلزمات الطبية في اليمن.</p>
                 </div>
                 
                 <div class="footer-links">
-                    <h4>روابط سريعة</h4>
+                    <h4 data-i18n="footer_quick_links">روابط سريعة</h4>
                     <ul>
-                        <li><a href="../index.html">الرئيسية</a></li>
-                        <li><a href="about.html">من نحن</a></li>
-                        <li><a href="products.html">المنتجات</a></li>
-                        <li><a href="services.html">الخدمات</a></li>
-                        <li><a href="partners.html">الشركات والوكالات</a></li>
-                        <li><a href="contact.html">تواصل معنا</a></li>
+                        <li><a href="../index.html" data-i18n="nav_home">الرئيسية</a></li>
+                        <li><a href="about.html" data-i18n="nav_about">من نحن</a></li>
+                        <li><a href="products.html" data-i18n="nav_products">المنتجات</a></li>
+                        <li><a href="services.html" data-i18n="nav_services">الخدمات</a></li>
+                        <li><a href="partners.html" data-i18n="nav_partners">الشركات والوكالات</a></li>
+                        <li><a href="contact.html" data-i18n="nav_contact">تواصل معنا</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-contact">
-                    <h4>معلومات الاتصال</h4>
+                    <h4 data-i18n="footer_contact_info">بيانات التواصل</h4>
                     <ul>
                         <li>
                             <i class="fas fa-map-marker-alt"></i>
-                            <span>صنعاء، اليمن - شارع الجزائر</span>
+                            <span data-i18n="contact_hq_val">صنعاء، اليمن - شارع الجزائر، تقاطع شارع بغداد</span>
                         </li>
                         <li>
                             <i class="fas fa-phone-alt"></i>
-                            <span>+967 772 000 577</span>
+                            <span dir="ltr">+967 772 000 577</span>
                         </li>
                         <li>
                             <i class="fab fa-whatsapp"></i>
-                            <span>+967 711 559 753</span>
+                            <span dir="ltr">+967 711 559 753</span>
                         </li>
                         <li>
                             <i class="fas fa-envelope"></i>
@@ -357,24 +323,21 @@
                 </div>
                 
                 <div class="footer-hours">
-                    <h4>ساعات العمل</h4>
-                    <p>الأحد - الخميس</p>
-                    <p class="highlight">8:00 صباحاً - 4:00 مساءً</p>
-                    <p style="margin-top: 15px;">الجمعة - السبت</p>
-                    <p class="highlight">مغلق</p>
+                    <h4 data-i18n="footer_hours_title">أوقات الدوام</h4>
+                    <p data-i18n="contact_hours_val">الأحد - الخميس: 8:00 صباحاً - 4:00 مساءً</p>
+                    <p class="highlight" style="margin-top: 15px;" data-i18n="contact_hours_closed">الجمعة والسبت: عطلة أسبوعية</p>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2026 New Tech Medical Import. جميع الحقوق محفوظة.</p>
+                <p data-i18n="footer_rights">&copy; 2026 شركة نيوتك الطبية للاستيراد. جميع الحقوق محفوظة.</p>
             </div>
         </div>
     </footer>
 
-    <button class="scroll-top" id="scrollTop">
+    <button class="scroll-top" id="scrollTop" aria-label="للأعلى">
         <i class="fas fa-arrow-up"></i>
     </button>
-
 
     <script src="../js/translations.js"></script>
     <script src="../js/main.js"></script>
