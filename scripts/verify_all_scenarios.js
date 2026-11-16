@@ -97,6 +97,16 @@ async function runAllTests() {
   // ----------------------------------------------------
   console.log('\n--- SCENARIO 4: POS Sale in Store 1 & Stock Isolation ---');
   // Record initial stock for product 10 in Store 1 and Store 2
+  const checkS1 = await get('/api/inventory?store_id=1', adminToken);
+  const pCheck = checkS1.body.find(i => i.product_id === 10);
+  if (!pCheck || pCheck.stock_quantity < 10) {
+    await post('/api/inventory/adjust', {
+      store_id: 1,
+      product_id: 10,
+      actual_quantity: 30,
+      reason: 'Automated test suite replenishment'
+    }, adminToken);
+  }
   const s1InvBefore = await get('/api/inventory?store_id=1', adminToken);
   const s2InvBefore = await get('/api/inventory?store_id=2', adminToken);
   const pS1Before = s1InvBefore.body.find(i => i.product_id === 10);
