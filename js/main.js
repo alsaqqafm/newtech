@@ -739,10 +739,6 @@ function renderProducts() {
         if (isEn && !p.description_en && typeof productTranslations !== 'undefined' && productTranslations[p.name]) {
             desc = productTranslations[p.name].description || desc;
         }
-        var image = p.image || '';
-        if (image && !image.startsWith('http') && !image.startsWith('data:')) {
-            image = imgBase + image.replace(/^\.\.\//, '');
-        }
         var badgeCategory = p.category || '';
         if (isEn) {
             if (badgeCategory === 'تحاليل مناعية') badgeCategory = 'Immunoassay';
@@ -752,6 +748,15 @@ function renderProducts() {
             else if (badgeCategory === 'كواشف التخثر') badgeCategory = 'Reagents';
         }
         var badgeHtml = badgeCategory ? '<span class="product-badge">' + badgeCategory + '</span>' : '';
+        // Category icon mapping (no product images – text+icon cards only)
+        var catIcon = 'fa-flask';
+        var catColor = 'var(--brand-blue)';
+        var cat = p.category || '';
+        if (cat === 'POCT') { catIcon = 'fa-heartbeat'; catColor = 'var(--brand-pink)'; }
+        else if (cat === 'غازات الدم') { catIcon = 'fa-tint'; catColor = 'var(--brand-cyan)'; }
+        else if (cat === 'الإلكتروليت') { catIcon = 'fa-microchip'; catColor = 'var(--brand-blue)'; }
+        else if (cat === 'أجهزة التخثر') { catIcon = 'fa-dna'; catColor = 'var(--brand-burgundy)'; }
+        else if (cat === 'كواشف التخثر') { catIcon = 'fa-vials'; catColor = '#6c5ce7'; }
         var priceCurrency = isEn ? 'YER' : 'ر.ي';
         var priceHtml = p.price > 0 ? '<p class="product-price"><i class="fas fa-tag"></i> ' + formatNumber(p.price) + ' ' + priceCurrency + '</p>' : '';
         var btnAddOrder = dict['btn_add_order'] || (isEn ? 'Add to Order' : 'أضف للطلب');
@@ -759,8 +764,8 @@ function renderProducts() {
         var btnDetails = dict['btn_details'] || (isEn ? 'Details' : 'التفاصيل');
 
         return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
-            '<div class="product-image">' +
-                '<img src="' + image + '" alt="' + name.replace(/"/g, '&quot;') + '" onerror="this.onerror=null;this.src=\'' + imgBase + 'images/placeholder-product.svg\';">' +
+            '<div class="product-icon-header" style="background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
+                '<i class="fas ' + catIcon + '" style="font-size:38px;color:' + catColor + ';display:block;margin-bottom:10px;"></i>' +
                 badgeHtml +
             '</div>' +
             '<div class="product-info">' +
@@ -1061,15 +1066,14 @@ function loadHomeProducts() {
         }
         var shown = products.filter(function(p) { return p.active !== 0 && p.status === 'متوفر'; }).slice(0, 4);
         grid.innerHTML = shown.map(function(p) {
-            var name = p.name || '';
-            var agent = p.agent || '';
-            var desc = p.description || '';
-            if (isEn && typeof productTranslations !== 'undefined' && productTranslations[name]) {
-                desc = productTranslations[name].description || desc;
+            var name = (isEn && p.name_en) ? p.name_en : (p.name || '');
+            if (isEn && !p.name_en && typeof productTranslations !== 'undefined' && productTranslations[p.name]) {
+                name = productTranslations[p.name].name || name;
             }
-            var image = p.image || '';
-            if (image && !image.startsWith('http') && !image.startsWith('data:')) {
-                image = imgBase + image.replace(/^\.\.\//, '');
+            var agent = p.agent || p.manufacturer || '';
+            var desc = (isEn && p.description_en) ? p.description_en : (p.description || '');
+            if (isEn && !p.description_en && typeof productTranslations !== 'undefined' && productTranslations[p.name]) {
+                desc = productTranslations[p.name].description || desc;
             }
             var badgeCategory = p.category || '';
             if (isEn) {
@@ -1080,19 +1084,28 @@ function loadHomeProducts() {
                 else if (badgeCategory === 'كواشف التخثر') badgeCategory = 'Reagents';
             }
             var badgeHtml = badgeCategory ? '<span class="product-badge">' + badgeCategory + '</span>' : '';
+            // Category icon (no product images – text+icon cards only)
+            var catIcon = 'fa-flask';
+            var catColor = 'var(--brand-blue)';
+            var cat = p.category || '';
+            if (cat === 'POCT') { catIcon = 'fa-heartbeat'; catColor = 'var(--brand-pink)'; }
+            else if (cat === 'غازات الدم') { catIcon = 'fa-tint'; catColor = 'var(--brand-cyan)'; }
+            else if (cat === 'الإلكتروليت') { catIcon = 'fa-microchip'; catColor = 'var(--brand-blue)'; }
+            else if (cat === 'أجهزة التخثر') { catIcon = 'fa-dna'; catColor = 'var(--brand-burgundy)'; }
+            else if (cat === 'كواشف التخثر') { catIcon = 'fa-vials'; catColor = '#6c5ce7'; }
             var priceHtml2 = p.price > 0 ? '<p class="product-price" style="font-size:13px;font-weight:600;color:var(--primary-blue);margin-bottom:8px"><i class="fas fa-tag"></i> ' + formatNumber(p.price) + ' ' + (isEn ? 'YER' : 'ر.ي') + '</p>' : '';
             var btnAddOrder = dict['btn_add_order'] || (isEn ? 'Add to Order' : 'أضف للطلب');
             var btnGetQuote = dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'عرض سعر');
             var btnDetails = dict['btn_details'] || (isEn ? 'Details' : 'التفاصيل');
 
             return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
-                '<div class="product-image">' +
-                    '<img src="' + image + '" alt="' + name + '" onerror="this.onerror=null;this.style.display=\'none\';">' +
+                '<div class="product-icon-header" style="background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
+                    '<i class="fas ' + catIcon + '" style="font-size:38px;color:' + catColor + ';display:block;margin-bottom:10px;"></i>' +
                     badgeHtml +
                 '</div>' +
                 '<div class="product-info">' +
                     '<h3>' + name + '</h3>' +
-                    '<p class="product-agent">' + agent + '</p>' +
+                    '<p class="product-agent"><i class="fas fa-building" style="color:var(--brand-blue);margin-inline-end:4px"></i> ' + agent + '</p>' +
                     priceHtml2 +
                     '<p>' + desc.substring(0, 85) + (desc.length > 85 ? '...' : '') + '</p>' +
                     '<div class="product-btn-group">' +
@@ -1147,8 +1160,8 @@ function loadAllProducts() {
         var active = products.filter(function(p) { return p.active !== 0; });
         allProductsCache = active;
         filteredProducts = active;
-        if (!products.length) { 
-            grid.innerHTML = '<p style="text-align:center;padding:60px;color:var(--text-secondary);grid-column:1/-1;">' + (dict['no_products'] || 'لا توجد منتجات حالياً') + '</p>'; 
+        if (!active.length) { 
+            grid.innerHTML = '<p style="text-align:center;padding:60px;color:var(--text-secondary);grid-column:1/-1;">' + (dict['no_products'] || 'لا توجد منتجات متوفرة حالياً') + '</p>'; 
             return; 
         }
         currentPage = 1;
@@ -1262,17 +1275,18 @@ function openProductDetailsById(productId) {
         document.getElementById('detailProductCategory').textContent = category || (isEn ? 'Medical Equipment' : 'أجهزة طبية');
         
         var img = document.getElementById('detailProductImage');
+        var imgContainer = document.querySelector('.product-details-image');
         var imgSrc = product.image || '';
         if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {
             imgSrc = imgBase + imgSrc.replace(/^\.\.\//, '');
         }
-        img.src = imgSrc;
-        img.onerror = function() {
-            this.onerror = null;
-            this.src = '';
-            this.alt = name;
-            this.style.background = 'linear-gradient(135deg, #f0f7ff, #e3f2fd)';
-        };
+        if (imgSrc && img) {
+            img.src = imgSrc;
+            if (imgContainer) imgContainer.style.display = 'block';
+        } else {
+            if (img) { img.src = ''; img.style.display = 'none'; }
+            if (imgContainer) imgContainer.style.display = 'none';
+        }
 
         document.getElementById('detailProductDescription').textContent = desc;
         

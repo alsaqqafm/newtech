@@ -117,10 +117,12 @@
           <div style="display:flex;gap:8px">
             <select class="form-control" style="width:auto;padding:6px 32px 6px 12px" id="categoryFilter" onchange="filterProducts()">
               <option value="">جميع الفئات</option>
-              <option value="أجهزة طبية">أجهزة طبية</option>
-              <option value="أجهزة قياس">أجهزة قياس</option>
-              <option value="أجهزة مخبرية">أجهزة مخبرية</option>
-              <option value="أجهزة تصوير">أجهزة تصوير</option>
+              <option value="تحاليل مناعية">تحاليل مناعية</option>
+              <option value="POCT">POCT</option>
+              <option value="غازات الدم">غازات الدم</option>
+              <option value="الإلكتروليت">الإلكتروليت</option>
+              <option value="أجهزة التخثر">أجهزة التخثر</option>
+              <option value="كواشف التخثر">كواشف التخثر</option>
             </select>
             <select class="form-control" style="width:auto;padding:6px 32px 6px 12px" id="statusFilter" onchange="filterProducts()">
               <option value="">جميع الحالات</option>
@@ -222,11 +224,6 @@
         <div class="form-group">
           <label>الكلمات المفتاحية (Keywords)</label>
           <input type="text" class="form-control" id="addProductKeywords" placeholder="مثال: Immunoassay, POCT, غازات الدم">
-        </div>
-        <div class="form-group">
-          <label>صورة المنتج</label>
-          <input type="file" class="form-control" accept="image/*" onchange="previewImage(this,'addPreview')">
-          <img id="addPreview" style="display:none;max-width:120px;margin-top:8px;border-radius:8px">
         </div>
       </div>
       <div class="modal-footer">

@@ -264,7 +264,7 @@
                 
                 <div class="products-grid" id="homeProductsGrid">
                     <div style="text-align:center;padding:40px;color:var(--text-secondary);grid-column:1/-1;">
-                        <i class="fas fa-spinner fa-spin"></i> جاري تحميل المنتجات...
+                        <i class="fas fa-spinner fa-spin"></i> <span data-i18n="loading_products">جاري تحميل المنتجات...</span>
                     </div>
                 </div>
                 
@@ -642,7 +642,7 @@
         <div class="modal product-details-modal">
             <button class="modal-close" onclick="closeProductDetails()" aria-label="إغلاق"><i class="fas fa-times"></i></button>
             <div class="product-details-content">
-                <div class="product-details-image">
+                <div class="product-details-image" style="display:none">
                     <img id="detailProductImage" src="" alt="Product Detail" style="width: 100%; height: 260px; object-fit: contain; border-radius: 10px; background: var(--bg-gray); padding: 12px;">
                 </div>
                 <div class="product-details-info">

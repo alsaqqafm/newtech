@@ -158,10 +158,8 @@ async function run() {
       assert(p.name_en && p.name_en.length > 3, `English name present for ${exp.model}: "${p.name_en}"`);
       assert(p.price === 0, `No invented price (price === 0) for ${exp.model}`);
 
-      // Verify file exists on disk
-      const cleanImgPath = exp.image.replace(/^\.\.\//, '');
-      const fullDiskPath = path.join(__dirname, '..', cleanImgPath);
-      assert(fs.existsSync(fullDiskPath), `Image file exists on disk: ${cleanImgPath}`);
+      // Verify strictly NO product images set (as required)
+      assert(!p.image || p.image === '', `Product image is empty string (no image) for ${exp.model}`);
     }
   }
 

@@ -494,7 +494,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'تحاليل مناعية',
     description: 'نظام تحاليل مناعية أوتوماتيكي للمختبرات المتوسطة والعالية الإنتاجية، يوفر دقة تحليلية ثابتة وتشغيلاً سهلاً وقائمة فحوصات واسعة.',
     description_en: 'Automated immunoassay system designed for medium-to-high throughput laboratories, offering consistent analytical precision, straightforward operation, and an extensive test menu.',
-    image: '../images/hipro-a1-pro.png',
+    image: '',
     keywords: 'Hipro, A1 Pro, Automated Immunoassay System, تحاليل مناعية, مختبرات, أجهزة مخبرية',
     features: 'نظام تحاليل مناعية أوتوماتيكي|دقة تحليلية ثابتة|تشغيل سهل|قائمة فحوصات واسعة|مناسب للمختبرات المتوسطة والعالية الإنتاجية',
     price: 0,
@@ -511,7 +511,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'POCT',
     description: 'جهاز POCT مدمج للفحوصات السريعة بجانب المريض، مناسب للطوارئ والعيادات، ويتميز بصغر حجم العينة وسرعة النتائج.',
     description_en: 'Compact point-of-care POCT immunoassay analyzer for rapid bedside patient diagnostics, suitable for emergency rooms and outpatient clinics, featuring micro sample volume and rapid results turnaround.',
-    image: '../images/hipro-hurricane.png',
+    image: '',
     keywords: 'Hipro, Hurricane, POCT Immunoassay Analyzer, فحوصات سريعة, بجانب المريض, طوارئ',
     features: 'جهاز POCT مدمج|فحوصات سريعة بجانب المريض|صغر حجم العينة|سرعة استخراج النتائج|مناسب للطوارئ والعيادات',
     price: 0,
@@ -528,7 +528,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'غازات الدم',
     description: 'محلل غازات دم يعمل بنظام الكارتريدج، مع معايرة تلقائية ومراقبة جودة داخلية، مناسب للطوارئ والعناية المركزة.',
     description_en: 'Cartridge-based blood gas analyzer with automated multi-point calibration and internal quality control, ideally engineered for emergency departments and intensive care units.',
-    image: '../images/pt1000.jpeg',
+    image: '',
     keywords: 'EasyDiagnosis, PT1000, Blood Gas Analyzer, غازات الدم, كارتريدج, عناية مركزة, طوارئ',
     features: 'نظام كارتريدج متكامل|معايرة تلقائية مستمرة|مراقبة جودة داخلية|مناسب للطوارئ والعناية المركزة|نتائج فورية دقيقة',
     price: 0,
@@ -545,7 +545,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'الإلكتروليت',
     description: 'جهاز تحليل إلكتروليت بتقنية الأقطاب الانتقائية ISE لقياس الصوديوم والبوتاسيوم والكلوريد والكالسيوم ودرجة الحموضة.',
     description_en: 'Electrolyte analyzer utilizing advanced Ion-Selective Electrode (ISE) technology for precise measurement of Sodium, Potassium, Chloride, Ionized Calcium, and pH.',
-    image: '../images/dx-electrolyte.jpeg',
+    image: '',
     keywords: 'EasyDiagnosis, DX, Electrolyte Analyzer, أقطاب انتقائية, ISE, صوديوم, بوتاسيوم, كلوريد, كالسيوم, حموضة',
     features: 'تقنية الأقطاب الانتقائية ISE|قياس الصوديوم والبوتاسيوم والكلوريد|قياس الكالسيوم ودرجة الحموضة pH|دقة قياس عالية|عمر تشغيلي طويل للأقطاب',
     price: 0,
@@ -562,7 +562,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'تحاليل مناعية',
     description: 'جهاز مناعي فلوري متعدد الفحوصات، يدعم مؤشرات القلب والالتهاب والغدة الدرقية والسكري والخصوبة.',
     description_en: 'Multi-parameter fluorescence immunoassay analyzer supporting comprehensive diagnostic panels including cardiac biomarkers, inflammation, thyroid, diabetes, and fertility.',
-    image: '../images/qft9000.jpeg',
+    image: '',
     keywords: 'EasyDiagnosis, QFT9000 Pro II, Fluorescence Immunoassay Analyzer, مناعي فلوري, مؤشرات القلب, التهاب, غدة درقية',
     features: 'تقنية المناعة الفلورية المتقدمة|دعم مؤشرات القلب والتروبونين|فحوصات الالتهاب والغدة الدرقية|فحوصات السكري والخصوبة|قراءة سريعة متعددة القنوات',
     price: 0,
@@ -579,7 +579,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'تحاليل مناعية',
     description: 'جهاز اقتصادي للفحوصات المناعية الروتينية، يجمع بين الاعتمادية وسهولة التشغيل.',
     description_en: 'Cost-effective automated immunoassay analyzer for routine clinical diagnostic testing, combining proven reliability with straightforward, dependable operation.',
-    image: '../images/placeholder-product.svg',
+    image: '',
     keywords: 'Hipro, A1, Immunoassay Analyzer, اقتصادي, فحوصات مناعية روتينية, اعتمادية, سهولة التشغيل',
     features: 'جهاز اقتصادي موفر للتكاليف|مثالي للفحوصات الروتينية اليومية|اعتمادية تشغيلية عالية|واجهة مستخدم سهلة وبسيطة|صيانة دورية ميسرة',
     price: 0,
@@ -596,7 +596,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'POCT',
     description: 'محلل متنقل لغازات الدم والإلكتروليت يعمل بكارتريدج أحادي الاستخدام، مناسب للعناية المركزة والطوارئ.',
     description_en: 'Portable point-of-care blood gas and electrolyte analyzer utilizing single-use microfluidic cartridges, suitable for critical care and emergency departments.',
-    image: '../images/seamaty-sg1.jpeg',
+    image: '',
     keywords: 'Seamaty, SG1, Blood Gas & Electrolyte POCT, محلل متنقل, كارتريدج أحادي الاستخدام, عناية مركزة, طوارئ',
     features: 'محلل متنقل محمول باليد|كارتريدج أحادي الاستخدام خالي من الصيانة|قياس متزامن لغازات الدم والإلكتروليت|مناسب للعناية المركزة وسيارات الإسعاف|نتائج سريعة في دقائق معدودة',
     price: 0,
@@ -613,7 +613,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'أجهزة التخثر',
     description: 'محلل تخثر شبه أوتوماتيكي لاختبارات PT وAPTT والفيبرينوجين وغيرها.',
     description_en: 'Semi-automated precision coagulation analyzer engineered for diagnostic PT, APTT, Fibrinogen, and related clotting factor assays.',
-    image: '../images/thrombotimer.jpeg',
+    image: '',
     keywords: 'Behnk Elektronik, Thrombotimer, Coagulation Analyzer, تخثر الدم, PT, APTT, فيبرينوجين, تحليل تجلط',
     features: 'صناعة ألمانية عالية الدقة|محلل تخثر شبه أوتوماتيكي|اختبارات زمن البروثرومبين PT|اختبارات زمن الثرومبوبلاستين الجزئي APTT|قياس تركيز الفيبرينوجين Fibrinogen',
     price: 0,
@@ -630,7 +630,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'أجهزة التخثر',
     description: 'جهاز حضانة وترموستات لدعم اختبارات التخثر وضمان ثبات درجة الحرارة.',
     description_en: 'Precision incubation workstation and thermostat unit designed to support coagulation assays and maintain rigid thermal stability.',
-    image: '../images/thrombostat.jpeg',
+    image: '',
     keywords: 'Behnk Elektronik, Thrombostat, Coagulation Thermostat, حضانة, ترموستات, ثبات حرارة, اختبارات تجلط',
     features: 'ثبات حراري فائق ومحكم|حاضنة عينات وكواشف متخصصة|دعم كامل لجميع اختبارات التخثر|تصميم ألماني متين وعملي|مؤشر حراري دقيق',
     price: 0,
@@ -647,7 +647,7 @@ var OFFICIAL_10_PRODUCTS = [
     category: 'كواشف التخثر',
     description: 'محاليل وكواشف تخثر تشمل PT وAPTT وFIB وK، وتستخدم مع أجهزة Behnk.',
     description_en: 'High-quality coagulation diagnostic reagents and test kits including PT, APTT, FIB, and K, optimized for use with Behnk analyzers.',
-    image: '../images/behnk-reagents.jpeg',
+    image: '',
     keywords: 'Behnk Elektronik, Behnk Reagents, كواشف تخثر, محاليل تجلط, PT, APTT, FIB, K, كواشف مخبرية',
     features: 'محاليل وكواشف تخثر عالية النقاء|كواشف فحص PT و APTT|كواشف قياس الفيبرينوجين FIB وكاشف K|متوافقة تماماً مع أجهزة Behnk|حساسية وثبات عالي للنتائج',
     price: 0,
@@ -660,6 +660,10 @@ function syncOfficialProducts(db) {
   try { db.exec("ALTER TABLE products ADD COLUMN name_en TEXT"); } catch(e) {}
   try { db.exec("ALTER TABLE products ADD COLUMN description_en TEXT"); } catch(e) {}
   try { db.exec("ALTER TABLE products ADD COLUMN manufacturer TEXT"); } catch(e) {}
+
+  // Clear image field for all official products (IDs 1-10) and deactivate test data
+  try { db.exec("UPDATE products SET image = '' WHERE id <= 10"); } catch(e) {}
+  try { db.exec("UPDATE products SET active = 0 WHERE (name = 'ieie' OR (name_en IS NULL AND id > 10))"); } catch(e) {}
 
   OFFICIAL_10_PRODUCTS.forEach(function (p) {
     var existing = db.prepare(`
@@ -675,19 +679,19 @@ function syncOfficialProducts(db) {
       db.prepare(`
         UPDATE products 
         SET name = ?, name_en = ?, model = ?, category = ?, description = ?, description_en = ?, 
-            image = ?, agent = ?, manufacturer = ?, keywords = ?, features = ?, price = ?, stock = ?, active = 1
+            image = '', agent = ?, manufacturer = ?, keywords = ?, features = ?, price = ?, stock = ?, active = 1
         WHERE id = ?
       `).run(
         p.name, p.name_en, p.model, p.category, p.description, p.description_en,
-        p.image, p.company, p.company, p.keywords, p.features, p.price, p.stock, existing.id
+        p.company, p.company, p.keywords, p.features, p.price, p.stock, existing.id
       );
     } else {
       var res = db.prepare(`
         INSERT INTO products (name, name_en, model, category, description, description_en, image, agent, manufacturer, price, stock, status, features, keywords, active)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+        VALUES (?, ?, ?, ?, ?, ?, '', ?, ?, ?, ?, ?, ?, ?, 1)
       `).run(
         p.name, p.name_en, p.model, p.category, p.description, p.description_en,
-        p.image, p.company, p.company, p.price, p.stock, p.status, p.features, p.keywords
+        p.company, p.company, p.price, p.stock, p.status, p.features, p.keywords
       );
       var newId = res.lastInsertRowid;
       var stores = db.prepare('SELECT id FROM stores').all();
