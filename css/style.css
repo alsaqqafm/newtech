@@ -248,6 +248,12 @@ img {
     gap: 8px;
 }
 
+.phone-number, [dir="ltr"] {
+    direction: ltr !important;
+    unicode-bidi: isolate !important;
+    display: inline-block;
+}
+
 .top-bar-social {
     display: flex;
     gap: 15px;
@@ -2297,7 +2303,8 @@ body.dark-mode {
     --brand-burgundy: #9a4860;
     --brand-fuchsia: #ea5a8b;
     --brand-blue: #22b4d8;
-    --brand-navy: #f1f5f9;
+    --brand-navy: #0b112c;
+    --brand-navy-dark: #07091a;
     --primary-blue: #22b4d8;
     --primary-blue-light: #5cd0ec;
     --primary-blue-dark: #0a95b7;
@@ -2311,9 +2318,10 @@ body.dark-mode {
     --text-dark: #f1f5f9;
     --text-secondary: #94a3b8;
     --text-on-dark: #ffffff;
-    --bg-white: #0a0d24;
-    --bg-light: #121838;
-    --bg-gray: #1e264f;
+    --bg-white: #0f172a;
+    --bg-light: #161f36;
+    --bg-gray: #1e293b;
+    --border-color: #334155;
     --gradient-hero: linear-gradient(135deg, #07091a 0%, #0f153d 50%, #16204c 100%);
     --gradient-blue: linear-gradient(135deg, #0a95b7 0%, #22b4d8 100%);
     --gradient-teal: linear-gradient(135deg, #0d9488 0%, #2dd4bf 100%);
@@ -2327,8 +2335,8 @@ body.dark-mode {
     --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.6);
     --shadow-glow: 0 0 30px rgba(88, 166, 255, 0.2);
     --shadow-3d: 0 8px 0 rgba(88, 166, 255, 0.15), 0 12px 30px rgba(0, 0, 0, 0.4);
-    background-color: #0d1117;
-    color: #e6edf3;
+    background-color: #0b0f19;
+    color: #e2e8f0;
 }
 
 body.dark-mode .top-bar {
@@ -2611,9 +2619,94 @@ body.dark-mode .about-feature-icon {
     opacity: 0.9;
 }
 
-/* Footer contact icons dark mode */
+/* Footer dark mode */
+body.dark-mode .footer {
+    background: linear-gradient(135deg, #07091a 0%, #0c1228 50%, #0f172a 100%) !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode .footer-about p {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .footer-links h4,
+body.dark-mode .footer-contact h4,
+body.dark-mode .footer-hours h4 {
+    color: #ffffff !important;
+}
+
+body.dark-mode .footer-links ul li a {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .footer-links ul li a:hover {
+    color: #38bdf8 !important;
+}
+
+body.dark-mode .footer-contact ul li {
+    color: #cbd5e1 !important;
+}
+
 body.dark-mode .footer-contact ul li i {
-    color: #58a6ff;
+    color: #38bdf8 !important;
+}
+
+body.dark-mode .footer-hours p {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .footer-hours .highlight {
+    color: #fbbf24 !important;
+}
+
+body.dark-mode .footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body.dark-mode .footer-bottom p {
+    color: #94a3b8 !important;
+}
+
+/* Why Choose Us & Background Sections dark mode */
+body.dark-mode .why-section {
+    background: linear-gradient(135deg, #07091a 0%, #0c1228 50%, #082f49 100%) !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .section.bg-light {
+    background: #070a14 !important;
+}
+
+body.dark-mode .partner-item {
+    background: #111a30 !important;
+    border: 1px solid #1e293b !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode .partner-item small {
+    color: #94a3b8 !important;
+}
+
+/* Modal details dark mode */
+body.dark-mode #detailProductName {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode #detailProductDescription {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode .product-details-info p {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .product-details-info strong {
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode #detailProductFeatures li,
+body.dark-mode #detailProductSpecs li {
+    color: #cbd5e1 !important;
 }
 
 /* Office cards dark mode */
