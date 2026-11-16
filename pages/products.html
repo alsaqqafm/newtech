@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="كتالوج منتجات وأجهزة نيوتك الطبية للاستيراد - أجهزة التحاليل المناعية، غازات الدم، الإلكتروليت، وأجهزة وكواشف التخثر">
+    <meta name="description"
+        content="كتالوج منتجات وأجهزة نيوتك الطبية للاستيراد - أجهزة التحاليل المناعية، غازات الدم، الإلكتروليت، وأجهزة وكواشف التخثر">
     <title>المنتجات والحلول الطبية | نيوتك الطبية للاستيراد</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f153d' width='100' height='100' rx='20'/><circle cx='50' cy='50' r='34' fill='%230a95b7'/><circle cx='62' cy='38' r='16' fill='%23d64776'/><text x='50' y='65' font-size='32' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>NT</text></svg>">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230f153d' width='100' height='100' rx='20'/><circle cx='50' cy='50' r='34' fill='%230a95b7'/><circle cx='62' cy='38' r='16' fill='%23d64776'/><text x='50' y='65' font-size='32' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>NT</text></svg>">
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
     <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body>
-    <div class="loader" id="loader"><div class="loader-spinner"></div></div>
+    <div class="loader" id="loader">
+        <div class="loader-spinner"></div>
+    </div>
 
     <!-- Floating 3D Shapes -->
     <div class="floating-shapes">
@@ -26,13 +32,16 @@
     <div class="top-bar">
         <div class="container">
             <div class="top-bar-content">
-                <span><i class="fas fa-truck-fast"></i> <span data-i18n="topbar_delivery">توصيل سريع وموثوق لجميع المحافظات اليمنية</span></span>
-                <span><i class="fas fa-phone-volume"></i> <span data-i18n="topbar_call">اتصل بنا: +967 772 000 577</span></span>
+                <span><i class="fas fa-truck-fast"></i> <span data-i18n="topbar_delivery">توصيل سريع وموثوق لجميع
+                        المحافظات اليمنية</span></span>
+                <span><i class="fas fa-phone-volume"></i> <span data-i18n="topbar_call">اتصل بنا: +967 772 000
+                        577</span></span>
             </div>
             <div class="top-bar-social">
                 <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
                 <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                <a href="https://wa.me/967711559753" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i
+                        class="fab fa-whatsapp"></i></a>
             </div>
         </div>
     </div>
@@ -40,7 +49,7 @@
     <!-- Header -->
     <header class="header" id="header">
         <div class="container">
-            <a href="../index.html" class="logo" title="New Tech Medical">
+            <a href="../index.html" class="logo" title="New Tech Medical" data-i18n-title="company_name_full">
                 <img src="../images/logo.png" alt="New Tech Medical" class="logo-img">
             </a>
             <nav class="nav-menu" id="navMenu">
@@ -55,14 +64,14 @@
                 <a href="../admin/login.html" class="admin-link" title="لوحة التحكم" data-i18n-title="admin_panel">
                     <i class="fas fa-shield-halved"></i>
                 </a>
-                <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="تبديل الوضع">
+                <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="تبديل الوضع الليلي" data-i18n-title="toggle_theme">
                     <i class="fas fa-moon"></i>
                 </button>
-                <button class="lang-toggle-btn" onclick="toggleLanguage()" title="Language / تغيير اللغة">
+                <button class="lang-toggle-btn" onclick="toggleLanguage()" title="Language / تغيير اللغة" data-i18n-title="toggle_lang">
                     <i class="fas fa-globe"></i>
                     <span class="lang-code-text">EN</span>
                 </button>
-                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="القائمة">
+                <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="القائمة" data-i18n-title="nav_menu">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
@@ -90,14 +99,16 @@
             <div class="container">
                 <div class="filter-container">
                     <div class="filter-buttons">
-                        <button class="filter-btn active" onclick="filterProducts('all')" data-i18n="category_all">الكل</button>
-                        <button class="filter-btn" onclick="filterProducts('Hipro Biotechnology')">Hipro Biotechnology</button>
+                        <button class="filter-btn active" onclick="filterProducts('all')"
+                            data-i18n="category_all">الكل</button>
+                        <button class="filter-btn" onclick="filterProducts('Hipro')">Hipro</button>
                         <button class="filter-btn" onclick="filterProducts('EasyDiagnosis')">EasyDiagnosis</button>
-                        <button class="filter-btn" onclick="filterProducts('Seamaty Diagnostic')">Seamaty Diagnostic</button>
+                        <button class="filter-btn" onclick="filterProducts('Seamaty')">Seamaty</button>
                         <button class="filter-btn" onclick="filterProducts('Behnk Elektronik')">Behnk Elektronik</button>
                     </div>
                     <div class="search-box">
-                        <input type="text" placeholder="ابحث عن جهاز أو مستحضر طبي..." data-i18n-placeholder="search_placeholder" oninput="searchProducts(this.value)">
+                        <input type="text" placeholder="ابحث عن جهاز أو مستحضر طبي..."
+                            data-i18n-placeholder="search_placeholder" oninput="searchProducts(this.value)">
                         <button class="btn btn-primary" aria-label="بحث"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
@@ -112,7 +123,7 @@
                         <i class="fas fa-spinner fa-spin"></i> جاري تحميل المنتجات...
                     </div>
                 </div>
-                
+
                 <div id="pagination" class="pagination"></div>
             </div>
         </section>
@@ -126,7 +137,9 @@
                     <a href="../index.html" class="logo">
                         <img src="../images/logo.png" alt="New Tech Medical" class="logo-img">
                     </a>
-                    <p data-i18n="footer_desc">شركة نيوتك الطبية للاستيراد - شريككم الموثوق في الرعاية الصحية. استيراد وتوزيع الأجهزة والمعدات الطبية والمخبرية، الأدوية، مستلزمات طب الأسنان والمستلزمات الطبية في اليمن.</p>
+                    <p data-i18n="footer_desc">شركة نيوتك الطبية للاستيراد - شريككم الموثوق في الرعاية الصحية. استيراد
+                        وتوزيع الأجهزة والمعدات الطبية والمخبرية، الأدوية، مستلزمات طب الأسنان والمستلزمات الطبية في
+                        اليمن.</p>
                 </div>
                 <div class="footer-links">
                     <h4 data-i18n="footer_quick_links">روابط سريعة</h4>
@@ -142,7 +155,8 @@
                 <div class="footer-contact">
                     <h4 data-i18n="footer_contact_info">بيانات التواصل</h4>
                     <ul>
-                        <li><i class="fas fa-map-marker-alt"></i><span data-i18n="contact_hq_val">صنعاء، اليمن - شارع الجزائر</span></li>
+                        <li><i class="fas fa-map-marker-alt"></i><span data-i18n="contact_hq_val">صنعاء، اليمن - شارع
+                                الجزائر</span></li>
                         <li><i class="fas fa-phone-alt"></i><span dir="ltr">+967 772 000 577</span></li>
                         <li><i class="fab fa-whatsapp"></i><span dir="ltr">+967 711 559 753</span></li>
                         <li><i class="fas fa-envelope"></i><span>info@new-techmedical.com</span></li>
@@ -151,7 +165,8 @@
                 <div class="footer-hours">
                     <h4 data-i18n="footer_hours_title">أوقات الدوام</h4>
                     <p data-i18n="contact_hours_val">الأحد - الخميس: 8:00 صباحاً - 4:00 مساءً</p>
-                    <p class="highlight" style="margin-top: 15px;" data-i18n="contact_hours_closed">الجمعة والسبت: عطلة أسبوعية</p>
+                    <p class="highlight" style="margin-top: 15px;" data-i18n="contact_hours_closed">الجمعة والسبت: عطلة
+                        أسبوعية</p>
                 </div>
             </div>
             <div class="footer-bottom">
@@ -171,20 +186,25 @@
     <!-- Order Modal (Cart) -->
     <div class="modal-overlay" id="orderModal">
         <div class="modal" style="max-width:550px">
-            <button class="modal-close" onclick="closeOrderModal()" aria-label="إغلاق"><i class="fas fa-times"></i></button>
-            <h3 style="margin-bottom:16px"><i class="fas fa-shopping-cart" style="color: var(--brand-blue);"></i> <span data-i18n="cart_title">سلة طلبات المنتجات</span></h3>
+            <button class="modal-close" onclick="closeOrderModal()" aria-label="إغلاق"><i
+                    class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:16px"><i class="fas fa-shopping-cart" style="color: var(--brand-blue);"></i> <span
+                    data-i18n="cart_title">سلة طلبات المنتجات</span></h3>
             <div id="cartItems" style="margin-bottom:16px;max-height:260px;overflow-y:auto"></div>
-            <div id="cartEmpty" style="text-align:center;padding:30px;color:var(--text-secondary)" data-i18n="cart_empty">
-                <i class="fas fa-cart-plus" style="font-size:40px;display:block;margin-bottom:10px"></i>السلة فارغة، يمكنك إضافة المنتجات من قائمة المعروضات
+            <div id="cartEmpty" style="text-align:center;padding:30px;color:var(--text-secondary)">
+                <i class="fas fa-cart-plus" style="font-size:40px;display:block;margin-bottom:10px"></i>
+                <span data-i18n="cart_empty">السلة فارغة، يمكنك إضافة المنتجات من قائمة المعروضات</span>
             </div>
             <form id="orderForm" style="border-top:1px solid var(--border-color);padding-top:16px;display:none">
                 <div class="form-group">
                     <label for="orderName" data-i18n="form_name">الاسم الكامل *</label>
-                    <input type="text" id="orderName" required placeholder="أدخل اسمك الكريم" data-i18n-placeholder="form_name">
+                    <input type="text" id="orderName" required placeholder="أدخل اسمك الكريم"
+                        data-i18n-placeholder="form_name">
                 </div>
                 <div class="form-group">
                     <label for="orderPhone" data-i18n="form_phone">رقم الهاتف *</label>
-                    <input type="tel" id="orderPhone" required placeholder="+967 ..." data-i18n-placeholder="form_phone">
+                    <input type="tel" id="orderPhone" required placeholder="+967 ..."
+                        data-i18n-placeholder="form_phone">
                 </div>
                 <div class="form-group">
                     <label for="orderNotes" data-i18n="quote_message_label">ملاحظات إضافية أو الكمية المطلوبة</label>
@@ -200,8 +220,10 @@
     <!-- Quote Modal -->
     <div class="modal-overlay" id="quoteModal">
         <div class="modal">
-            <button class="modal-close" onclick="closeQuoteModal()" aria-label="إغلاق"><i class="fas fa-times"></i></button>
-            <h3><i class="fas fa-paper-plane" style="color: var(--brand-blue);"></i> <span data-i18n="quote_modal_title">طلب عرض سعر</span></h3>
+            <button class="modal-close" onclick="closeQuoteModal()" aria-label="إغلاق"><i
+                    class="fas fa-times"></i></button>
+            <h3><i class="fas fa-paper-plane" style="color: var(--brand-blue);"></i> <span
+                    data-i18n="quote_modal_title">طلب عرض سعر</span></h3>
             <p id="quoteProductName" style="margin-bottom: 20px; color: var(--brand-blue); font-weight: 700;"></p>
             <form id="quoteForm">
                 <div class="form-group">
@@ -230,24 +252,37 @@
     <!-- Product Details Modal -->
     <div class="modal-overlay" id="productDetailsModal">
         <div class="modal product-details-modal">
-            <button class="modal-close" onclick="closeProductDetails()" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+            <button class="modal-close" onclick="closeProductDetails()" aria-label="إغلاق"><i
+                    class="fas fa-times"></i></button>
             <div class="product-details-content">
                 <div class="product-details-image">
-                    <img id="detailProductImage" src="" alt="Product Detail" style="width: 100%; height: 260px; object-fit: contain; border-radius: 10px; background: var(--bg-gray); padding: 12px;">
+                    <img id="detailProductImage" src="" alt="Product Detail"
+                        style="width: 100%; height: 260px; object-fit: contain; border-radius: 10px; background: var(--bg-gray); padding: 12px;">
                 </div>
                 <div class="product-details-info">
                     <h2 id="detailProductName" style="color: var(--brand-navy); margin-bottom: 6px;"></h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 6px;"><strong data-i18n="product_manufacturer">الشركة المصنعة:</strong> <span id="detailProductAgent"></span></p>
-                    <p style="color: var(--text-secondary); margin-bottom: 6px;"><strong data-i18n="product_category">الفئة:</strong> <span id="detailProductCategory"></span></p>
-                    <p id="detailProductPriceRow" style="color: var(--brand-blue); font-size: 18px; font-weight: 700; margin-bottom: 12px; display: none;"><span id="detailProductPrice"></span></p>
-                    <p id="detailProductDescription" style="color: var(--text-dark); line-height: 1.8; margin-bottom: 14px;"></p>
-                    
-                    <h4 style="margin-bottom: 8px;"><i class="fas fa-circle-check" style="color: var(--brand-blue);"></i> <span data-i18n="modal_features_title">المميزات الرئيسية:</span></h4>
+                    <p style="color: var(--text-secondary); margin-bottom: 6px;"><strong
+                            data-i18n="product_manufacturer">الشركة المصنعة:</strong> <span
+                            id="detailProductAgent"></span></p>
+                    <p style="color: var(--text-secondary); margin-bottom: 6px;"><strong
+                            data-i18n="product_category">الفئة:</strong> <span id="detailProductCategory"></span></p>
+                    <p id="detailProductPriceRow"
+                        style="color: var(--brand-blue); font-size: 18px; font-weight: 700; margin-bottom: 12px; display: none;">
+                        <span id="detailProductPrice"></span>
+                    </p>
+                    <p id="detailProductDescription"
+                        style="color: var(--text-dark); line-height: 1.8; margin-bottom: 14px;"></p>
+
+                    <h4 style="margin-bottom: 8px;"><i class="fas fa-circle-check"
+                            style="color: var(--brand-blue);"></i> <span data-i18n="modal_features_title">المميزات
+                            الرئيسية:</span></h4>
                     <ul id="detailProductFeatures" style="list-style: none; padding: 0; margin-bottom: 14px;"></ul>
-                    
-                    <h4 style="margin-bottom: 8px;"><i class="fas fa-sliders" style="color: var(--brand-fuchsia);"></i> <span data-i18n="modal_specs_title">المواصفات الفنية:</span></h4>
+
+                    <h4 style="margin-bottom: 8px;"><i class="fas fa-sliders" style="color: var(--brand-fuchsia);"></i>
+                        <span data-i18n="modal_specs_title">المواصفات الفنية:</span>
+                    </h4>
                     <ul id="detailProductSpecs" style="list-style: none; padding: 0; margin-bottom: 18px;"></ul>
-                    
+
                     <button id="detailQuoteBtn" class="btn btn-primary" style="width: 100%;">
                         <i class="fas fa-paper-plane"></i> <span data-i18n="btn_get_quote">طلب عرض سعر</span>
                     </button>
@@ -259,4 +294,5 @@
     <script src="../js/translations.js"></script>
     <script src="../js/main.js"></script>
 </body>
+
 </html>

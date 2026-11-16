@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#edf2f7"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a95b7"/>
+      <stop offset="100%" stop-color="#d64776"/>
+    </linearGradient>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a95b7"/>
+      <stop offset="100%" stop-color="#0f153d"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Card Background -->
+  <rect width="400" height="300" fill="url(#bgGrad)" rx="16"/>
+  <rect x="2" y="2" width="396" height="296" fill="none" stroke="#e2e8f0" stroke-width="2" rx="14"/>
+  
+  <!-- Subtle decorative grid -->
+  <g opacity="0.15" stroke="#0a95b7" stroke-width="1">
+    <line x1="40" y1="0" x2="40" y2="300"/>
+    <line x1="360" y1="0" x2="360" y2="300"/>
+    <line x1="0" y1="40" x2="400" y2="40"/>
+    <line x1="0" y1="260" x2="400" y2="260"/>
+  </g>
+
+  <!-- Medical Device Silhouette / Icon Box -->
+  <g transform="translate(140, 60)">
+    <!-- Device Body -->
+    <rect x="0" y="20" width="120" height="90" rx="12" fill="#ffffff" stroke="url(#accentGrad)" stroke-width="3" filter="drop-shadow(0 8px 16px rgba(15,21,61,0.08))"/>
+    <!-- Screen -->
+    <rect x="15" y="32" width="55" height="40" rx="6" fill="#0f153d"/>
+    <!-- Screen graphic: pulse line -->
+    <path d="M 22 52 L 32 52 L 37 42 L 43 62 L 48 50 L 53 54 L 62 54" fill="none" stroke="#22b4d8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Control Buttons -->
+    <circle cx="90" cy="40" r="5" fill="#0a95b7"/>
+    <circle cx="90" cy="55" r="5" fill="#813c50"/>
+    <circle cx="90" cy="70" r="5" fill="#d64776"/>
+    <!-- Sample Tray Slot -->
+    <rect x="20" y="86" width="80" height="10" rx="3" fill="#cbd5e1"/>
+    <!-- Status LED -->
+    <circle cx="108" cy="28" r="3" fill="#10b981"/>
+  </g>
+
+  <!-- Badge: Official Placeholder -->
+  <g transform="translate(110, 190)">
+    <rect x="0" y="0" width="180" height="28" rx="14" fill="#0f153d" opacity="0.06"/>
+    <rect x="1" y="1" width="178" height="26" rx="13" fill="#ffffff"/>
+    <text x="90" y="18" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#0a95b7">NEW TECH MEDICAL</text>
+  </g>
+
+  <!-- Product Notice -->
+  <text x="200" y="244" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Tajawal', sans-serif" font-size="14" font-weight="bold" fill="#0f153d">صورة الجهاز قيد التحديث</text>
+  <text x="200" y="264" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" fill="#64748b">Device Image Pending Official Photo</text>
+</svg>

@@ -433,13 +433,14 @@ function updateCartBadge() {
 }
 function addToCart(productId, productName) {
   var cart = getCart();
+  var isEn = document.documentElement.lang === 'en';
   if (cart.some(function(item) { return item.id === productId; })) {
-    alert('المنتج موجود بالفعل في السلة');
+    alert(isEn ? 'This product is already in your basket' : 'المنتج موجود بالفعل في السلة');
     return;
   }
   cart.push({ id: productId, name: productName });
   saveCart(cart);
-  showCartFeedback('تمت إضافة "' + productName + '" إلى السلة');
+  showCartFeedback(isEn ? 'Added "' + productName + '" to basket' : ('تمت إضافة "' + productName + '" إلى السلة'));
 }
 function removeFromCart(productId) {
   var cart = getCart().filter(function(item) { return item.id !== productId; });
@@ -671,10 +672,39 @@ function searchProducts(query) {
 
 function applyFilters() {
     filteredProducts = allProductsCache.filter(function(product) {
-        var matchCategory = (currentFilter === 'all' || product.agent === currentFilter || product.category === currentFilter);
+        var matchCategory = false;
+        if (currentFilter === 'all') {
+            matchCategory = true;
+        } else {
+            var filterLower = currentFilter.toLowerCase();
+            var agent = (product.agent || '').toLowerCase();
+            var mfg = (product.manufacturer || '').toLowerCase();
+            var cat = (product.category || '').toLowerCase();
+            var model = (product.model || '').toLowerCase();
+            matchCategory = (
+                agent.indexOf(filterLower) !== -1 || 
+                mfg.indexOf(filterLower) !== -1 || 
+                cat.indexOf(filterLower) !== -1 ||
+                model.indexOf(filterLower) !== -1 ||
+                (filterLower === 'hipro' && agent.indexOf('hipro') !== -1) ||
+                (filterLower === 'seamaty' && agent.indexOf('seamaty') !== -1) ||
+                (filterLower === 'behnk elektronik' && (agent.indexOf('behnk') !== -1 || mfg.indexOf('behnk') !== -1))
+            );
+        }
+
         var matchSearch = true;
         if (currentSearch) {
-            var text = ((product.name || '') + ' ' + (product.agent || '') + ' ' + (product.description || '') + ' ' + (product.category || '')).toLowerCase();
+            var text = (
+                (product.name || '') + ' ' + 
+                (product.name_en || '') + ' ' + 
+                (product.agent || '') + ' ' + 
+                (product.manufacturer || '') + ' ' + 
+                (product.description || '') + ' ' + 
+                (product.description_en || '') + ' ' + 
+                (product.category || '') + ' ' + 
+                (product.model || '') + ' ' + 
+                (product.keywords || '')
+            ).toLowerCase();
             matchSearch = text.indexOf(currentSearch) !== -1;
         }
         return matchCategory && matchSearch;
@@ -698,12 +728,16 @@ function renderProducts() {
     if (currentPage < 1) currentPage = 1;
     var start = (currentPage - 1) * PRODUCTS_PER_PAGE;
     var pageProducts = filteredProducts.slice(start, start + PRODUCTS_PER_PAGE);
+
     grid.innerHTML = pageProducts.map(function(p) {
-        var name = p.name || '';
-        var agent = p.agent || '';
-        var desc = p.description || '';
-        if (isEn && typeof productTranslations !== 'undefined' && productTranslations[name]) {
-            desc = productTranslations[name].description || desc;
+        var name = (isEn && p.name_en) ? p.name_en : (p.name || '');
+        if (isEn && !p.name_en && typeof productTranslations !== 'undefined' && productTranslations[p.name]) {
+            name = productTranslations[p.name].name || name;
+        }
+        var agent = p.agent || p.manufacturer || '';
+        var desc = (isEn && p.description_en) ? p.description_en : (p.description || '');
+        if (isEn && !p.description_en && typeof productTranslations !== 'undefined' && productTranslations[p.name]) {
+            desc = productTranslations[p.name].description || desc;
         }
         var image = p.image || '';
         if (image && !image.startsWith('http') && !image.startsWith('data:')) {
@@ -726,12 +760,12 @@ function renderProducts() {
 
         return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
             '<div class="product-image">' +
-                '<img src="' + image + '" alt="' + name + '" onerror="this.onerror=null;this.style.display=\'none\';">' +
+                '<img src="' + image + '" alt="' + name.replace(/"/g, '&quot;') + '" onerror="this.onerror=null;this.src=\'' + imgBase + 'images/placeholder-product.svg\';">' +
                 badgeHtml +
             '</div>' +
             '<div class="product-info">' +
                 '<h3>' + name + '</h3>' +
-                '<p class="product-agent">' + agent + '</p>' +
+                '<p class="product-agent"><i class="fas fa-building" style="color:var(--brand-blue);margin-inline-end:4px"></i> ' + agent + '</p>' +
                 priceHtml +
                 '<p class="product-desc">' + desc + '</p>' +
                 '<div class="product-btn-group">' +
@@ -1195,18 +1229,28 @@ function openProductDetailsById(productId) {
     fetch('/api/products/' + productId).then(function(r) { return r.json(); }).then(function(product) {
         if (!product || product.error || product.active === 0) { closeProductDetails(); return; }
         
-        var name = product.name || '';
-        var desc = product.description || '';
+        var name = (isEn && product.name_en) ? product.name_en : (product.name || '');
+        var desc = (isEn && product.description_en) ? product.description_en : (product.description || '');
         var category = product.category || '';
         var features = [];
         var specs = [];
 
-        if (isEn && typeof productTranslations !== 'undefined' && productTranslations[name]) {
-            var pt = productTranslations[name];
-            desc = pt.description || desc;
-            category = pt.category || category;
-            if (pt.features) features = pt.features;
-            if (pt.specs) specs = pt.specs;
+        if (isEn) {
+            if (category === 'تحاليل مناعية') category = 'Immunoassay';
+            else if (category === 'غازات الدم') category = 'Blood Gas';
+            else if (category === 'الإلكتروليت') category = 'Electrolytes';
+            else if (category === 'أجهزة التخثر') category = 'Coagulation';
+            else if (category === 'كواشف التخثر') category = 'Reagents';
+
+            if (typeof productTranslations !== 'undefined') {
+                var pt = productTranslations[product.name] || productTranslations[name];
+                if (pt) {
+                    if (!product.description_en && pt.description) desc = pt.description;
+                    if (pt.category) category = pt.category;
+                    if (pt.features) features = pt.features;
+                    if (pt.specs) specs = pt.specs;
+                }
+            }
         }
 
         if (features.length === 0 && product.features) {

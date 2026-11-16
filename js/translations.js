@@ -17,6 +17,10 @@ const translations = {
     topbar_call: "اتصل بنا: +967 772 000 577",
     header_quote_btn: "طلب عرض سعر",
     lang_toggle_name: "English",
+    toggle_theme: "تبديل الوضع الليلي",
+    toggle_lang: "تغيير اللغة / Switch Language",
+    nav_menu: "القائمة الرئيسية",
+    company_name_full: "شركة نيوتك الطبية للاستيراد - New Tech Medical",
 
     // Hero Section
     hero_badge: "🏥 شريككم المعتمد في الرعاية الصحية والحلول الطبية",
@@ -252,6 +256,10 @@ const translations = {
     topbar_call: "Call Us: +967 772 000 577",
     header_quote_btn: "Request Quote",
     lang_toggle_name: "عربي",
+    toggle_theme: "Toggle Dark/Light Mode",
+    toggle_lang: "Switch to Arabic",
+    nav_menu: "Toggle Navigation Menu",
+    company_name_full: "New Tech Medical Import Corp",
 
     // Hero Section
     hero_badge: "🏥 Your Trusted Partner in Healthcare & Medical Solutions",
@@ -477,74 +485,137 @@ const translations = {
 
 // Dynamic Product Translations (English Lookups)
 const productTranslations = {
-  "Hipro A1 Pro": {
-    name: "Hipro A1 Pro",
+  "Hipro A1 Pro – Automated Immunoassay System": {
+    name: "Hipro A1 Pro – Automated Immunoassay System",
     category: "Immunoassay",
-    description: "Automated immunoassay analyzer designed for clinical laboratories. Features high precision, rapid throughput, and intuitive user operation.",
-    features: ["Automatic cartridge reading", "Multi-parameter test menu", "High reproducibility & low CV%"],
+    description: "Automated immunoassay system designed for medium-to-high throughput laboratories, offering consistent analytical precision, straightforward operation, and an extensive test menu.",
+    features: ["Automated immunoassay operation", "Consistent analytical precision", "Straightforward user workflow", "Extensive diagnostic test menu", "Medium to high throughput design"],
     specs: ["Throughput: Rapid batch testing", "Sample Type: Whole blood, Serum, Plasma", "Interface: Touchscreen LCD"]
   },
-  "Hipro Hurricane": {
-    name: "Hipro Hurricane",
+  "Hipro A1 Pro": {
+    name: "Hipro A1 Pro – Automated Immunoassay System",
+    category: "Immunoassay",
+    description: "Automated immunoassay system designed for medium-to-high throughput laboratories, offering consistent analytical precision, straightforward operation, and an extensive test menu.",
+    features: ["Automated immunoassay operation", "Consistent analytical precision", "Straightforward user workflow", "Extensive diagnostic test menu", "Medium to high throughput design"],
+    specs: ["Throughput: Rapid batch testing", "Sample Type: Whole blood, Serum, Plasma", "Interface: Touchscreen LCD"]
+  },
+  "Hipro Hurricane – POCT Immunoassay Analyzer": {
+    name: "Hipro Hurricane – POCT Immunoassay Analyzer",
     category: "POCT",
-    description: "Compact point-of-care immunoassay analyzer for urgent bedside diagnostic testing in critical care, ER, and outpatient clinics.",
-    features: ["Instant turnaround time", "Compact portable footprint", "Maintenance-free cartridge system"],
+    description: "Compact point-of-care POCT immunoassay analyzer for rapid bedside patient diagnostics, suitable for emergency rooms and outpatient clinics, featuring micro sample volume and rapid results turnaround.",
+    features: ["Compact POCT design", "Rapid bedside patient diagnostics", "Micro sample volume requirement", "Rapid result turnaround", "Ideal for ER and outpatient clinics"],
     specs: ["Method: Fluorescence Immunoassay", "Warm-up Time: Instant", "Connectivity: USB, LIS/HIS"]
   },
-  "Hipro A1": {
-    name: "Hipro A1",
-    category: "Immunoassay",
-    description: "Economical and dependable automated immunoassay system for routine diagnostic testing in medium throughput laboratories.",
-    features: ["Cost-effective reagent system", "Easy calibration", "Stable internal quality control"],
-    specs: ["Assay Types: Cardiac, Inflammation, Renal", "Optical System: High-sensitivity photometer"]
+  "Hipro Hurricane": {
+    name: "Hipro Hurricane – POCT Immunoassay Analyzer",
+    category: "POCT",
+    description: "Compact point-of-care POCT immunoassay analyzer for rapid bedside patient diagnostics, suitable for emergency rooms and outpatient clinics, featuring micro sample volume and rapid results turnaround.",
+    features: ["Compact POCT design", "Rapid bedside patient diagnostics", "Micro sample volume requirement", "Rapid result turnaround", "Ideal for ER and outpatient clinics"],
+    specs: ["Method: Fluorescence Immunoassay", "Warm-up Time: Instant", "Connectivity: USB, LIS/HIS"]
   },
-  "PT1000": {
-    name: "PT1000",
+  "PT1000 – Blood Gas Analyzer": {
+    name: "PT1000 – Blood Gas Analyzer",
     category: "Blood Gas",
-    description: "Integrated blood gas and electrolyte analyzer with maintenance-free multi-use cartridge, engineered for Intensive Care Units (ICU) and Emergency Departments.",
-    features: ["Cartridge-based all-in-one system", "Zero regular maintenance required", "Comprehensive blood gas and metabolic panel"],
+    description: "Cartridge-based blood gas analyzer with automated multi-point calibration and internal quality control, ideally engineered for emergency departments and intensive care units.",
+    features: ["Integrated all-in-one cartridge system", "Automated regular calibration", "Internal quality control", "Engineered for ICU & Emergency care", "Rapid and accurate test output"],
     specs: ["Parameters: pH, pCO2, pO2, Na+, K+, Ca++, Cl-, Hct, Glu, Lac", "Sample Volume: ≤ 100 μL", "Test Time: < 60 seconds"]
   },
-  "DX Electrolyte Analyzer": {
-    name: "DX Electrolyte Analyzer",
+  "PT1000": {
+    name: "PT1000 – Blood Gas Analyzer",
+    category: "Blood Gas",
+    description: "Cartridge-based blood gas analyzer with automated multi-point calibration and internal quality control, ideally engineered for emergency departments and intensive care units.",
+    features: ["Integrated all-in-one cartridge system", "Automated regular calibration", "Internal quality control", "Engineered for ICU & Emergency care", "Rapid and accurate test output"],
+    specs: ["Parameters: pH, pCO2, pO2, Na+, K+, Ca++, Cl-, Hct, Glu, Lac", "Sample Volume: ≤ 100 μL", "Test Time: < 60 seconds"]
+  },
+  "DX – Electrolyte Analyzer": {
+    name: "DX – Electrolyte Analyzer",
     category: "Electrolytes",
-    description: "Advanced electrolyte analyzer based on Ion-Selective Electrode (ISE) technology, delivering high measurement accuracy and long electrode lifespan.",
-    features: ["Advanced ISE electrodes", "Automatic liquid level detection", "Sleep mode power saving"],
+    description: "Electrolyte analyzer utilizing advanced Ion-Selective Electrode (ISE) technology for precise measurement of Sodium, Potassium, Chloride, Ionized Calcium, and pH.",
+    features: ["Precision ISE electrode technology", "Measures Sodium, Potassium, Chloride", "Measures Ionized Calcium and pH", "High analytical reproducibility", "Extended electrode lifespan"],
     specs: ["Parameters: K+, Na+, Cl-, Ca++, pH", "Aspiration Volume: 65 μL", "Speed: 60 samples/hour"]
   },
-  "QFT9000 Pro II": {
-    name: "QFT9000 Pro II",
-    category: "Immunoassay",
-    description: "Fluorescence Immunoassay (FIA) analyzer supporting multi-test diagnostic panels for rapid cardiac markers, infectious diseases, and hormones.",
-    features: ["High sensitivity fluorescence detection", "Built-in thermal printer", "Multi-channel testing support"],
-    specs: ["Linearity: R ≥ 0.99", "Data Storage: 10,000+ patient results"]
+  "DX Electrolyte Analyzer": {
+    name: "DX – Electrolyte Analyzer",
+    category: "Electrolytes",
+    description: "Electrolyte analyzer utilizing advanced Ion-Selective Electrode (ISE) technology for precise measurement of Sodium, Potassium, Chloride, Ionized Calcium, and pH.",
+    features: ["Precision ISE electrode technology", "Measures Sodium, Potassium, Chloride", "Measures Ionized Calcium and pH", "High analytical reproducibility", "Extended electrode lifespan"],
+    specs: ["Parameters: K+, Na+, Cl-, Ca++, pH", "Aspiration Volume: 65 μL", "Speed: 60 samples/hour"]
   },
-  "Seamaty SG1": {
-    name: "Seamaty SG1",
+  "QFT9000 Pro II – Fluorescence Immunoassay Analyzer": {
+    name: "QFT9000 Pro II – Fluorescence Immunoassay Analyzer",
+    category: "Immunoassay",
+    description: "Multi-parameter fluorescence immunoassay analyzer supporting comprehensive diagnostic panels including cardiac biomarkers, inflammation, thyroid, diabetes, and fertility.",
+    features: ["Advanced fluorescence immunoassay FIA", "Cardiac markers panel", "Inflammation & thyroid testing", "Diabetes & fertility hormone panels", "High-sensitivity multi-channel reading"],
+    specs: ["Linearity: R ≥ 0.99", "Data Storage: 10,000+ patient results", "Printer: Built-in thermal"]
+  },
+  "QFT9000 Pro II": {
+    name: "QFT9000 Pro II – Fluorescence Immunoassay Analyzer",
+    category: "Immunoassay",
+    description: "Multi-parameter fluorescence immunoassay analyzer supporting comprehensive diagnostic panels including cardiac biomarkers, inflammation, thyroid, diabetes, and fertility.",
+    features: ["Advanced fluorescence immunoassay FIA", "Cardiac markers panel", "Inflammation & thyroid testing", "Diabetes & fertility hormone panels", "High-sensitivity multi-channel reading"],
+    specs: ["Linearity: R ≥ 0.99", "Data Storage: 10,000+ patient results", "Printer: Built-in thermal"]
+  },
+  "Hipro A1 – Immunoassay Analyzer": {
+    name: "Hipro A1 – Immunoassay Analyzer",
+    category: "Immunoassay",
+    description: "Cost-effective automated immunoassay analyzer for routine clinical diagnostic testing, combining proven reliability with straightforward, dependable operation.",
+    features: ["Cost-effective laboratory solution", "Optimized for routine daily diagnostic panels", "Proven operational dependability", "Simple user-friendly interface", "Low maintenance requirements"],
+    specs: ["Assay Types: Cardiac, Inflammation, Renal", "Optical System: High-sensitivity photometer"]
+  },
+  "Hipro A1": {
+    name: "Hipro A1 – Immunoassay Analyzer",
+    category: "Immunoassay",
+    description: "Cost-effective automated immunoassay analyzer for routine clinical diagnostic testing, combining proven reliability with straightforward, dependable operation.",
+    features: ["Cost-effective laboratory solution", "Optimized for routine daily diagnostic panels", "Proven operational dependability", "Simple user-friendly interface", "Low maintenance requirements"],
+    specs: ["Assay Types: Cardiac, Inflammation, Renal", "Optical System: High-sensitivity photometer"]
+  },
+  "Seamaty SG1 – Blood Gas & Electrolyte POCT": {
+    name: "Seamaty SG1 – Blood Gas & Electrolyte POCT",
     category: "POCT",
-    description: "Ultra-portable handheld blood gas and biochemistry analyzer utilizing microfluidic test cards for instant bedside clinical diagnostics.",
-    features: ["Handheld battery operated", "Zero reagent maintenance", "Microfluidic lab-on-a-chip technology"],
+    description: "Portable point-of-care blood gas and electrolyte analyzer utilizing single-use microfluidic cartridges, suitable for critical care and emergency departments.",
+    features: ["Ultra-portable handheld format", "Zero-maintenance single-use cartridge", "Simultaneous blood gas & electrolyte panel", "Ideal for ICU, bedside & emergency ambulance", "Rapid results in 3-5 minutes"],
     specs: ["Weight: Lightweight handheld", "Card Type: Single-use multi-parameter", "Results: Within 3-5 minutes"]
   },
-  "Thrombotimer": {
-    name: "Thrombotimer",
+  "Seamaty SG1": {
+    name: "Seamaty SG1 – Blood Gas & Electrolyte POCT",
+    category: "POCT",
+    description: "Portable point-of-care blood gas and electrolyte analyzer utilizing single-use microfluidic cartridges, suitable for critical care and emergency departments.",
+    features: ["Ultra-portable handheld format", "Zero-maintenance single-use cartridge", "Simultaneous blood gas & electrolyte panel", "Ideal for ICU, bedside & emergency ambulance", "Rapid results in 3-5 minutes"],
+    specs: ["Weight: Lightweight handheld", "Card Type: Single-use multi-parameter", "Results: Within 3-5 minutes"]
+  },
+  "Thrombotimer – Coagulation Analyzer": {
+    name: "Thrombotimer – Coagulation Analyzer",
     category: "Coagulation",
-    description: "Precision opto-mechanical coagulation analyzer from Behnk Elektronik Germany. Accurately determines PT, APTT, Fibrinogen, and Thrombin Time.",
-    features: ["German precision engineering", "Opto-mechanical sensing resistant to icteric/lipemic samples", "High repeatability"],
+    description: "Semi-automated precision coagulation analyzer engineered for diagnostic PT, APTT, Fibrinogen, and related clotting factor assays.",
+    features: ["German precision engineering", "Semi-automated opto-mechanical testing", "PT and APTT clotting factor testing", "Fibrinogen and thrombin assays", "Stable and reproducible test results"],
     specs: ["Origin: Germany", "Measuring Channels: 1 - 4 channels", "Incubation Positions: Integrated heated block"]
   },
-  "Thrombostat": {
-    name: "Thrombostat",
+  "Thrombotimer": {
+    name: "Thrombotimer – Coagulation Analyzer",
     category: "Coagulation",
-    description: "Semi-automated coagulation system and precision incubator for manual and semi-automated diagnostic clotting assays.",
-    features: ["Precise temperature regulation", "Reliable ball-method detection", "Long-term operational durability"],
+    description: "Semi-automated precision coagulation analyzer engineered for diagnostic PT, APTT, Fibrinogen, and related clotting factor assays.",
+    features: ["German precision engineering", "Semi-automated opto-mechanical testing", "PT and APTT clotting factor testing", "Fibrinogen and thrombin assays", "Stable and reproducible test results"],
+    specs: ["Origin: Germany", "Measuring Channels: 1 - 4 channels", "Incubation Positions: Integrated heated block"]
+  },
+  "Thrombostat – Coagulation Thermostat": {
+    name: "Thrombostat – Coagulation Thermostat",
+    category: "Coagulation",
+    description: "Precision incubation workstation and thermostat unit designed to support coagulation assays and maintain rigid thermal stability.",
+    features: ["High thermal precision regulation", "Specimen and reagent incubation block", "Essential support for manual & semi-auto clotting assays", "Durable German engineering", "Continuous temperature monitoring"],
+    specs: ["Origin: Germany", "Detection: Mechanical ball coagulation", "Temperature: 37.0°C ± 0.2°C"]
+  },
+  "Thrombostat": {
+    name: "Thrombostat – Coagulation Thermostat",
+    category: "Coagulation",
+    description: "Precision incubation workstation and thermostat unit designed to support coagulation assays and maintain rigid thermal stability.",
+    features: ["High thermal precision regulation", "Specimen and reagent incubation block", "Essential support for manual & semi-auto clotting assays", "Durable German engineering", "Continuous temperature monitoring"],
     specs: ["Origin: Germany", "Detection: Mechanical ball coagulation", "Temperature: 37.0°C ± 0.2°C"]
   },
   "Behnk Reagents": {
-    name: "Behnk Reagents",
+    name: "Behnk Reagents – Coagulation Diagnostic Reagents",
     category: "Reagents",
-    description: "High-grade diagnostic coagulation reagents and controls from Behnk Elektronik Germany, formulated for sensitive and reproducible clotting diagnostics.",
-    features: ["High sensitivity and stability", "Compliant with international ISI calibration standards", "Clear reconstitution"],
+    description: "High-quality coagulation diagnostic reagents and test kits including PT, APTT, FIB, and K, optimized for use with Behnk analyzers.",
+    features: ["High purity diagnostic coagulation reagents", "Dedicated PT and APTT diagnostic kits", "Fibrinogen (FIB) and K factor reagents", "Fully optimized for Behnk coagulation instruments", "High sensitivity and analytical stability"],
     specs: ["Types: PT Reagents, APTT, Fibrinogen, Controls", "Origin: Germany", "Storage: 2 - 8°C"]
   }
 };

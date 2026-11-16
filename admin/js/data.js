@@ -173,6 +173,12 @@ var DataStore = {
       return r;
     });
   },
+  deleteProduct: function (id) {
+    cacheDelete('products', id);
+    return api('DELETE', '/products/' + id).then(function (r) {
+      return r;
+    });
+  },
 
   // ---- Store Inventory (مخزون المحلات والجرد) ----
   getStoreInventory: function (storeId) {

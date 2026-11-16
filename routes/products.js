@@ -87,11 +87,27 @@ module.exports = function (db) {
 
   router.post('/', authenticateToken, requireRole('admin', 'store_manager', 'inventory', 'editor'), function (req, res) {
     try {
-      var { name, model, category, description, image, agent, price, stock, status, store_id, purchase_price, wholesale_price, unit } = req.body;
+      var { name, name_en, model, category, description, description_en, image, agent, manufacturer, price, stock, status, features, keywords, store_id, purchase_price, wholesale_price, unit } = req.body;
       if (!name) return res.status(400).json({ error: 'اسم المنتج مطلوب' });
 
-      var result = db.prepare('INSERT INTO products (name, model, category, description, image, agent, price, stock, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
-        name, model || '', category || '', description || '', image || '', agent || '', price || 0, stock || 0, status || 'متوفر'
+      var result = db.prepare(`
+        INSERT INTO products (name, name_en, model, category, description, description_en, image, agent, manufacturer, price, stock, status, features, keywords, active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      `).run(
+        name,
+        name_en || '',
+        model || '',
+        category || '',
+        description || '',
+        description_en || '',
+        image || '',
+        agent || manufacturer || '',
+        manufacturer || agent || '',
+        price || 0,
+        stock || 0,
+        status || 'متوفر',
+        features || '',
+        keywords || ''
       );
 
       var newProductId = result.lastInsertRowid;
@@ -133,18 +149,28 @@ module.exports = function (db) {
       var existing = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
       if (!existing) return res.status(404).json({ error: 'المنتج غير موجود' });
 
-      var { name, model, category, description, image, agent, price, stock, status, store_id } = req.body;
+      var { name, name_en, model, category, description, description_en, image, agent, manufacturer, price, stock, status, features, keywords, store_id } = req.body;
 
-      db.prepare('UPDATE products SET name = ?, model = ?, category = ?, description = ?, image = ?, agent = ?, price = ?, stock = ?, status = ? WHERE id = ?').run(
+      db.prepare(`
+        UPDATE products 
+        SET name = ?, name_en = ?, model = ?, category = ?, description = ?, description_en = ?, 
+            image = ?, agent = ?, manufacturer = ?, price = ?, stock = ?, status = ?, features = ?, keywords = ? 
+        WHERE id = ?
+      `).run(
         name !== undefined ? name : existing.name,
+        name_en !== undefined ? name_en : existing.name_en,
         model !== undefined ? model : existing.model,
         category !== undefined ? category : existing.category,
         description !== undefined ? description : existing.description,
+        description_en !== undefined ? description_en : existing.description_en,
         image !== undefined ? image : existing.image,
-        agent !== undefined ? agent : existing.agent,
+        agent !== undefined ? agent : (existing.agent || existing.manufacturer),
+        manufacturer !== undefined ? manufacturer : (existing.manufacturer || existing.agent),
         price !== undefined ? price : existing.price,
         stock !== undefined ? stock : existing.stock,
         status !== undefined ? status : existing.status,
+        features !== undefined ? features : existing.features,
+        keywords !== undefined ? keywords : existing.keywords,
         req.params.id
       );
 
@@ -161,6 +187,28 @@ module.exports = function (db) {
 
       var product = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
       res.json(product);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  router.delete('/:id', authenticateToken, requireRole('admin', 'store_manager'), function (req, res) {
+    try {
+      var existing = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
+      if (!existing) return res.status(404).json({ error: 'المنتج غير موجود' });
+
+      // Clean up store inventory and adjustments
+      db.prepare('DELETE FROM store_inventory WHERE product_id = ?').run(req.params.id);
+      db.prepare('DELETE FROM stock_adjustments WHERE product_id = ?').run(req.params.id);
+
+      // Delete the product
+      db.prepare('DELETE FROM products WHERE id = ?').run(req.params.id);
+
+      db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
+        req.user.id, req.user.name, 'delete', 'product', req.params.id, JSON.stringify({ name: existing.name })
+      );
+
+      res.json({ message: 'تم حذف المنتج بنجاح', id: req.params.id });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

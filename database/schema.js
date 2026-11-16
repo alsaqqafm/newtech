@@ -185,6 +185,9 @@ function initDatabase(fileData) {
 
     // Add active column for toggle/deactivate support
     try { db.exec("ALTER TABLE products ADD COLUMN active INTEGER DEFAULT 1"); } catch(e) {}
+    try { db.exec("ALTER TABLE products ADD COLUMN name_en TEXT"); } catch(e) {}
+    try { db.exec("ALTER TABLE products ADD COLUMN description_en TEXT"); } catch(e) {}
+    try { db.exec("ALTER TABLE products ADD COLUMN manufacturer TEXT"); } catch(e) {}
     try { db.exec("ALTER TABLE orders ADD COLUMN active INTEGER DEFAULT 1"); } catch(e) {}
     try { db.exec("ALTER TABLE quotes ADD COLUMN active INTEGER DEFAULT 1"); } catch(e) {}
     try { db.exec("ALTER TABLE users ADD COLUMN avatar TEXT"); } catch(e) {}
@@ -480,6 +483,226 @@ function seedDatabase(db) {
   console.log('Database seeded successfully.');
 }
 
+var OFFICIAL_10_PRODUCTS = [
+  {
+    name: 'Hipro A1 Pro – Automated Immunoassay System',
+    name_ar: 'Hipro A1 Pro – نظام تحاليل مناعية أوتوماتيكي',
+    name_en: 'Hipro A1 Pro – Automated Immunoassay System',
+    model: 'A1 Pro',
+    company: 'Hipro',
+    agent: 'Hipro',
+    category: 'تحاليل مناعية',
+    description: 'نظام تحاليل مناعية أوتوماتيكي للمختبرات المتوسطة والعالية الإنتاجية، يوفر دقة تحليلية ثابتة وتشغيلاً سهلاً وقائمة فحوصات واسعة.',
+    description_en: 'Automated immunoassay system designed for medium-to-high throughput laboratories, offering consistent analytical precision, straightforward operation, and an extensive test menu.',
+    image: '../images/hipro-a1-pro.png',
+    keywords: 'Hipro, A1 Pro, Automated Immunoassay System, تحاليل مناعية, مختبرات, أجهزة مخبرية',
+    features: 'نظام تحاليل مناعية أوتوماتيكي|دقة تحليلية ثابتة|تشغيل سهل|قائمة فحوصات واسعة|مناسب للمختبرات المتوسطة والعالية الإنتاجية',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'Hipro Hurricane – POCT Immunoassay Analyzer',
+    name_ar: 'Hipro Hurricane – جهاز الفحوصات المناعية السريعة POCT',
+    name_en: 'Hipro Hurricane – POCT Immunoassay Analyzer',
+    model: 'Hurricane',
+    company: 'Hipro',
+    agent: 'Hipro',
+    category: 'POCT',
+    description: 'جهاز POCT مدمج للفحوصات السريعة بجانب المريض، مناسب للطوارئ والعيادات، ويتميز بصغر حجم العينة وسرعة النتائج.',
+    description_en: 'Compact point-of-care POCT immunoassay analyzer for rapid bedside patient diagnostics, suitable for emergency rooms and outpatient clinics, featuring micro sample volume and rapid results turnaround.',
+    image: '../images/hipro-hurricane.png',
+    keywords: 'Hipro, Hurricane, POCT Immunoassay Analyzer, فحوصات سريعة, بجانب المريض, طوارئ',
+    features: 'جهاز POCT مدمج|فحوصات سريعة بجانب المريض|صغر حجم العينة|سرعة استخراج النتائج|مناسب للطوارئ والعيادات',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'PT1000 – Blood Gas Analyzer',
+    name_ar: 'PT1000 – محلل غازات الدم',
+    name_en: 'PT1000 – Blood Gas Analyzer',
+    model: 'PT1000',
+    company: 'EasyDiagnosis',
+    agent: 'EasyDiagnosis',
+    category: 'غازات الدم',
+    description: 'محلل غازات دم يعمل بنظام الكارتريدج، مع معايرة تلقائية ومراقبة جودة داخلية، مناسب للطوارئ والعناية المركزة.',
+    description_en: 'Cartridge-based blood gas analyzer with automated multi-point calibration and internal quality control, ideally engineered for emergency departments and intensive care units.',
+    image: '../images/pt1000.jpeg',
+    keywords: 'EasyDiagnosis, PT1000, Blood Gas Analyzer, غازات الدم, كارتريدج, عناية مركزة, طوارئ',
+    features: 'نظام كارتريدج متكامل|معايرة تلقائية مستمرة|مراقبة جودة داخلية|مناسب للطوارئ والعناية المركزة|نتائج فورية دقيقة',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'DX – Electrolyte Analyzer',
+    name_ar: 'DX – محلل الإلكتروليت',
+    name_en: 'DX – Electrolyte Analyzer',
+    model: 'DX',
+    company: 'EasyDiagnosis',
+    agent: 'EasyDiagnosis',
+    category: 'الإلكتروليت',
+    description: 'جهاز تحليل إلكتروليت بتقنية الأقطاب الانتقائية ISE لقياس الصوديوم والبوتاسيوم والكلوريد والكالسيوم ودرجة الحموضة.',
+    description_en: 'Electrolyte analyzer utilizing advanced Ion-Selective Electrode (ISE) technology for precise measurement of Sodium, Potassium, Chloride, Ionized Calcium, and pH.',
+    image: '../images/dx-electrolyte.jpeg',
+    keywords: 'EasyDiagnosis, DX, Electrolyte Analyzer, أقطاب انتقائية, ISE, صوديوم, بوتاسيوم, كلوريد, كالسيوم, حموضة',
+    features: 'تقنية الأقطاب الانتقائية ISE|قياس الصوديوم والبوتاسيوم والكلوريد|قياس الكالسيوم ودرجة الحموضة pH|دقة قياس عالية|عمر تشغيلي طويل للأقطاب',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'QFT9000 Pro II – Fluorescence Immunoassay Analyzer',
+    name_ar: 'QFT9000 Pro II – جهاز التحاليل المناعية الفلورية',
+    name_en: 'QFT9000 Pro II – Fluorescence Immunoassay Analyzer',
+    model: 'QFT9000 Pro II',
+    company: 'EasyDiagnosis',
+    agent: 'EasyDiagnosis',
+    category: 'تحاليل مناعية',
+    description: 'جهاز مناعي فلوري متعدد الفحوصات، يدعم مؤشرات القلب والالتهاب والغدة الدرقية والسكري والخصوبة.',
+    description_en: 'Multi-parameter fluorescence immunoassay analyzer supporting comprehensive diagnostic panels including cardiac biomarkers, inflammation, thyroid, diabetes, and fertility.',
+    image: '../images/qft9000.jpeg',
+    keywords: 'EasyDiagnosis, QFT9000 Pro II, Fluorescence Immunoassay Analyzer, مناعي فلوري, مؤشرات القلب, التهاب, غدة درقية',
+    features: 'تقنية المناعة الفلورية المتقدمة|دعم مؤشرات القلب والتروبونين|فحوصات الالتهاب والغدة الدرقية|فحوصات السكري والخصوبة|قراءة سريعة متعددة القنوات',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'Hipro A1 – Immunoassay Analyzer',
+    name_ar: 'Hipro A1 – محلل الفحوصات المناعية',
+    name_en: 'Hipro A1 – Immunoassay Analyzer',
+    model: 'A1',
+    company: 'Hipro',
+    agent: 'Hipro',
+    category: 'تحاليل مناعية',
+    description: 'جهاز اقتصادي للفحوصات المناعية الروتينية، يجمع بين الاعتمادية وسهولة التشغيل.',
+    description_en: 'Cost-effective automated immunoassay analyzer for routine clinical diagnostic testing, combining proven reliability with straightforward, dependable operation.',
+    image: '../images/placeholder-product.svg',
+    keywords: 'Hipro, A1, Immunoassay Analyzer, اقتصادي, فحوصات مناعية روتينية, اعتمادية, سهولة التشغيل',
+    features: 'جهاز اقتصادي موفر للتكاليف|مثالي للفحوصات الروتينية اليومية|اعتمادية تشغيلية عالية|واجهة مستخدم سهلة وبسيطة|صيانة دورية ميسرة',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'Seamaty SG1 – Blood Gas & Electrolyte POCT',
+    name_ar: 'Seamaty SG1 – محلل غازات الدم والإلكتروليت المحمول',
+    name_en: 'Seamaty SG1 – Blood Gas & Electrolyte POCT',
+    model: 'SG1',
+    company: 'Seamaty',
+    agent: 'Seamaty',
+    category: 'POCT',
+    description: 'محلل متنقل لغازات الدم والإلكتروليت يعمل بكارتريدج أحادي الاستخدام، مناسب للعناية المركزة والطوارئ.',
+    description_en: 'Portable point-of-care blood gas and electrolyte analyzer utilizing single-use microfluidic cartridges, suitable for critical care and emergency departments.',
+    image: '../images/seamaty-sg1.jpeg',
+    keywords: 'Seamaty, SG1, Blood Gas & Electrolyte POCT, محلل متنقل, كارتريدج أحادي الاستخدام, عناية مركزة, طوارئ',
+    features: 'محلل متنقل محمول باليد|كارتريدج أحادي الاستخدام خالي من الصيانة|قياس متزامن لغازات الدم والإلكتروليت|مناسب للعناية المركزة وسيارات الإسعاف|نتائج سريعة في دقائق معدودة',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'Thrombotimer – Coagulation Analyzer',
+    name_ar: 'Thrombotimer – محلل التخثر',
+    name_en: 'Thrombotimer – Coagulation Analyzer',
+    model: 'Thrombotimer',
+    company: 'Behnk Elektronik',
+    agent: 'Behnk Elektronik',
+    category: 'أجهزة التخثر',
+    description: 'محلل تخثر شبه أوتوماتيكي لاختبارات PT وAPTT والفيبرينوجين وغيرها.',
+    description_en: 'Semi-automated precision coagulation analyzer engineered for diagnostic PT, APTT, Fibrinogen, and related clotting factor assays.',
+    image: '../images/thrombotimer.jpeg',
+    keywords: 'Behnk Elektronik, Thrombotimer, Coagulation Analyzer, تخثر الدم, PT, APTT, فيبرينوجين, تحليل تجلط',
+    features: 'صناعة ألمانية عالية الدقة|محلل تخثر شبه أوتوماتيكي|اختبارات زمن البروثرومبين PT|اختبارات زمن الثرومبوبلاستين الجزئي APTT|قياس تركيز الفيبرينوجين Fibrinogen',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'Thrombostat – Coagulation Thermostat',
+    name_ar: 'Thrombostat – جهاز حضانة وترموستات التخثر',
+    name_en: 'Thrombostat – Coagulation Thermostat',
+    model: 'Thrombostat',
+    company: 'Behnk Elektronik',
+    agent: 'Behnk Elektronik',
+    category: 'أجهزة التخثر',
+    description: 'جهاز حضانة وترموستات لدعم اختبارات التخثر وضمان ثبات درجة الحرارة.',
+    description_en: 'Precision incubation workstation and thermostat unit designed to support coagulation assays and maintain rigid thermal stability.',
+    image: '../images/thrombostat.jpeg',
+    keywords: 'Behnk Elektronik, Thrombostat, Coagulation Thermostat, حضانة, ترموستات, ثبات حرارة, اختبارات تجلط',
+    features: 'ثبات حراري فائق ومحكم|حاضنة عينات وكواشف متخصصة|دعم كامل لجميع اختبارات التخثر|تصميم ألماني متين وعملي|مؤشر حراري دقيق',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  },
+  {
+    name: 'Behnk Reagents',
+    name_ar: 'Behnk Reagents – محاليل وكواشف التخثر',
+    name_en: 'Behnk Reagents – Coagulation Diagnostic Reagents',
+    model: 'Reagents',
+    company: 'Behnk Elektronik',
+    agent: 'Behnk Elektronik',
+    category: 'كواشف التخثر',
+    description: 'محاليل وكواشف تخثر تشمل PT وAPTT وFIB وK، وتستخدم مع أجهزة Behnk.',
+    description_en: 'High-quality coagulation diagnostic reagents and test kits including PT, APTT, FIB, and K, optimized for use with Behnk analyzers.',
+    image: '../images/behnk-reagents.jpeg',
+    keywords: 'Behnk Elektronik, Behnk Reagents, كواشف تخثر, محاليل تجلط, PT, APTT, FIB, K, كواشف مخبرية',
+    features: 'محاليل وكواشف تخثر عالية النقاء|كواشف فحص PT و APTT|كواشف قياس الفيبرينوجين FIB وكاشف K|متوافقة تماماً مع أجهزة Behnk|حساسية وثبات عالي للنتائج',
+    price: 0,
+    stock: 0,
+    status: 'متوفر'
+  }
+];
+
+function syncOfficialProducts(db) {
+  try { db.exec("ALTER TABLE products ADD COLUMN name_en TEXT"); } catch(e) {}
+  try { db.exec("ALTER TABLE products ADD COLUMN description_en TEXT"); } catch(e) {}
+  try { db.exec("ALTER TABLE products ADD COLUMN manufacturer TEXT"); } catch(e) {}
+
+  OFFICIAL_10_PRODUCTS.forEach(function (p) {
+    var existing = db.prepare(`
+      SELECT id FROM products 
+      WHERE model = ? 
+         OR name = ? 
+         OR name = ?
+         OR name_en = ?
+      LIMIT 1
+    `).get(p.model, p.name, p.name_ar, p.name_en);
+
+    if (existing) {
+      db.prepare(`
+        UPDATE products 
+        SET name = ?, name_en = ?, model = ?, category = ?, description = ?, description_en = ?, 
+            image = ?, agent = ?, manufacturer = ?, keywords = ?, features = ?, price = ?, stock = ?, active = 1
+        WHERE id = ?
+      `).run(
+        p.name, p.name_en, p.model, p.category, p.description, p.description_en,
+        p.image, p.company, p.company, p.keywords, p.features, p.price, p.stock, existing.id
+      );
+    } else {
+      var res = db.prepare(`
+        INSERT INTO products (name, name_en, model, category, description, description_en, image, agent, manufacturer, price, stock, status, features, keywords, active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+      `).run(
+        p.name, p.name_en, p.model, p.category, p.description, p.description_en,
+        p.image, p.company, p.company, p.price, p.stock, p.status, p.features, p.keywords
+      );
+      var newId = res.lastInsertRowid;
+      var stores = db.prepare('SELECT id FROM stores').all();
+      stores.forEach(function (s) {
+        db.prepare(`
+          INSERT OR IGNORE INTO store_inventory (store_id, product_id, stock_quantity, min_stock_alert, purchase_price, wholesale_price, retail_price, unit)
+          VALUES (?, ?, 0, 5, 0, 0, 0, 'قطعة')
+        `).run(s.id, newId);
+      });
+    }
+  });
+
+  db.save();
+}
+
 function getDatabase() {
   var fileData = null;
   try {
@@ -492,9 +715,14 @@ function getDatabase() {
 
   return initDatabase(fileData).then(function (db) {
     seedDatabase(db);
+    syncOfficialProducts(db);
     console.log('Database loaded from: ' + DB_PATH);
     return db;
   });
 }
 
-module.exports = { getDatabase: getDatabase };
+module.exports = { 
+  getDatabase: getDatabase,
+  OFFICIAL_10_PRODUCTS: OFFICIAL_10_PRODUCTS,
+  syncOfficialProducts: syncOfficialProducts
+};

@@ -167,28 +167,43 @@
         <button class="modal-close" onclick="closeModal('addProductModal')"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label>اسم المنتج</label>
-          <input type="text" class="form-control" id="addProductName" placeholder="أدخل اسم المنتج">
+        <div class="form-row">
+          <div class="form-group">
+            <label>اسم المنتج (عربي) *</label>
+            <input type="text" class="form-control" id="addProductName" placeholder="أدخل اسم المنتج بالعربية">
+          </div>
+          <div class="form-group">
+            <label>اسم المنتج (إنجليزي)</label>
+            <input type="text" class="form-control" id="addProductNameEn" placeholder="Product Name in English" dir="ltr">
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>الفئة</label>
+            <label>الفئة *</label>
             <select class="form-control" id="addProductCategory">
-              <option>أجهزة طبية</option>
-              <option>أجهزة قياس</option>
-              <option>أجهزة مخبرية</option>
-              <option>أجهزة تصوير</option>
+              <option value="تحاليل مناعية">تحاليل مناعية</option>
+              <option value="POCT">POCT</option>
+              <option value="غازات الدم">غازات الدم</option>
+              <option value="الإلكتروليت">الإلكتروليت</option>
+              <option value="أجهزة التخثر">أجهزة التخثر</option>
+              <option value="كواشف التخثر">كواشف التخثر</option>
+              <option value="أجهزة طبية">أجهزة طبية</option>
+              <option value="أجهزة قياس">أجهزة قياس</option>
+              <option value="أجهزة مخبرية">أجهزة مخبرية</option>
             </select>
           </div>
           <div class="form-group">
-            <label>رقم الطراز</label>
-            <input type="text" class="form-control" id="addProductModel" placeholder="مثال: BP-200">
+            <label>الشركة المصنعة / الوكيل *</label>
+            <input type="text" class="form-control" id="addProductCompany" placeholder="مثال: Hipro, EasyDiagnosis, Behnk">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label>السعر (ر.ي)</label>
+            <label>رقم الطراز (Model)</label>
+            <input type="text" class="form-control" id="addProductModel" placeholder="مثال: A1 Pro, PT1000">
+          </div>
+          <div class="form-group">
+            <label>السعر (ر.ي) [0 = طلب عرض سعر]</label>
             <input type="number" class="form-control" id="addProductPrice" placeholder="0">
           </div>
           <div class="form-group">
@@ -197,8 +212,16 @@
           </div>
         </div>
         <div class="form-group">
-          <label>الوصف</label>
-          <textarea class="form-control" id="addProductDesc" placeholder="وصف المنتج..."></textarea>
+          <label>الوصف (عربي)</label>
+          <textarea class="form-control" id="addProductDesc" placeholder="وصف المنتج بالعربية..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>الوصف (إنجليزي)</label>
+          <textarea class="form-control" id="addProductDescEn" placeholder="Product description in English..." dir="ltr"></textarea>
+        </div>
+        <div class="form-group">
+          <label>الكلمات المفتاحية (Keywords)</label>
+          <input type="text" class="form-control" id="addProductKeywords" placeholder="مثال: Immunoassay, POCT, غازات الدم">
         </div>
         <div class="form-group">
           <label>صورة المنتج</label>
@@ -221,26 +244,41 @@
         <button class="modal-close" onclick="closeModal('editProductModal')"><i class="fas fa-times"></i></button>
       </div>
       <div class="modal-body">
-        <div class="form-group">
-          <label>اسم المنتج</label>
-          <input type="text" class="form-control" id="editProductName">
+        <div class="form-row">
+          <div class="form-group">
+            <label>اسم المنتج (عربي)</label>
+            <input type="text" class="form-control" id="editProductName">
+          </div>
+          <div class="form-group">
+            <label>اسم المنتج (إنجليزي)</label>
+            <input type="text" class="form-control" id="editProductNameEn" dir="ltr">
+          </div>
         </div>
         <div class="form-row">
           <div class="form-group">
             <label>الفئة</label>
             <select class="form-control" id="editProductCategory">
-              <option>أجهزة طبية</option>
-              <option>أجهزة قياس</option>
-              <option>أجهزة مخبرية</option>
-              <option>أجهزة تصوير</option>
+              <option value="تحاليل مناعية">تحاليل مناعية</option>
+              <option value="POCT">POCT</option>
+              <option value="غازات الدم">غازات الدم</option>
+              <option value="الإلكتروليت">الإلكتروليت</option>
+              <option value="أجهزة التخثر">أجهزة التخثر</option>
+              <option value="كواشف التخثر">كواشف التخثر</option>
+              <option value="أجهزة طبية">أجهزة طبية</option>
+              <option value="أجهزة قياس">أجهزة قياس</option>
+              <option value="أجهزة مخبرية">أجهزة مخبرية</option>
             </select>
           </div>
           <div class="form-group">
-            <label>رقم الطراز</label>
-            <input type="text" class="form-control" id="editProductModel">
+            <label>الشركة المصنعة / الوكيل</label>
+            <input type="text" class="form-control" id="editProductCompany">
           </div>
         </div>
         <div class="form-row">
+          <div class="form-group">
+            <label>رقم الطراز (Model)</label>
+            <input type="text" class="form-control" id="editProductModel">
+          </div>
           <div class="form-group">
             <label>السعر (ر.ي)</label>
             <input type="number" class="form-control" id="editProductPrice">
@@ -259,8 +297,16 @@
           </select>
         </div>
         <div class="form-group">
-          <label>الوصف</label>
+          <label>الوصف (عربي)</label>
           <textarea class="form-control" id="editProductDesc"></textarea>
+        </div>
+        <div class="form-group">
+          <label>الوصف (إنجليزي)</label>
+          <textarea class="form-control" id="editProductDescEn" dir="ltr"></textarea>
+        </div>
+        <div class="form-group">
+          <label>الكلمات المفتاحية (Keywords)</label>
+          <input type="text" class="form-control" id="editProductKeywords">
         </div>
       </div>
       <div class="modal-footer">
@@ -351,6 +397,7 @@
             '<td><div class="action-btns">' +
             (canWrite('products') ? '<button class="btn btn-outline btn-icon btn-sm" title="تعديل" onclick="editProduct(' + p.id + ')"><i class="fas fa-edit"></i></button>' : '') +
             (canWrite('products') ? '<button class="btn btn-outline btn-icon btn-sm" title="إيقاف تنشيط" onclick="toggleProduct(' + p.id + ')"><i class="fas fa-ban"></i></button>' : '') +
+            (canDelete('products') ? '<button class="btn btn-outline btn-icon btn-sm" style="color:var(--danger)" title="حذف" onclick="deleteProduct(' + p.id + ')"><i class="fas fa-trash-alt"></i></button>' : '') +
             '</div></td>' +
           '</tr>';
         } else {
@@ -364,6 +411,7 @@
             '<td><div class="action-btns">' +
             (canWrite('products') ? '<button class="btn btn-outline btn-icon btn-sm" title="تعديل" onclick="editProduct(' + p.id + ')"><i class="fas fa-edit"></i></button>' : '') +
             (canWrite('products') ? '<button class="btn btn-outline btn-icon btn-sm" title="إيقاف تنشيط" onclick="toggleProduct(' + p.id + ')"><i class="fas fa-ban"></i></button>' : '') +
+            (canDelete('products') ? '<button class="btn btn-outline btn-icon btn-sm" style="color:var(--danger)" title="حذف" onclick="deleteProduct(' + p.id + ')"><i class="fas fa-trash-alt"></i></button>' : '') +
             '</div></td>' +
           '</tr>';
         }
@@ -387,40 +435,55 @@
 
     function addProduct() {
       var name = document.getElementById('addProductName').value.trim();
+      var name_en = document.getElementById('addProductNameEn').value.trim();
       var category = document.getElementById('addProductCategory').value;
+      var company = document.getElementById('addProductCompany').value.trim();
       var model = document.getElementById('addProductModel').value.trim();
       var price = parseFloat(document.getElementById('addProductPrice').value) || 0;
       var stock = parseInt(document.getElementById('addProductStock').value) || 0;
       var description = document.getElementById('addProductDesc').value.trim();
+      var description_en = document.getElementById('addProductDescEn').value.trim();
+      var keywords = document.getElementById('addProductKeywords').value.trim();
 
       if (!name || !category) {
-        alert('يرجى ملء جميع الحقول المطلوبة');
+        alert('يرجى ملء جميع الحقول المطلوبة (اسم المنتج والفئة)');
         return;
       }
 
-      var status = stock === 0 ? 'غير متوفر' : stock < 10 ? 'مخزون منخفض' : 'متوفر';
+      var status = stock === 0 ? 'متوفر' : stock < 10 ? 'مخزون منخفض' : 'متوفر';
 
       DataStore.addProduct({
         name: name,
+        name_en: name_en || name,
         model: model,
         category: category,
+        agent: company,
+        manufacturer: company,
         price: price,
         stock: stock,
         status: status,
         description: description,
+        description_en: description_en,
+        keywords: keywords,
         image: ''
+      }).then(function() {
+        closeModal('addProductModal');
+        loadProducts();
+        showToast('تمت إضافة المنتج بنجاح');
+
+        // Reset form
+        document.getElementById('addProductName').value = '';
+        document.getElementById('addProductNameEn').value = '';
+        document.getElementById('addProductCompany').value = '';
+        document.getElementById('addProductModel').value = '';
+        document.getElementById('addProductPrice').value = '';
+        document.getElementById('addProductStock').value = '';
+        document.getElementById('addProductDesc').value = '';
+        document.getElementById('addProductDescEn').value = '';
+        document.getElementById('addProductKeywords').value = '';
+      }).catch(function(err) {
+        alert('حدث خطأ أثناء إضافة المنتج: ' + (err.error || err.message));
       });
-
-      closeModal('addProductModal');
-      loadProducts();
-      showToast('تمت إضافة المنتج بنجاح');
-
-      // Reset form
-      document.getElementById('addProductName').value = '';
-      document.getElementById('addProductModel').value = '';
-      document.getElementById('addProductPrice').value = '';
-      document.getElementById('addProductStock').value = '';
-      document.getElementById('addProductDesc').value = '';
     }
 
     function editProduct(id) {
@@ -428,13 +491,17 @@
       if (!product) return;
 
       currentEditId = id;
-      document.getElementById('editProductName').value = product.name;
-      document.getElementById('editProductCategory').value = product.category;
-      document.getElementById('editProductModel').value = product.model;
-      document.getElementById('editProductPrice').value = product.price;
-      document.getElementById('editProductStock').value = product.stock;
-      document.getElementById('editProductStatus').value = product.status;
-      document.getElementById('editProductDesc').value = product.description;
+      document.getElementById('editProductName').value = product.name || '';
+      document.getElementById('editProductNameEn').value = product.name_en || '';
+      document.getElementById('editProductCategory').value = product.category || 'تحاليل مناعية';
+      document.getElementById('editProductCompany').value = product.agent || product.manufacturer || '';
+      document.getElementById('editProductModel').value = product.model || '';
+      document.getElementById('editProductPrice').value = product.price || 0;
+      document.getElementById('editProductStock').value = product.stock || 0;
+      document.getElementById('editProductStatus').value = product.status || 'متوفر';
+      document.getElementById('editProductDesc').value = product.description || '';
+      document.getElementById('editProductDescEn').value = product.description_en || '';
+      document.getElementById('editProductKeywords').value = product.keywords || '';
 
       openModal('editProductModal');
     }
@@ -443,26 +510,50 @@
       if (!currentEditId) return;
 
       var name = document.getElementById('editProductName').value.trim();
+      var name_en = document.getElementById('editProductNameEn').value.trim();
       var category = document.getElementById('editProductCategory').value;
+      var company = document.getElementById('editProductCompany').value.trim();
       var model = document.getElementById('editProductModel').value.trim();
       var price = parseFloat(document.getElementById('editProductPrice').value) || 0;
       var stock = parseInt(document.getElementById('editProductStock').value) || 0;
       var status = document.getElementById('editProductStatus').value;
       var description = document.getElementById('editProductDesc').value.trim();
+      var description_en = document.getElementById('editProductDescEn').value.trim();
+      var keywords = document.getElementById('editProductKeywords').value.trim();
 
       DataStore.updateProduct(currentEditId, {
         name: name,
+        name_en: name_en,
         model: model,
         category: category,
+        agent: company,
+        manufacturer: company,
         price: price,
         stock: stock,
         status: status,
-        description: description
+        description: description,
+        description_en: description_en,
+        keywords: keywords
+      }).then(function() {
+        closeModal('editProductModal');
+        loadProducts();
+        showToast('تم تحديث المنتج بنجاح');
+      }).catch(function(err) {
+        alert('حدث خطأ أثناء التحديث: ' + (err.error || err.message));
       });
+    }
 
-      closeModal('editProductModal');
-      loadProducts();
-      showToast('تم تحديث المنتج بنجاح');
+    function deleteProduct(id) {
+      var product = DataStore.getProduct(id);
+      if (!product) return;
+      if (!confirm('هل أنت متأكد من رغبتك في حذف المنتج "' + product.name + '" نهائياً؟')) return;
+
+      DataStore.deleteProduct(id).then(function() {
+        loadProducts();
+        showToast('تم حذف المنتج بنجاح');
+      }).catch(function(err) {
+        alert('حدث خطأ أثناء الحذف: ' + (err.error || err.message));
+      });
     }
 
     function toggleProduct(id) {
