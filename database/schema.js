@@ -1,9 +1,17 @@
-var initSqlJs = require('sql.js');
+var initSqlJs;
+try {
+  initSqlJs = require('sql.js/dist/sql-asm.js');
+} catch (e) {
+  initSqlJs = require('sql.js');
+}
 var bcrypt = require('bcryptjs');
 var fs = require('fs');
 var path = require('path');
 
-var DB_PATH = process.env.DATABASE_PATH ? path.resolve(process.env.DATABASE_PATH) : path.join(__dirname, 'newtechmed.db');
+var isServerless = !!(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT);
+var DB_PATH = isServerless
+  ? path.join('/tmp', 'newtechmed.db')
+  : (process.env.DATABASE_PATH ? path.resolve(process.env.DATABASE_PATH) : path.join(__dirname, 'newtechmed.db'));
 
 function createWrapper(SQL, fileData) {
   var db;
@@ -14,13 +22,17 @@ function createWrapper(SQL, fileData) {
   }
 
   function save() {
-    var data = db.export();
-    var buffer = Buffer.from(data);
-    var dir = path.dirname(DB_PATH);
-    if (!fs.existsSync(dir)) {
-      try { fs.mkdirSync(dir, { recursive: true }); } catch (e) {}
+    try {
+      var data = db.export();
+      var buffer = Buffer.from(data);
+      var dir = path.dirname(DB_PATH);
+      if (!fs.existsSync(dir)) {
+        try { fs.mkdirSync(dir, { recursive: true }); } catch (e) {}
+      }
+      fs.writeFileSync(DB_PATH, buffer);
+    } catch (err) {
+      console.warn('Database save skipped (read-only environment):', err.message);
     }
-    fs.writeFileSync(DB_PATH, buffer);
   }
 
   function toObjects(result) {
@@ -712,14 +724,26 @@ function getDatabase() {
   try {
     if (fs.existsSync(DB_PATH)) {
       fileData = fs.readFileSync(DB_PATH);
+    } else {
+      var bundledPath = path.join(__dirname, 'newtechmed.db');
+      if (fs.existsSync(bundledPath)) {
+        fileData = fs.readFileSync(bundledPath);
+        if (isServerless) {
+          try { fs.writeFileSync(DB_PATH, fileData); } catch (e) {}
+        }
+      }
     }
   } catch (e) {
     fileData = null;
   }
 
   return initDatabase(fileData).then(function (db) {
-    seedDatabase(db);
-    syncOfficialProducts(db);
+    try {
+      seedDatabase(db);
+      syncOfficialProducts(db);
+    } catch (err) {
+      console.warn('Database sync note:', err.message);
+    }
     console.log('Database loaded from: ' + DB_PATH);
     return db;
   });

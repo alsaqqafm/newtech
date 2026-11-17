@@ -7,6 +7,14 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Normalize URL path if Vercel strips /api prefix
+app.use(function (req, res, next) {
+  if (req.url && !req.url.startsWith('/api') && req.url !== '/') {
+    req.url = '/api' + req.url;
+  }
+  next();
+});
+
 var initPromise = null;
 var initialized = false;
 
@@ -84,9 +92,17 @@ async function setup() {
 }
 
 module.exports = async function (req, res) {
-  if (!initPromise) {
-    initPromise = setup();
+  try {
+    if (!initPromise) {
+      initPromise = setup();
+    }
+    await initPromise;
+    return app(req, res);
+  } catch (err) {
+    console.error('API Error in Vercel Serverless Function:', err);
+    return res.status(500).json({
+      error: 'Internal Server Error',
+      message: err.message
+    });
   }
-  await initPromise;
-  return app(req, res);
 };
