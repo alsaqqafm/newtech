@@ -119,6 +119,9 @@ getDatabase().then(function (db) {
   });
 
   app.get('*', function (req, res) {
+    if (req.path.includes('.') && !req.path.endsWith('.html')) {
+      return res.status(404).send('Not found');
+    }
     res.sendFile(path.join(__dirname, 'index.html'));
   });
 

@@ -1,8 +1,7 @@
 {
-  "name": "newtechmed-server",
+  "name": "newtechmed",
   "version": "1.0.0",
-  "description": "New Tech Medical - Backend Server",
-  "main": "server.js",
+  "description": "New Tech Medical - Official Website & Management System",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js"
