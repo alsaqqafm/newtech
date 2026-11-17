@@ -374,6 +374,38 @@ body.dark-mode .admin-link:hover {
     color: var(--primary-red);
 }
 
+/* Mobile Navigation Backdrop & Body Scroll Lock */
+html.menu-open,
+body.menu-open {
+    overflow: hidden !important;
+    height: 100vh !important;
+    touch-action: none !important;
+}
+
+.mobile-nav-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(11, 17, 44, 0.65);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+}
+
+.mobile-nav-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
 .nav-menu {
     display: flex;
     gap: 30px;
@@ -2254,15 +2286,32 @@ html, body {
         right: 0;
         background: var(--bg-white);
         flex-direction: column;
-        padding: 15px 20px;
-        box-shadow: var(--shadow-lg);
+        padding: 15px 20px 25px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         border-top: 1px solid rgba(2, 132, 199, 0.08);
         gap: 0;
-        z-index: 1000;
+        z-index: 1001;
+        max-height: calc(100vh - 75px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        border-bottom-left-radius: 16px;
+        border-bottom-right-radius: 16px;
     }
     
     .nav-menu.active {
         display: flex;
+        animation: navMenuSlide 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes navMenuSlide {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .nav-menu a {
@@ -2272,13 +2321,13 @@ html, body {
     }
 
     body.dark-mode .nav-menu {
-        background: #0f172a;
-        border-top: 1px solid #1e293b;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        background: #0b112c;
+        border-top: 1px solid rgba(34, 180, 216, 0.15);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
     }
 
     body.dark-mode .nav-menu a {
-        border-bottom-color: #1e293b;
+        border-bottom-color: rgba(255, 255, 255, 0.08);
         color: #f1f5f9;
     }
     

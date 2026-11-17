@@ -100,48 +100,91 @@ function initHeader() {
 }
 
 /* ========================================
-   Mobile Menu
+   Mobile Menu with Scroll Lock & Backdrop
    ======================================== */
 function initMobileMenu() {
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const navMenu = document.getElementById('navMenu');
     
-    if (mobileMenuBtn && navMenu) {
-        mobileMenuBtn.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-            
-            // Toggle icon
-            const icon = mobileMenuBtn.querySelector('i');
-            if (navMenu.classList.contains('active')) {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
-            } else {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
-        
-        // Close menu when clicking on a link
-        const navLinks = navMenu.querySelectorAll('a');
-        navLinks.forEach(function(link) {
-            link.addEventListener('click', function() {
-                navMenu.classList.remove('active');
-                const icon = mobileMenuBtn.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            });
-        });
-        
-        // Close menu when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!navMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                navMenu.classList.remove('active');
-                const icon = mobileMenuBtn.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
+    if (!mobileMenuBtn || !navMenu) return;
+
+    // Ensure backdrop exists in the DOM
+    let backdrop = document.getElementById('mobileNavBackdrop');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'mobileNavBackdrop';
+        backdrop.className = 'mobile-nav-backdrop';
+        document.body.appendChild(backdrop);
     }
+
+    function preventTouchScroll(e) {
+        if (!navMenu.contains(e.target)) {
+            e.preventDefault();
+        }
+    }
+
+    function openMenu() {
+        navMenu.classList.add('active');
+        backdrop.classList.add('active');
+        document.body.classList.add('menu-open');
+        document.documentElement.classList.add('menu-open');
+
+        const icon = mobileMenuBtn.querySelector('i');
+        if (icon) {
+            icon.classList.remove('fa-bars');
+            icon.classList.add('fa-times');
+        }
+        mobileMenuBtn.setAttribute('aria-expanded', 'true');
+        document.addEventListener('touchmove', preventTouchScroll, { passive: false });
+    }
+
+    function closeMenu() {
+        navMenu.classList.remove('active');
+        backdrop.classList.remove('active');
+        document.body.classList.remove('menu-open');
+        document.documentElement.classList.remove('menu-open');
+
+        const icon = mobileMenuBtn.querySelector('i');
+        if (icon) {
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        }
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+        document.removeEventListener('touchmove', preventTouchScroll);
+    }
+
+    // Toggle button click
+    mobileMenuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (navMenu.classList.contains('active')) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    });
+
+    // Close when clicking on backdrop
+    backdrop.addEventListener('click', closeMenu);
+
+    // Close menu when clicking on any navigation link
+    const navLinks = navMenu.querySelectorAll('a');
+    navLinks.forEach(function(link) {
+        link.addEventListener('click', closeMenu);
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+            closeMenu();
+        }
+    });
+
+    // Close if resized to desktop breakpoint
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && navMenu.classList.contains('active')) {
+            closeMenu();
+        }
+    });
 }
 
 /* ========================================

@@ -238,8 +238,8 @@ const translations = {
     footer_contact_info: "بيانات التواصل",
     footer_hours_title: "أوقات الدوام",
     footer_rights: "© 2026 شركة نيوتك الطبية للاستيراد. جميع الحقوق محفوظة.",
-    developer_credit: "تطوير بواسطة",
-    developer_name: "هيبه سوفت",
+    developer_credit: "تم التطوير بواسطة",
+    developer_name: "هيبه سوفت للبرمجيات",
 
     // Alerts & Notifications
     alert_quote_success: "تم إرسال طلب عرض السعر بنجاح! سيتواصل معكم فريقنا المختص قريباً.",
@@ -485,7 +485,7 @@ const translations = {
     footer_hours_title: "Working Hours",
     footer_rights: "© 2026 New Tech Medical Import Corp. All rights reserved.",
     developer_credit: "Developed by",
-    developer_name: "Heyba Soft",
+    developer_name: "Heyba Soft Software",
 
     // Alerts & Notifications
     alert_quote_success: "Quotation request submitted successfully! Our team will contact you shortly.",
