@@ -1,6 +1,14 @@
 {
   "version": 2,
   "cleanUrls": false,
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "{css,js,images,pages,admin,database}/**"
+    },
+    "server.js": {
+      "includeFiles": "{css,js,images,pages,admin,database}/**"
+    }
+  },
   "routes": [
     {
       "src": "/api/(.*)",

@@ -1,5 +1,6 @@
 var express = require('express');
 var cors = require('cors');
+var path = require('path');
 var { getDatabase } = require('../database/schema');
 
 var app = express();
@@ -7,13 +8,11 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Normalize URL path if Vercel strips /api prefix
-app.use(function (req, res, next) {
-  if (req.url && !req.url.startsWith('/api') && req.url !== '/') {
-    req.url = '/api' + req.url;
-  }
-  next();
-});
+app.use('/css', express.static(path.join(__dirname, '..', 'css')));
+app.use('/js', express.static(path.join(__dirname, '..', 'js')));
+app.use('/images', express.static(path.join(__dirname, '..', 'images')));
+app.use('/pages', express.static(path.join(__dirname, '..', 'pages')));
+app.use('/admin', express.static(path.join(__dirname, '..', 'admin')));
 
 var initPromise = null;
 var initialized = false;
