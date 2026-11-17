@@ -231,19 +231,29 @@ function acceptCookies() {
 window.acceptCookies = acceptCookies;
 
 /* ========================================
-   Scroll to Top
+   Scroll to Top with Dynamic Progress
    ======================================== */
 function initScrollToTop() {
     const scrollTopBtn = document.getElementById('scrollTop');
     
     if (scrollTopBtn) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 500) {
+        function updateScroll() {
+            const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = docHeight > 0 ? (scrollY / docHeight) * 100 : 0;
+            const clamped = Math.min(100, Math.max(0, Math.round(progress)));
+            
+            scrollTopBtn.style.setProperty('--scroll-progress', clamped + '%');
+            
+            if (scrollY > 120) {
                 scrollTopBtn.classList.add('visible');
             } else {
                 scrollTopBtn.classList.remove('visible');
             }
-        });
+        }
+
+        window.addEventListener('scroll', updateScroll, { passive: true });
+        updateScroll();
         
         scrollTopBtn.addEventListener('click', function() {
             window.scrollTo({

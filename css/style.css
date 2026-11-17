@@ -2066,17 +2066,54 @@ html[dir="ltr"] .hero-image-bg-full::after {
 }
 
 .footer-bottom {
-    padding: 20px 0;
+    padding: 22px 0 16px;
     text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .footer-bottom p {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13.5px;
+    margin: 0;
 }
 
-.footer-bottom a {
-    color: var(--primary-blue-light);
+.developer-credit {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.heybasoft-link {
+    color: #22b4d8 !important;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: 8px;
+    background: rgba(34, 180, 216, 0.08);
+    border: 1px solid rgba(34, 180, 216, 0.2);
+}
+
+.heybasoft-link:hover {
+    color: #ffffff !important;
+    background: linear-gradient(135deg, #ba3862 0%, #ea5a8b 100%);
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(186, 56, 98, 0.4);
+}
+
+.heybasoft-link i {
+    font-size: 12px;
 }
 
 /* ========================================
@@ -2513,9 +2550,17 @@ html, body {
     .scroll-top {
         width: 46px;
         height: 46px;
-        font-size: 18px;
         bottom: 20px;
         right: 14px;
+    }
+
+    .scroll-top::before {
+        inset: 3px;
+        box-shadow: inset 0 0 0 1.5px var(--st-gap);
+    }
+
+    .scroll-top i {
+        font-size: 15px;
     }
 
     .modal {
@@ -2981,6 +3026,22 @@ body.dark-mode .footer-bottom p {
     color: #94a3b8 !important;
 }
 
+body.dark-mode .developer-credit {
+    color: #94a3b8 !important;
+}
+
+body.dark-mode .heybasoft-link {
+    color: #38bdf8 !important;
+    background: rgba(56, 189, 248, 0.1);
+    border-color: rgba(56, 189, 248, 0.25);
+}
+
+body.dark-mode .heybasoft-link:hover {
+    background: linear-gradient(135deg, #0a95b7 0%, #22b4d8 100%);
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(10, 149, 183, 0.4);
+}
+
 /* Why Choose Us & Background Sections dark mode */
 body.dark-mode .why-section {
     background: linear-gradient(135deg, #07091a 0%, #0c1228 50%, #082f49 100%) !important;
@@ -3273,32 +3334,76 @@ body.dark-mode .dark-mode-toggle {
 }
 
 /* ========================================
-   Scroll to Top (All Pages)
-   ========================================
-   - Fixed position bottom-right
-   - Shows after scrolling 500px
-   - Smooth scroll animation
+   Scroll to Top (All Pages) with Dynamic Progress Fill
+   - Daytime: --brand-fuchsia-dark: #ba3862; --brand-fuchsia-light: #ea5a8b;
+   - Nighttime: --gradient-blue: linear-gradient(135deg, #0a95b7 0%, #22b4d8 100%);
+   - Dynamic fill on scroll up and down
    ======================================== */
+:root {
+    --st-fill-1: #ba3862;
+    --st-fill-2: #ea5a8b;
+    --st-track: rgba(186, 56, 98, 0.18);
+    --st-gap: #ffffff;
+    --st-shadow: rgba(186, 56, 98, 0.35);
+    --st-shadow-hover: rgba(186, 56, 98, 0.55);
+    --scroll-progress: 0%;
+}
+
+body.dark-mode {
+    --st-fill-1: #0a95b7;
+    --st-fill-2: #22b4d8;
+    --st-track: rgba(34, 180, 216, 0.22);
+    --st-gap: #0b112c;
+    --st-shadow: rgba(10, 149, 183, 0.45);
+    --st-shadow-hover: rgba(34, 180, 216, 0.6);
+}
+
 .scroll-top {
     position: fixed;
     bottom: 30px;
     right: 30px;
-    width: 50px;
-    height: 50px;
-    background: var(--gradient-blue);
-    color: var(--text-on-dark);
-    border-radius: 16px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        var(--st-fill-1) 0%,
+        var(--st-fill-2) var(--scroll-progress, 0%),
+        var(--st-track) var(--scroll-progress, 0%) 100%
+    );
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
     cursor: pointer;
     z-index: 999;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: opacity 0.35s ease, visibility 0.35s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
     border: none;
-    box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+    box-shadow: 0 6px 20px var(--st-shadow);
+    padding: 0;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.scroll-top::before {
+    content: '';
+    position: absolute;
+    inset: 3.5px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--st-fill-1) 0%, var(--st-fill-2) 100%);
+    box-shadow: inset 0 0 0 2px var(--st-gap);
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.scroll-top i {
+    position: relative;
+    z-index: 2;
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1;
+    transition: transform 0.3s ease;
 }
 
 .scroll-top.visible {
@@ -3307,8 +3412,16 @@ body.dark-mode .dark-mode-toggle {
 }
 
 .scroll-top:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(2, 132, 199, 0.4);
+    transform: translateY(-5px) scale(1.06);
+    box-shadow: 0 10px 28px var(--st-shadow-hover);
+}
+
+.scroll-top:hover i {
+    transform: translateY(-2px);
+}
+
+.scroll-top:active {
+    transform: translateY(-2px) scale(0.96);
 }
 
 /* ========================================
@@ -4268,20 +4381,6 @@ body.dark-mode .acm-coverage-title {
 }
 
 /* --- 10. Scroll to Top 3D --- */
-.scroll-top {
-    transform: perspective(500px) translateZ(0);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.scroll-top:hover {
-    transform: perspective(500px) translateZ(10px) translateY(-5px);
-    box-shadow: 0 10px 30px rgba(2, 132, 199, 0.4);
-}
-
-.scroll-top:active {
-    transform: perspective(500px) translateZ(-5px);
-}
-
 /* --- Cart FAB --- */
 .cart-fab {
     position: fixed;
