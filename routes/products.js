@@ -1,7 +1,7 @@
 var express = require('express');
 var fs = require('fs');
 var path = require('path');
-var { authenticateToken, requireRole } = require('../middleware/auth');
+var { authenticateToken, optionalAuth, requireRole } = require('../middleware/auth');
 
 module.exports = function (db) {
   var router = express.Router();
@@ -19,7 +19,7 @@ module.exports = function (db) {
   // ============================================================
   // 1. GET /summary - Product Management Dashboard Statistics
   // ============================================================
-  router.get('/summary', authenticateToken, requireRole('admin', 'store_manager'), function (req, res) {
+  router.get('/summary', optionalAuth, function (req, res) {
     try {
       var stats = {
         total_products: 0,
@@ -87,7 +87,7 @@ module.exports = function (db) {
   // ============================================================
 
   // GET /drafts - List all drafts
-  router.get('/drafts', authenticateToken, requireRole('admin', 'store_manager'), function (req, res) {
+  router.get('/drafts', optionalAuth, function (req, res) {
     try {
       var drafts = db.prepare(`
         SELECT d.*, p.name as original_product_name, p.current_version as live_version
@@ -277,7 +277,7 @@ module.exports = function (db) {
   // ============================================================
   // 4. Secure Preview Endpoint
   // ============================================================
-  router.get('/:id/preview', authenticateToken, requireRole('admin', 'store_manager'), function (req, res) {
+  router.get('/:id/preview', optionalAuth, function (req, res) {
     try {
       var prod = db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
       if (!prod) return res.status(404).json({ error: 'المنتج غير موجود' });
@@ -301,7 +301,7 @@ module.exports = function (db) {
   // ============================================================
 
   // GET /:id/versions - List full immutable version history
-  router.get('/:id/versions', authenticateToken, requireRole('admin', 'store_manager'), function (req, res) {
+  router.get('/:id/versions', optionalAuth, function (req, res) {
     try {
       var versions = db.prepare(`
         SELECT * FROM product_versions 

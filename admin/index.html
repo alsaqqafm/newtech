@@ -33,6 +33,11 @@
         <i class="fas fa-box"></i>
         <span>المنتجات</span>
       </a>
+      <a class="nav-item" href="settings.html?tab=products-settings" id="navProductSettings">
+        <i class="fas fa-boxes"></i>
+        <span>إعدادات المنتجات</span>
+        <span class="badge" style="background:var(--primary);color:#fff">جديد</span>
+      </a>
       <a class="nav-item" data-page="orders.html">
         <i class="fas fa-shopping-cart"></i>
         <span>الطلبات</span>
@@ -144,7 +149,8 @@
             <p id="currentStoreSubtitle" style="font-size:12px;color:var(--text-secondary);margin:4px 0 0 0">متابعة الأداء المالي، المخزون، والمبيعات لفرعي صنعاء وعدن لحظيًا</p>
           </div>
         </div>
-        <div id="storeActionsQuick" style="display:flex;gap:8px">
+        <div id="storeActionsQuick" style="display:flex;gap:8px;flex-wrap:wrap">
+          <a href="settings.html?tab=products-settings" class="btn btn-primary btn-sm" style="background:linear-gradient(135deg,var(--brand-burgundy),var(--brand-fuchsia));border:none;"><i class="fas fa-boxes"></i> إعدادات المنتجات والمسودات</a>
           <a href="invoices.html" class="btn btn-primary btn-sm"><i class="fas fa-cash-register"></i> فاتورة بيع جديدة</a>
           <a href="transfers.html" class="btn btn-outline btn-sm"><i class="fas fa-dolly"></i> تحويل بين المحلين</a>
           <a href="inventory.html" class="btn btn-outline btn-sm"><i class="fas fa-warehouse"></i> جرد المخزون</a>

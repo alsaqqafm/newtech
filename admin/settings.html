@@ -21,6 +21,7 @@
       <a class="nav-item" data-page="index.html"><i class="fas fa-th-large"></i><span>لوحة التحكم</span></a>
       <div class="nav-section">الإدارة</div>
       <a class="nav-item" data-page="products.html"><i class="fas fa-box"></i><span>المنتجات</span></a>
+      <a class="nav-item" href="settings.html?tab=products-settings" id="navProductSettings"><i class="fas fa-boxes"></i><span>إعدادات المنتجات</span><span class="badge" style="background:var(--primary);color:#fff">جديد</span></a>
       <a class="nav-item" data-page="orders.html"><i class="fas fa-shopping-cart"></i><span>الطلبات</span><span class="badge" id="ordersBadge">0</span></a>
       <a class="nav-item" data-page="quotes.html"><i class="fas fa-file-invoice"></i><span>عروض الأسعار</span><span class="badge" id="quotesBadge">0</span></a>
       <a class="nav-item" data-page="partners.html"><i class="fas fa-handshake"></i><span>الشركات</span></a>
@@ -55,6 +56,7 @@
         <button class="tab-btn" onclick="switchTab(this,'profile')">الملف الشخصي</button>
         <button class="tab-btn" onclick="switchTab(this,'security')">الأمان</button>
         <button class="tab-btn" onclick="switchTab(this,'notifications')">الإشعارات</button>
+        <button class="tab-btn" id="productSettingsTabBtn" onclick="switchTab(this,'products-settings')"><i class="fas fa-boxes" style="margin-left:6px"></i>إعدادات المنتجات</button>
       </div>
 
       <div id="tab-general">
@@ -201,6 +203,318 @@
         </div>
       </div>
 
+      <!-- ============================================================ -->
+      <!-- Tab 5: Product Settings & Management Engine (Phase B/C) -->
+      <!-- ============================================================ -->
+      <div id="tab-products-settings" style="display:none">
+        
+        <!-- Top Stats Row -->
+        <div class="stats-grid" style="margin-bottom:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">
+          <div class="stat-card" style="background:#fff;border-radius:10px;padding:16px;border:1px solid var(--border-color);display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+            <div style="width:48px;height:48px;border-radius:10px;background:#ecfdf5;display:flex;align-items:center;justify-content:center;color:#059669;font-size:20px;">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:700;color:var(--text-primary)" id="psStatPublished">0</div>
+              <div style="font-size:12px;color:var(--text-secondary)">منتجات منشورة بالكتالوج</div>
+            </div>
+          </div>
+
+          <div class="stat-card" style="background:#fff;border-radius:10px;padding:16px;border:1px solid var(--border-color);display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+            <div style="width:48px;height:48px;border-radius:10px;background:#fffbeb;display:flex;align-items:center;justify-content:center;color:#d97706;font-size:20px;">
+              <i class="fas fa-edit"></i>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:700;color:var(--text-primary)" id="psStatDrafts">0</div>
+              <div style="font-size:12px;color:var(--text-secondary)">مسودات غير منشورة</div>
+            </div>
+          </div>
+
+          <div class="stat-card" style="background:#fff;border-radius:10px;padding:16px;border:1px solid var(--border-color);display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+            <div style="width:48px;height:48px;border-radius:10px;background:#fff1f2;display:flex;align-items:center;justify-content:center;color:#e11d48;font-size:20px;">
+              <i class="fas fa-eye-slash"></i>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:700;color:var(--text-primary)" id="psStatHidden">0</div>
+              <div style="font-size:12px;color:var(--text-secondary)">منتجات مخفية</div>
+            </div>
+          </div>
+
+          <div class="stat-card" style="background:#fff;border-radius:10px;padding:16px;border:1px solid var(--border-color);display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-sm);">
+            <div style="width:48px;height:48px;border-radius:10px;background:#f3e8ff;display:flex;align-items:center;justify-content:center;color:#7c3aed;font-size:20px;">
+              <i class="fas fa-history"></i>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:700;color:var(--text-primary)" id="psStatVersions">0</div>
+              <div style="font-size:12px;color:var(--text-secondary)">إجمالي النسخ التاريخية</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Product Settings Card -->
+        <div class="card" style="border-radius:10px;box-shadow:var(--shadow-sm);border:1px solid var(--border-color);overflow:hidden;">
+          <div class="card-header" style="background:#fff;padding:16px 20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h3 style="margin:0;font-size:16px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-boxes" style="color:var(--primary)"></i>
+                إدارة منتجات الكتالوج العام والمسودات
+              </h3>
+              <p style="margin:4px 0 0;font-size:12px;color:var(--text-secondary);">
+                نظام النشر الآمن: حفظ المسودات، المعاينة قبل النشر، وتتبع سجل الإصدارات والاستعادة غير التدميرية
+              </p>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-outline btn-sm" onclick="loadProductsSettingsData()" title="تحديث البيانات">
+                <i class="fas fa-sync-alt"></i> تحديث
+              </button>
+              <button class="btn btn-primary" onclick="openProductEditor()" style="background:linear-gradient(135deg,var(--brand-burgundy),var(--brand-fuchsia));border:none;">
+                <i class="fas fa-plus"></i> إضافة منتج / مسودة جديدة
+              </button>
+            </div>
+          </div>
+
+          <!-- Filters Bar -->
+          <div style="padding:14px 20px;background:var(--bg-main);border-bottom:1px solid var(--border-color);display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            <div style="flex:1;min-width:200px;position:relative;">
+              <i class="fas fa-search" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-secondary);font-size:13px;"></i>
+              <input type="text" id="psSearchInput" class="form-control" placeholder="بحث بالاسم أو الموديل..." oninput="renderProductsSettingsTable()" style="padding-right:34px;height:38px;">
+            </div>
+            <div style="width:180px;">
+              <select id="psCategoryFilter" class="form-control" onchange="renderProductsSettingsTable()" style="height:38px;">
+                <option value="">جميع التصنيفات</option>
+              </select>
+            </div>
+            <div style="width:160px;">
+              <select id="psStatusFilter" class="form-control" onchange="renderProductsSettingsTable()" style="height:38px;">
+                <option value="">جميع الحالات</option>
+                <option value="published">منشور فقط</option>
+                <option value="has_draft">يحتوي على مسودة</option>
+                <option value="hidden">مخفي فقط</option>
+                <option value="archived">مؤرشف</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Products Table -->
+          <div class="card-body" style="padding:0;">
+            <div class="table-responsive" style="overflow-x:auto;">
+              <table class="data-table" style="width:100%;border-collapse:collapse;" id="productsSettingsTable">
+                <thead>
+                  <tr style="background:#f8fafc;border-bottom:1px solid var(--border-color);font-size:12px;color:var(--text-secondary);text-align:right;">
+                    <th style="padding:12px 14px;width:60px;text-align:center;">الصورة</th>
+                    <th style="padding:12px 14px;">اسم المنتج / الموديل</th>
+                    <th style="padding:12px 14px;">التصنيف</th>
+                    <th style="padding:12px 14px;">السعر المعتمد</th>
+                    <th style="padding:12px 14px;">الإصدار والحالة</th>
+                    <th style="padding:12px 14px;">آخر تعديل</th>
+                    <th style="padding:12px 14px;text-align:center;">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody id="productsSettingsTableBody">
+                  <!-- Populated dynamically by products_settings.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- MODAL 1: Product Editor & 3-Stage Workflow -->
+      <!-- ============================================================ -->
+      <div id="psEditorModal" class="modal-backdrop" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,21,61,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+        <div class="modal-dialog" style="background:#fff;border-radius:12px;width:100%;max-width:850px;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden;">
+          
+          <div class="modal-header" style="padding:16px 20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:var(--bg-main);">
+            <h3 id="psEditorModalTitle" style="margin:0;font-size:16px;font-weight:700;color:var(--text-primary);">
+              إضافة / تعديل المنتج
+            </h3>
+            <button onclick="closeProductEditor()" type="button" style="background:none;border:none;font-size:20px;color:var(--text-secondary);cursor:pointer;">&times;</button>
+          </div>
+
+          <div class="modal-body" style="padding:20px;overflow-y:auto;flex:1;">
+            
+            <div id="psEditorDraftNotice" style="display:none;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 14px;font-size:12px;color:#92400e;margin-bottom:16px;align-items:center;">
+              <!-- Populated dynamically -->
+            </div>
+
+            <!-- Basic Details -->
+            <div style="font-weight:700;font-size:13px;color:var(--primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+              <i class="fas fa-info-circle"></i> البيانات الأساسية
+            </div>
+            <div class="form-row">
+              <div class="form-group" style="flex:2;">
+                <label>اسم المنتج (عربي) *</label>
+                <input type="text" id="psFormName" class="form-control" placeholder="مثال: Hipro A1 Pro – Automated Immunoassay System">
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label>الموديل / الكود</label>
+                <input type="text" id="psFormModel" class="form-control" placeholder="مثال: A1 Pro">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>اسم المنتج (إنجليزي)</label>
+                <input type="text" id="psFormNameEn" class="form-control" placeholder="English Product Name" style="direction:ltr;text-align:right;">
+              </div>
+              <div class="form-group">
+                <label>التصنيف</label>
+                <input type="text" id="psFormCategory" class="form-control" placeholder="مثال: تحاليل مناعية">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>الشركة المصنعة / الوكيل</label>
+                <input type="text" id="psFormManufacturer" class="form-control" placeholder="مثال: Hipro Biotechnology">
+              </div>
+              <div class="form-group">
+                <label>سعر البيع الافتراضي ($)</label>
+                <input type="number" id="psFormPrice" class="form-control" placeholder="0" min="0" step="any">
+              </div>
+            </div>
+
+            <!-- Descriptions & Specs -->
+            <div style="font-weight:700;font-size:13px;color:var(--primary);margin:16px 0 10px;display:flex;align-items:center;gap:6px;">
+              <i class="fas fa-align-right"></i> الأوصاف والمواصفات
+            </div>
+            <div class="form-group">
+              <label>الوصف العام (عربي)</label>
+              <textarea id="psFormDescription" class="form-control" rows="3" placeholder="وصف تفصيلي لوظائف واستخدامات الجهاز..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>الوصف العام (إنجليزي)</label>
+              <textarea id="psFormDescriptionEn" class="form-control" rows="2" placeholder="English description..." style="direction:ltr;text-align:right;"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>المميزات الرئيسية (ميزة في كل سطر)</label>
+                <textarea id="psFormFeatures" class="form-control" rows="3" placeholder="ميزة 1&#10;ميزة 2&#10;ميزة 3"></textarea>
+              </div>
+              <div class="form-group">
+                <label>المواصفات الفنية التفصيلية (Technical Specs)</label>
+                <textarea id="psFormTechnicalSpecs" class="form-control" rows="3" placeholder="السرعة: 120 فحص/ساعة&#10;الحجم والوزن: ...&#10;درجة الحرارة: ..."></textarea>
+              </div>
+            </div>
+
+            <!-- Images & Media Section -->
+            <div style="font-weight:700;font-size:13px;color:var(--primary);margin:16px 0 10px;display:flex;align-items:center;gap:6px;">
+              <i class="fas fa-images"></i> إدارة الصور (Cloudinary & Local Media)
+            </div>
+            
+            <div class="form-row" style="align-items:flex-start;">
+              <!-- Main Image Preview & Controls -->
+              <div class="form-group" style="flex:1;">
+                <label>الصورة الرئيسية</label>
+                <div style="display:flex;gap:12px;align-items:center;">
+                  <img id="psMainImagePreview" src="../images/logo.png" alt="Main" style="width:80px;height:80px;object-fit:contain;border:1px solid var(--border-color);border-radius:8px;background:#fff;padding:4px;">
+                  <div style="flex:1;">
+                    <input type="text" id="psFormMainImageUrl" class="form-control" placeholder="رابط الصورة أو مسارها..." style="font-size:12px;margin-bottom:6px;">
+                    <div style="display:flex;gap:6px;">
+                      <label class="btn btn-outline btn-sm" style="cursor:pointer;margin:0;">
+                        <i class="fas fa-upload"></i> رفع ملف
+                        <input type="file" accept="image/*" onchange="handleMainImageUpload(this)" style="display:none;">
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Gallery Images -->
+              <div class="form-group" style="flex:1;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                  <label style="margin:0;">صور المعرض الإضافية (Gallery)</label>
+                  <div style="display:flex;gap:4px;">
+                    <label class="btn btn-outline btn-sm" style="cursor:pointer;font-size:11px;padding:2px 6px;">
+                      <i class="fas fa-plus"></i> رفع للمعرض
+                      <input type="file" accept="image/*" onchange="handleGalleryFileUpload(this)" style="display:none;">
+                    </label>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="addGalleryImageFromPrompt()" style="font-size:11px;padding:2px 6px;">
+                      <i class="fas fa-link"></i> إضافة رابط
+                    </button>
+                  </div>
+                </div>
+                <div id="psGalleryThumbnails" style="min-height:76px;border:1px dashed var(--border-color);border-radius:8px;padding:6px;display:flex;flex-wrap:wrap;align-items:center;background:var(--bg-main);">
+                  <!-- Thumbnails rendered here -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Change Summary for Audit -->
+            <div style="font-weight:700;font-size:13px;color:var(--primary);margin:16px 0 6px;display:flex;align-items:center;gap:6px;">
+              <i class="fas fa-comment-dots"></i> ملخص التغييرات (لتسجيل النسخة في السجل التاريخي)
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <input type="text" id="psFormChangeSummary" class="form-control" placeholder="مثال: تحديث المواصفات الفنية وسعر البيع لعام 2026">
+            </div>
+
+          </div>
+
+          <!-- 3-Stage Action Footer -->
+          <div class="modal-footer" style="padding:14px 20px;border-top:1px solid var(--border-color);background:var(--bg-main);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <button type="button" class="btn btn-outline" onclick="closeProductEditor()">إلغاء</button>
+            <div style="display:flex;gap:8px;">
+              <button type="button" id="psSaveDraftBtn" class="btn btn-outline" onclick="saveCurrentAsDraft()" style="color:#d97706;border-color:#fde68a;background:#fffbeb;">
+                <i class="fas fa-save"></i> حفظ كمسودة
+              </button>
+              <button type="button" class="btn btn-outline" onclick="previewCurrentEditorData()" style="color:#0284c7;border-color:#bae6fd;">
+                <i class="fas fa-eye"></i> معاينة المنتج
+              </button>
+              <button type="button" id="psPublishBtn" class="btn btn-primary" onclick="publishCurrentProduct()" style="background:linear-gradient(135deg,var(--brand-burgundy),var(--brand-fuchsia));border:none;">
+                <i class="fas fa-paper-plane"></i> اعتماد ونشر التعديلات
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- MODAL 2: Revision History Timeline & Restore -->
+      <!-- ============================================================ -->
+      <div id="psVersionsModal" class="modal-backdrop" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,21,61,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+        <div class="modal-dialog" style="background:#fff;border-radius:12px;width:100%;max-width:700px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden;">
+          <div class="modal-header" style="padding:16px 20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:var(--bg-main);">
+            <h3 id="psVersionsModalTitle" style="margin:0;font-size:16px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
+              <i class="fas fa-history" style="color:#7c3aed"></i> سجل الإصدارات التاريخية
+            </h3>
+            <button onclick="closeVersionHistoryModal()" type="button" style="background:none;border:none;font-size:20px;color:var(--text-secondary);cursor:pointer;">&times;</button>
+          </div>
+          <div class="modal-body" id="psVersionsList" style="padding:20px;overflow-y:auto;flex:1;">
+            <!-- Populated dynamically -->
+          </div>
+          <div class="modal-footer" style="padding:12px 20px;border-top:1px solid var(--border-color);background:var(--bg-main);text-align:left;">
+            <button type="button" class="btn btn-outline" onclick="closeVersionHistoryModal()">إغلاق</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- MODAL 3: Live Preview & Diff Modal -->
+      <!-- ============================================================ -->
+      <div id="psPreviewModal" class="modal-backdrop" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,21,61,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+        <div class="modal-dialog" style="background:#fff;border-radius:12px;width:100%;max-width:750px;max-height:85vh;display:flex;flex-direction:column;box-shadow:var(--shadow-lg);overflow:hidden;">
+          <div class="modal-header" style="padding:16px 20px;border-bottom:1px solid var(--border-color);display:flex;align-items:center;justify-content:space-between;background:var(--bg-main);">
+            <h3 style="margin:0;font-size:16px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
+              <i class="fas fa-eye" style="color:#0284c7"></i> معاينة المنتج الحية قبل النشر
+            </h3>
+            <button onclick="closeProductPreview()" type="button" style="background:none;border:none;font-size:20px;color:var(--text-secondary);cursor:pointer;">&times;</button>
+          </div>
+          <div class="modal-body" id="psPreviewContainer" style="padding:20px;overflow-y:auto;flex:1;">
+            <!-- Rendered dynamically -->
+          </div>
+          <div class="modal-footer" style="padding:12px 20px;border-top:1px solid var(--border-color);background:var(--bg-main);display:flex;justify-content:space-between;align-items:center;">
+            <button type="button" class="btn btn-outline" onclick="closeProductPreview()">إغلاق المعاينة</button>
+            <button type="button" class="btn btn-primary" onclick="closeProductPreview();publishCurrentProduct();" style="background:linear-gradient(135deg,var(--brand-burgundy),var(--brand-fuchsia));border:none;">
+              <i class="fas fa-paper-plane"></i> نشر هذه البيانات للكتالوج الآن
+            </button>
+          </div>
+        </div>
+      </div>
+
+
       <div style="margin-top:20px;display:flex;gap:8px">
         <button class="btn btn-primary" onclick="showToast('تم حفظ جميع الإعدادات بنجاح')"><i class="fas fa-save"></i> حفظ جميع الإعدادات</button>
         <button class="btn btn-outline" onclick="showToast('تم التراجع عن التغييرات','error')"><i class="fas fa-undo"></i> تراجع</button>
@@ -209,12 +523,17 @@
   </main>
 
   <script src="js/admin.js"></script>
+  <script src="js/products_settings.js"></script>
   <script>
     function switchTab(btn, tabId) {
       document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
       btn.classList.add('active');
       document.querySelectorAll('[id^="tab-"]').forEach(function(tab) { tab.style.display = 'none'; });
-      document.getElementById('tab-' + tabId).style.display = 'block';
+      var target = document.getElementById('tab-' + tabId);
+      if (target) target.style.display = 'block';
+      if (tabId === 'products-settings' && typeof loadProductsSettingsData === 'function') {
+        loadProductsSettingsData();
+      }
     }
 
     function exportBackup() {
