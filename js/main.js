@@ -828,9 +828,8 @@ function renderProducts() {
                 '<p class="product-desc">' + desc + '</p>' +
                 '<div class="product-btn-group">' +
                     '<button class="product-btn product-btn-order" onclick="addToCart(' + p.id + ',\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-cart-plus"></i> ' + btnAddOrder + '</button>' +
-                    '<button class="product-btn product-btn-outline" onclick="openQuoteModal(\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-paper-plane"></i> ' + btnGetQuote + '</button>' +
+                    '<button class="product-btn product-btn-details" onclick="openProductDetailsById(' + p.id + ')"><i class="fas fa-info-circle"></i> ' + btnDetails + '</button>' +
                 '</div>' +
-                '<button class="product-btn product-btn-details" onclick="openProductDetailsById(' + p.id + ')" style="margin-top:6px"><i class="fas fa-info-circle"></i> ' + btnDetails + '</button>' +
             '</div>' +
         '</div>';
     }).join('');
@@ -1163,9 +1162,8 @@ function loadHomeProducts() {
                     '<p>' + desc.substring(0, 85) + (desc.length > 85 ? '...' : '') + '</p>' +
                     '<div class="product-btn-group">' +
                         '<button class="product-btn product-btn-order" onclick="addToCart(' + p.id + ',\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-cart-plus"></i> ' + btnAddOrder + '</button>' +
-                        '<button class="product-btn product-btn-outline" onclick="openQuoteModal(\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-paper-plane"></i> ' + btnGetQuote + '</button>' +
+                        '<button class="product-btn product-btn-details" onclick="openProductDetailsById(' + p.id + ')"><i class="fas fa-info-circle"></i> ' + btnDetails + '</button>' +
                     '</div>' +
-                    '<button class="product-btn product-btn-details" onclick="openProductDetailsById(' + p.id + ')" style="margin-top:6px"><i class="fas fa-info-circle"></i> ' + btnDetails + '</button>' +
                 '</div>' +
             '</div>';
         }).join('');
@@ -1378,8 +1376,8 @@ function openProductDetailsById(productId) {
 
         var detailQuoteBtn = document.getElementById('detailQuoteBtn');
         if (detailQuoteBtn) {
-            detailQuoteBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ' + (dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'طلب عرض سعر'));
-            detailQuoteBtn.setAttribute('onclick', "closeProductDetails(); openQuoteModal('" + name.replace(/'/g, "\\'") + "');");
+            detailQuoteBtn.innerHTML = '<i class="fas fa-cart-plus"></i> ' + (dict['btn_add_order'] || (isEn ? 'Add to Order' : 'أضف للطلب'));
+            detailQuoteBtn.setAttribute('onclick', "closeProductDetails(); addToCart(" + product.id + ", '" + name.replace(/'/g, "\\'") + "');");
         }
 
         modal.classList.add('active');
