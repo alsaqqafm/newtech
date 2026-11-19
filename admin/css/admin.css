@@ -1084,9 +1084,11 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 }
 
 .login-logo img {
-  width: 70px;
-  height: 70px;
+  width: auto;
+  max-width: 140px;
+  height: 60px;
   margin-bottom: 12px;
+  object-fit: contain;
 }
 
 .login-logo h2 {
