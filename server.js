@@ -11,6 +11,23 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Anti-Cache headers for API and Graceful Shutdown Request Tracking
+var isShuttingDown = false;
+var activeRequests = 0;
+
+app.use('/api', function (req, res, next) {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  if (isShuttingDown && (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE' || req.method === 'PATCH')) {
+    res.set('Connection', 'close');
+    return res.status(503).json({ error: 'الخادم قيد إعادة التشغيل الآمن، يرجى المحاولة بعد لحظات.' });
+  }
+  activeRequests++;
+  res.on('finish', function () { activeRequests--; });
+  next();
+});
+
 var apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 200,
@@ -27,6 +44,15 @@ app.use(express.static(path.join(__dirname)));
 
 getDatabase().then(function (db) {
   console.log('Database connected and seeded.');
+
+  // Idempotent Phase B Product Management Migration
+  try {
+    var { applyPhaseBMigration } = require('./database/migration_phase_b');
+    applyPhaseBMigration(db);
+    console.log('[Migration] Phase B product management schema active.');
+  } catch (mErr) {
+    console.warn('[Migration] Note:', mErr.message);
+  }
 
   var authRoutes = require('./routes/auth')(db);
   var productsRoutes = require('./routes/products')(db);
@@ -130,13 +156,57 @@ getDatabase().then(function (db) {
     res.sendFile(path.join(__dirname, 'index.html'));
   });
 
-  app.listen(PORT, function () {
+  // On-demand verified backup endpoint (Admin only)
+  var { authenticateToken, requireRole } = require('./middleware/auth');
+  app.post('/api/backups/run', authenticateToken, requireRole('admin'), function (req, res) {
+    try {
+      var timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      db.save();
+      var backupDir = path.join(__dirname, 'database', 'backups');
+      if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
+      var backupFile = path.join(backupDir, 'newtechmed_backup_' + timestamp + '.db');
+      var crypto = require('crypto');
+      var fileBuf = fs.readFileSync(path.join(__dirname, 'database', 'newtechmed.db'));
+      fs.writeFileSync(backupFile, fileBuf);
+      var hash = crypto.createHash('sha256').update(fileBuf).digest('hex');
+      res.json({ message: 'تم إنشاء النسخة الاحتياطية بنجاح', filename: path.basename(backupFile), sha256: hash });
+    } catch (e) {
+      res.status(500).json({ error: e.message });
+    }
+  });
+
+  var server = app.listen(PORT, function () {
     console.log('=================================');
     console.log('  New Tech Medical Server');
     console.log('  Running on http://localhost:' + PORT);
     console.log('  Database: SQLite (newtechmed.db)');
     console.log('=================================');
   });
+
+  function gracefulShutdown(signal) {
+    console.log(`[Shutdown] Received ${signal}. Draining active requests...`);
+    isShuttingDown = true;
+    server.close(function () {
+      console.log('[Shutdown] Closed server to new connections.');
+    });
+    var drainTimer = setInterval(function () {
+      if (activeRequests <= 0) {
+        clearInterval(drainTimer);
+        try {
+          db.save();
+          console.log('[Shutdown] Database flushed atomically. Exiting cleanly.');
+        } catch (e) {}
+        process.exit(0);
+      }
+    }, 200);
+    setTimeout(function () {
+      console.warn('[Shutdown] Timeout forced exit.');
+      process.exit(0);
+    }, 10000);
+  }
+
+  process.on('SIGTERM', function () { gracefulShutdown('SIGTERM'); });
+  process.on('SIGINT', function () { gracefulShutdown('SIGINT'); });
 
 }).catch(function (err) {
   console.error('Failed to start server:', err);

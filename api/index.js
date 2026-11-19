@@ -8,6 +8,56 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Anti-Cache headers for sensitive API responses
+app.use('/api', function (req, res, next) {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  next();
+});
+
+// Optional Reverse Proxy to dedicated Render backend if configured in Vercel environment
+var backendUrl = process.env.BACKEND_API_URL || process.env.RENDER_API_URL;
+if (backendUrl) {
+  backendUrl = backendUrl.replace(/\/$/, '');
+  app.use('/api', function (req, res) {
+    var targetUrl = backendUrl + req.originalUrl;
+    var parsedUrl = new URL(targetUrl);
+    var isHttps = parsedUrl.protocol === 'https:';
+    var client = isHttps ? require('https') : require('http');
+
+    var headers = Object.assign({}, req.headers);
+    delete headers.host;
+
+    var proxyReq = client.request({
+      hostname: parsedUrl.hostname,
+      port: parsedUrl.port || (isHttps ? 443 : 80),
+      path: parsedUrl.pathname + parsedUrl.search,
+      method: req.method,
+      headers: headers
+    }, function (proxyRes) {
+      res.status(proxyRes.statusCode);
+      Object.keys(proxyRes.headers).forEach(function (h) {
+        res.setHeader(h, proxyRes.headers[h]);
+      });
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      proxyRes.pipe(res);
+    });
+
+    proxyReq.on('error', function (err) {
+      res.status(502).json({ error: 'Backend gateway connection failed', message: err.message });
+    });
+
+    if (req.body && Object.keys(req.body).length > 0) {
+      var bodyData = JSON.stringify(req.body);
+      proxyReq.setHeader('Content-Length', Buffer.byteLength(bodyData));
+      proxyReq.setHeader('Content-Type', 'application/json');
+      proxyReq.write(bodyData);
+    }
+    proxyReq.end();
+  });
+}
+
 app.use('/css', express.static(path.join(__dirname, '..', 'css')));
 app.use('/js', express.static(path.join(__dirname, '..', 'js')));
 app.use('/images', express.static(path.join(__dirname, '..', 'images')));
@@ -20,6 +70,11 @@ var initialized = false;
 async function setup() {
   if (initialized) return;
   var db = await getDatabase();
+
+  try {
+    var { applyPhaseBMigration } = require('../database/migration_phase_b');
+    applyPhaseBMigration(db);
+  } catch (e) {}
 
   app.use('/api', require('../routes/auth')(db));
   app.use('/api/products', require('../routes/products')(db));

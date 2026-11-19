@@ -29,9 +29,21 @@ function createWrapper(SQL, fileData) {
       if (!fs.existsSync(dir)) {
         try { fs.mkdirSync(dir, { recursive: true }); } catch (e) {}
       }
-      fs.writeFileSync(DB_PATH, buffer);
+
+      // Hardened POSIX Atomic Save: write to temp file, fsync to disk, then atomic rename
+      var tmpPath = DB_PATH + '.tmp.' + Date.now();
+      var fd = fs.openSync(tmpPath, 'w');
+      fs.writeSync(fd, buffer, 0, buffer.length);
+      try { fs.fsyncSync(fd); } catch (e) {}
+      fs.closeSync(fd);
+      fs.renameSync(tmpPath, DB_PATH);
     } catch (err) {
-      console.warn('Database save skipped (read-only environment):', err.message);
+      // Direct write fallback (e.g. for serverless /tmp or environments where rename fails)
+      try {
+        fs.writeFileSync(DB_PATH, buffer);
+      } catch (fallbackErr) {
+        console.warn('Database save note:', fallbackErr.message);
+      }
     }
   }
 
@@ -728,9 +740,12 @@ function getDatabase() {
       var bundledPath = path.join(__dirname, 'newtechmed.db');
       if (fs.existsSync(bundledPath)) {
         fileData = fs.readFileSync(bundledPath);
-        if (isServerless) {
-          try { fs.writeFileSync(DB_PATH, fileData); } catch (e) {}
-        }
+        try {
+          var targetDir = path.dirname(DB_PATH);
+          if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+          fs.writeFileSync(DB_PATH, fileData);
+          console.log('[Database] Initialized new persistent disk file at:', DB_PATH);
+        } catch (e) {}
       }
     }
   } catch (e) {
