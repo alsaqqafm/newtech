@@ -5,19 +5,19 @@ module.exports = function (db) {
   var router = express.Router();
 
   // List all stores
-  router.get('/', authenticateToken, function (req, res) {
+  router.get('/', authenticateToken, async function (req, res) {
     try {
       var stores;
-      // If user is locked to a specific store, only return that store unless they are admin/no store assigned
       if (req.user.store_id && req.user.role !== 'admin') {
-        stores = db.prepare('SELECT * FROM stores WHERE id = ?').all(req.user.store_id);
+        stores = await db.prepare('SELECT * FROM stores WHERE id = ?').all(req.user.store_id);
       } else {
-        stores = db.prepare('SELECT * FROM stores ORDER BY id ASC').all();
+        stores = await db.prepare('SELECT * FROM stores ORDER BY id ASC').all();
       }
 
-      // Append summary stats for each store
-      stores = stores.map(function (s) {
-        var invStats = db.prepare(`
+      var enhancedStores = [];
+      for (var i = 0; i < stores.length; i++) {
+        var s = stores[i];
+        var invStats = await db.prepare(`
           SELECT 
             COUNT(*) as total_items,
             COALESCE(SUM(stock_quantity), 0) as total_units,
@@ -26,7 +26,7 @@ module.exports = function (db) {
           WHERE store_id = ?
         `).get(s.id);
 
-        var salesStats = db.prepare(`
+        var salesStats = await db.prepare(`
           SELECT 
             COUNT(*) as total_invoices,
             COALESCE(SUM(total_amount), 0) as total_sales,
@@ -36,7 +36,7 @@ module.exports = function (db) {
           WHERE store_id = ? AND status != 'cancelled'
         `).get(s.id);
 
-        return Object.assign({}, s, {
+        enhancedStores.push(Object.assign({}, s, {
           total_items: invStats ? invStats.total_items : 0,
           total_units: invStats ? invStats.total_units : 0,
           inventory_value: invStats ? invStats.inventory_value : 0,
@@ -44,19 +44,19 @@ module.exports = function (db) {
           total_sales: salesStats ? salesStats.total_sales : 0,
           total_collected: salesStats ? salesStats.total_collected : 0,
           total_receivables: salesStats ? salesStats.total_receivables : 0
-        });
-      });
+        }));
+      }
 
-      res.json(stores);
+      res.json(enhancedStores);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
 
   // Get single store details
-  router.get('/:id', authenticateToken, requireStoreAccess, function (req, res) {
+  router.get('/:id', authenticateToken, requireStoreAccess, async function (req, res) {
     try {
-      var store = db.prepare('SELECT * FROM stores WHERE id = ?').get(req.params.id);
+      var store = await db.prepare('SELECT * FROM stores WHERE id = ?').get(req.params.id);
       if (!store) return res.status(404).json({ error: 'المحل غير موجود' });
       res.json(store);
     } catch (err) {
@@ -65,20 +65,20 @@ module.exports = function (db) {
   });
 
   // Create new store (Admin only)
-  router.post('/', authenticateToken, requireRole('admin'), function (req, res) {
+  router.post('/', authenticateToken, requireRole('admin'), async function (req, res) {
     try {
       var { name, code, address, phone, email, tax_number, invoice_prefix, invoice_footer } = req.body;
       if (!name || !code) {
         return res.status(400).json({ error: 'اسم المحل ورمز المحل مطلوبان' });
       }
 
-      var existing = db.prepare('SELECT id FROM stores WHERE code = ?').get(code.trim().toUpperCase());
+      var existing = await db.prepare('SELECT id FROM stores WHERE code = ?').get(code.trim().toUpperCase());
       if (existing) {
         return res.status(400).json({ error: 'رمز المحل مستخدم بالفعل لمحل آخر' });
       }
 
       var prefix = invoice_prefix || ('INV-' + code.trim().toUpperCase());
-      var result = db.prepare(`
+      var result = await db.prepare(`
         INSERT INTO stores (name, code, address, phone, email, tax_number, invoice_prefix, invoice_footer, status)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'active')
       `).run(
@@ -95,21 +95,22 @@ module.exports = function (db) {
       var newStoreId = result.lastInsertRowid;
 
       // Automatically create store inventory records for all existing products with 0 stock
-      var products = db.prepare('SELECT id, price FROM products').all();
-      products.forEach(function (p) {
+      var products = await db.prepare('SELECT id, price FROM products').all();
+      for (var pIdx = 0; pIdx < products.length; pIdx++) {
+        var p = products[pIdx];
         var purchaseCost = p.price > 0 ? Math.round(p.price * 0.7) : 0;
         var wholesale = p.price > 0 ? Math.round(p.price * 0.88) : 0;
-        db.prepare(`
+        await db.prepare(`
           INSERT OR IGNORE INTO store_inventory (store_id, product_id, stock_quantity, min_stock_alert, purchase_price, wholesale_price, retail_price, unit)
           VALUES (?, ?, 0, 5, ?, ?, ?, 'قطعة')
         `).run(newStoreId, p.id, purchaseCost, wholesale, p.price || 0);
-      });
+      }
 
-      db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
+      await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
         req.user.id, req.user.name, 'create', 'store', newStoreId, JSON.stringify({ name: name, code: code })
       );
 
-      var createdStore = db.prepare('SELECT * FROM stores WHERE id = ?').get(newStoreId);
+      var createdStore = await db.prepare('SELECT * FROM stores WHERE id = ?').get(newStoreId);
       res.status(201).json(createdStore);
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -117,14 +118,14 @@ module.exports = function (db) {
   });
 
   // Update store (Admin or Store Manager of this store)
-  router.put('/:id', authenticateToken, requireStoreAccess, function (req, res) {
+  router.put('/:id', authenticateToken, requireStoreAccess, async function (req, res) {
     try {
-      var existing = db.prepare('SELECT * FROM stores WHERE id = ?').get(req.params.id);
+      var existing = await db.prepare('SELECT * FROM stores WHERE id = ?').get(req.params.id);
       if (!existing) return res.status(404).json({ error: 'المحل غير موجود' });
 
       var { name, address, phone, email, tax_number, invoice_prefix, invoice_footer, status } = req.body;
 
-      db.prepare(`
+      await db.prepare(`
         UPDATE stores
         SET name = ?, address = ?, phone = ?, email = ?, tax_number = ?, invoice_prefix = ?, invoice_footer = ?, status = ?
         WHERE id = ?
@@ -140,11 +141,11 @@ module.exports = function (db) {
         req.params.id
       );
 
-      db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
+      await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
         req.user.id, req.user.name, 'update', 'store', req.params.id, JSON.stringify({ name: name || existing.name })
       );
 
-      var updated = db.prepare('SELECT * FROM stores WHERE id = ?').get(req.params.id);
+      var updated = await db.prepare('SELECT * FROM stores WHERE id = ?').get(req.params.id);
       res.json(updated);
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -152,15 +153,15 @@ module.exports = function (db) {
   });
 
   // Toggle store active/inactive (Admin only - preserves historical data)
-  router.patch('/:id/toggle', authenticateToken, requireRole('admin'), function (req, res) {
+  router.patch('/:id/toggle', authenticateToken, requireRole('admin'), async function (req, res) {
     try {
-      var store = db.prepare('SELECT * FROM stores WHERE id = ?').get(req.params.id);
+      var store = await db.prepare('SELECT * FROM stores WHERE id = ?').get(req.params.id);
       if (!store) return res.status(404).json({ error: 'المحل غير موجود' });
 
       var newStatus = store.status === 'active' ? 'inactive' : 'active';
-      db.prepare('UPDATE stores SET status = ? WHERE id = ?').run(newStatus, req.params.id);
+      await db.prepare('UPDATE stores SET status = ? WHERE id = ?').run(newStatus, req.params.id);
 
-      db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
+      await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
         req.user.id, req.user.name, newStatus === 'active' ? 'activate' : 'deactivate', 'store', req.params.id, JSON.stringify({ name: store.name })
       );
 

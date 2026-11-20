@@ -5,7 +5,7 @@ module.exports = function (db) {
   var router = express.Router();
 
   // List invoices
-  router.get('/', authenticateToken, requireStoreAccess, function (req, res) {
+  router.get('/', authenticateToken, requireStoreAccess, async function (req, res) {
     try {
       var storeId = req.query.store_id || req.user.store_id;
       var paymentStatus = req.query.payment_status;
@@ -41,7 +41,7 @@ module.exports = function (db) {
 
       var whereSql = whereClauses.length > 0 ? 'WHERE ' + whereClauses.join(' AND ') : '';
 
-      var invoices = db.prepare(`
+      var invoices = await db.prepare(`
         SELECT 
           inv.*,
           s.name as store_name,
@@ -61,9 +61,9 @@ module.exports = function (db) {
   });
 
   // Get single invoice for viewing and printing
-  router.get('/:id', authenticateToken, function (req, res) {
+  router.get('/:id', authenticateToken, async function (req, res) {
     try {
-      var invoice = db.prepare(`
+      var invoice = await db.prepare(`
         SELECT 
           inv.*,
           s.name as store_name,
@@ -80,12 +80,11 @@ module.exports = function (db) {
 
       if (!invoice) return res.status(404).json({ error: 'الفاتورة غير موجودة' });
 
-      // Check access
       if (req.user.store_id && req.user.role !== 'admin' && req.user.store_id !== invoice.store_id) {
         return res.status(403).json({ error: 'غير مصرح لك بالاطلاع على فاتورة محل آخر' });
       }
 
-      var items = db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ?').all(req.params.id);
+      var items = await db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ?').all(req.params.id);
       invoice.items = items;
 
       res.json(invoice);
@@ -94,8 +93,8 @@ module.exports = function (db) {
     }
   });
 
-  // Create new sale invoice (اعتماد عملية البيع وخصم المخزون الحقيقي)
-  router.post('/', authenticateToken, requireRole('admin', 'store_manager', 'cashier'), function (req, res) {
+  // Create new sale invoice - ATOMIC TRANSACTION WITH AUTOMATIC ROLLBACK
+  router.post('/', authenticateToken, requireRole('admin', 'store_manager', 'cashier'), async function (req, res) {
     try {
       var {
         store_id, customer_id, customer_name, customer_phone,
@@ -104,13 +103,12 @@ module.exports = function (db) {
 
       var targetStoreId = store_id || req.user.store_id || 1;
 
-      // Enforce store isolation
       if (req.user.store_id && String(req.user.store_id) !== String(targetStoreId) && req.user.role !== 'admin') {
         return res.status(403).json({ error: 'لا يمكنك إصدار فاتورة لمحل آخر غير محلك' });
       }
 
       if (!customer_name && customer_id) {
-        var cust = db.prepare('SELECT name, phone FROM customers WHERE id = ?').get(customer_id);
+        var cust = await db.prepare('SELECT name, phone FROM customers WHERE id = ?').get(customer_id);
         if (cust) {
           customer_name = cust.name;
           if (!customer_phone) customer_phone = cust.phone;
@@ -122,16 +120,16 @@ module.exports = function (db) {
         return res.status(400).json({ error: 'قائمة المنتجات والكميات مطلوبة' });
       }
 
-      var store = db.prepare('SELECT * FROM stores WHERE id = ?').get(targetStoreId);
+      var store = await db.prepare('SELECT * FROM stores WHERE id = ?').get(targetStoreId);
       if (!store) return res.status(404).json({ error: 'المحل المحدد غير موجود' });
 
-      // 1. Validate stock availability in this specific store
+      // 1. Validate stock availability
       for (var i = 0; i < items.length; i++) {
         var itm = items[i];
-        var inv = db.prepare('SELECT stock_quantity FROM store_inventory WHERE store_id = ? AND product_id = ?').get(targetStoreId, itm.product_id);
+        var inv = await db.prepare('SELECT stock_quantity FROM store_inventory WHERE store_id = ? AND product_id = ?').get(targetStoreId, itm.product_id);
         var avail = inv ? inv.stock_quantity : 0;
         if (avail < itm.quantity) {
-          var prod = db.prepare('SELECT name FROM products WHERE id = ?').get(itm.product_id);
+          var prod = await db.prepare('SELECT name FROM products WHERE id = ?').get(itm.product_id);
           var prodName = prod ? prod.name : 'المنتج';
           return res.status(400).json({
             error: `الرصيد المتاح من (${prodName}) في ${store.name} هو (${avail}) فقط ولا يكفي لبيع (${itm.quantity})`
@@ -139,14 +137,13 @@ module.exports = function (db) {
         }
       }
 
-      // 2. Generate unique sequential invoice number for this store
+      // 2. Generate unique sequential invoice number
       var year = new Date().getFullYear();
-      var countRow = db.prepare('SELECT COUNT(*) as count FROM invoices WHERE store_id = ?').get(targetStoreId);
+      var countRow = await db.prepare('SELECT COUNT(*) as count FROM invoices WHERE store_id = ?').get(targetStoreId);
       var seq = (countRow ? countRow.count : 0) + 1;
       var invoiceNumber = `${store.invoice_prefix || ('INV-' + store.code)}-${year}-${String(seq).padStart(4, '0')}`;
 
-      // Check if duplicate exists (concurrency safety)
-      var checkDup = db.prepare('SELECT id FROM invoices WHERE invoice_number = ?').get(invoiceNumber);
+      var checkDup = await db.prepare('SELECT id FROM invoices WHERE invoice_number = ?').get(invoiceNumber);
       if (checkDup) {
         invoiceNumber = `${store.invoice_prefix || ('INV-' + store.code)}-${year}-${String(seq + 1).padStart(4, '0')}`;
       }
@@ -154,16 +151,17 @@ module.exports = function (db) {
       // 3. Calculate financial totals
       var subtotal = 0;
       var totalCost = 0;
-      items.forEach(function (itm) {
-        var inv = db.prepare('SELECT purchase_price, retail_price FROM store_inventory WHERE store_id = ? AND product_id = ?').get(targetStoreId, itm.product_id);
-        var unitPrice = itm.unit_price !== undefined ? parseFloat(itm.unit_price) : (inv ? inv.retail_price : 0);
-        var unitCost = inv ? inv.purchase_price : 0;
-        itm.unit_price = unitPrice;
-        itm.unit_cost = unitCost;
-        itm.total_price = unitPrice * itm.quantity;
-        subtotal += itm.total_price;
-        totalCost += unitCost * itm.quantity;
-      });
+      for (var k = 0; k < items.length; k++) {
+        var itmCalc = items[k];
+        var invCalc = await db.prepare('SELECT purchase_price, retail_price FROM store_inventory WHERE store_id = ? AND product_id = ?').get(targetStoreId, itmCalc.product_id);
+        var unitPrice = itmCalc.unit_price !== undefined ? parseFloat(itmCalc.unit_price) : (invCalc ? invCalc.retail_price : 0);
+        var unitCost = invCalc ? invCalc.purchase_price : 0;
+        itmCalc.unit_price = unitPrice;
+        itmCalc.unit_cost = unitCost;
+        itmCalc.total_price = unitPrice * itmCalc.quantity;
+        subtotal += itmCalc.total_price;
+        totalCost += unitCost * itmCalc.quantity;
+      }
 
       var disc = parseFloat(discount) || 0;
       var tx = parseFloat(tax) || 0;
@@ -173,72 +171,82 @@ module.exports = function (db) {
       var remaining = Math.max(0, totalAmount - paid);
       var pStatus = remaining <= 0 ? 'paid' : (paid > 0 ? 'partial' : 'unpaid');
 
-      // 4. Insert Invoice
-      var invResult = db.prepare(`
-        INSERT INTO invoices (
-          invoice_number, store_id, customer_id, customer_name, customer_phone,
-          payment_type, payment_status, subtotal, discount, tax, total_amount,
-          paid_amount, remaining_amount, total_cost, status, notes, created_by, created_by_name
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?)
-      `).run(
-        invoiceNumber, targetStoreId, customer_id || null, customer_name, customer_phone || '',
-        pType, pStatus, subtotal, disc, tx, totalAmount,
-        paid, remaining, totalCost, notes || '', req.user.id, req.user.name
-      );
+      var invoiceId = null;
 
-      var invoiceId = invResult.lastInsertRowid;
-
-      // 5. Insert Items & Deduct Stock from this store
-      var productSummaryArr = [];
-      items.forEach(function (itm) {
-        var prod = db.prepare('SELECT name FROM products WHERE id = ?').get(itm.product_id);
-        var prodName = prod ? prod.name : 'منتج';
-        productSummaryArr.push(prodName + ' (' + itm.quantity + ')');
-
-        db.prepare(`
-          INSERT INTO invoice_items (invoice_id, product_id, product_name, quantity, unit_price, unit_cost, total_price)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `).run(invoiceId, itm.product_id, prodName, itm.quantity, itm.unit_price, itm.unit_cost, itm.total_price);
-
-        // Deduct from store_inventory
-        var inv = db.prepare('SELECT id, stock_quantity FROM store_inventory WHERE store_id = ? AND product_id = ?').get(targetStoreId, itm.product_id);
-        var newQty = inv.stock_quantity - itm.quantity;
-        db.prepare("UPDATE store_inventory SET stock_quantity = ?, updated_at = datetime('now') WHERE id = ?").run(newQty, inv.id);
-
-        // Record in inventory ledger
-        db.prepare(`
-          INSERT INTO inventory_transactions (store_id, product_id, change_type, quantity, balance_after, reference_type, reference_id, user_id, user_name, notes)
-          VALUES (?, ?, 'sale', ?, ?, 'invoice', ?, ?, ?, ?)
+      // ATOMIC TRANSACTION EXECUTION
+      var executeSale = async function (ctx) {
+        var invResult = await ctx.prepare(`
+          INSERT INTO invoices (
+            invoice_number, store_id, customer_id, customer_name, customer_phone,
+            payment_type, payment_status, subtotal, discount, tax, total_amount,
+            paid_amount, remaining_amount, total_cost, status, notes, created_by, created_by_name
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?)
         `).run(
-          targetStoreId, itm.product_id, -itm.quantity, newQty, invoiceId, req.user.id, req.user.name,
-          `مبيعات فاتورة رقم ${invoiceNumber} للعميل ${customer_name}`
+          invoiceNumber, targetStoreId, customer_id || null, customer_name, customer_phone || '',
+          pType, pStatus, subtotal, disc, tx, totalAmount,
+          paid, remaining, totalCost, notes || '', req.user.id, req.user.name
         );
-      });
 
-      // 6. Bridge to legacy orders table so all legacy screens stay updated
-      var prodSummaryStr = productSummaryArr.join('، ');
-      db.prepare(`
-        INSERT INTO orders (customer_id, customer_name, phone, products, amount, status, notes, store_id, invoice_number)
-        VALUES (?, ?, ?, ?, ?, 'completed', ?, ?, ?)
-      `).run(customer_id || null, customer_name, customer_phone || '', prodSummaryStr, totalAmount, notes || '', targetStoreId, invoiceNumber);
+        invoiceId = invResult.lastInsertRowid;
 
-      // 7. Update customer statistics if customer exists
-      if (customer_id) {
-        db.prepare(`
-          UPDATE customers 
-          SET orders_count = orders_count + 1, total = total + ?
-          WHERE id = ?
-        `).run(totalAmount, customer_id);
+        var productSummaryArr = [];
+        for (var j = 0; j < items.length; j++) {
+          var itemObj = items[j];
+          var pData = await ctx.prepare('SELECT name FROM products WHERE id = ?').get(itemObj.product_id);
+          var pName = pData ? pData.name : 'منتج';
+          productSummaryArr.push(pName + ' (' + itemObj.quantity + ')');
+
+          await ctx.prepare(`
+            INSERT INTO invoice_items (invoice_id, product_id, product_name, quantity, unit_price, unit_cost, total_price)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+          `).run(invoiceId, itemObj.product_id, pName, itemObj.quantity, itemObj.unit_price, itemObj.unit_cost, itemObj.total_price);
+
+          // Deduct from store_inventory
+          var currentInv = await ctx.prepare('SELECT id, stock_quantity FROM store_inventory WHERE store_id = ? AND product_id = ?').get(targetStoreId, itemObj.product_id);
+          var newStock = currentInv.stock_quantity - itemObj.quantity;
+          await ctx.prepare("UPDATE store_inventory SET stock_quantity = ?, updated_at = datetime('now') WHERE id = ?").run(newStock, currentInv.id);
+
+          // Record in inventory ledger
+          await ctx.prepare(`
+            INSERT INTO inventory_transactions (store_id, product_id, change_type, quantity, balance_after, reference_type, reference_id, user_id, user_name, notes)
+            VALUES (?, ?, 'sale', ?, ?, 'invoice', ?, ?, ?, ?)
+          `).run(
+            targetStoreId, itemObj.product_id, -itemObj.quantity, newStock, invoiceId, req.user.id, req.user.name,
+            `مبيعات فاتورة رقم ${invoiceNumber} للعميل ${customer_name}`
+          );
+        }
+
+        // Bridge to orders table
+        var prodSummaryStr = productSummaryArr.join('، ');
+        await ctx.prepare(`
+          INSERT INTO orders (customer_id, customer_name, phone, products, amount, status, notes, store_id, invoice_number)
+          VALUES (?, ?, ?, ?, ?, 'completed', ?, ?, ?)
+        `).run(customer_id || null, customer_name, customer_phone || '', prodSummaryStr, totalAmount, notes || '', targetStoreId, invoiceNumber);
+
+        // Update customer total
+        if (customer_id) {
+          await ctx.prepare(`
+            UPDATE customers 
+            SET orders_count = orders_count + 1, total = total + ?
+            WHERE id = ?
+          `).run(totalAmount, customer_id);
+        }
+
+        // Log activity
+        await ctx.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
+          req.user.id, req.user.name, 'create_invoice', 'invoice', invoiceId,
+          JSON.stringify({ invoice_number: invoiceNumber, store_id: targetStoreId, amount: totalAmount })
+        );
+      };
+
+      if (typeof db.transaction === 'function') {
+        await db.transaction(executeSale);
+      } else {
+        await executeSale(db);
       }
 
-      // 8. Log activity
-      db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
-        req.user.id, req.user.name, 'create_invoice', 'invoice', invoiceId,
-        JSON.stringify({ invoice_number: invoiceNumber, store_id: targetStoreId, amount: totalAmount })
-      );
-
-      var fullInvoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(invoiceId);
-      fullInvoice.items = db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ?').all(invoiceId);
+      var fullInvoice = await db.prepare('SELECT * FROM invoices WHERE id = ?').get(invoiceId);
+      fullInvoice.items = await db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ?').all(invoiceId);
 
       res.status(201).json(fullInvoice);
     } catch (err) {
@@ -246,13 +254,12 @@ module.exports = function (db) {
     }
   });
 
-  // Sales return (مرتجع مبيعات وإعادة البضاعة لمخزون المحل الصحيح)
-  router.post('/:id/return', authenticateToken, requireRole('admin', 'store_manager'), function (req, res) {
+  // Sales return - ATOMIC TRANSACTION WITH AUTOMATIC ROLLBACK
+  router.post('/:id/return', authenticateToken, requireRole('admin', 'store_manager'), async function (req, res) {
     try {
-      var invoice = db.prepare('SELECT * FROM invoices WHERE id = ?').get(req.params.id);
+      var invoice = await db.prepare('SELECT * FROM invoices WHERE id = ?').get(req.params.id);
       if (!invoice) return res.status(404).json({ error: 'الفاتورة غير موجودة' });
 
-      // Check store access
       if (req.user.store_id && req.user.role !== 'admin' && req.user.store_id !== invoice.store_id) {
         return res.status(403).json({ error: 'غير مصرح بتسجيل مرتجع لمحل آخر' });
       }
@@ -263,54 +270,62 @@ module.exports = function (db) {
         return res.status(400).json({ error: 'قائمة الأصناف المرتجعة مطلوبة' });
       }
 
-      var countRow = db.prepare('SELECT COUNT(*) as count FROM sales_returns').get();
+      var countRow = await db.prepare('SELECT COUNT(*) as count FROM sales_returns').get();
       var seq = (countRow ? countRow.count : 0) + 1;
       var returnNumber = `RET-${invoice.store_id}-${new Date().getFullYear()}-${String(seq).padStart(4, '0')}`;
 
       var totalRefund = 0;
-      return_items.forEach(function (ri) {
-        var itm = db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ? AND product_id = ?').get(invoice.id, ri.product_id);
+      for (var rIdx = 0; rIdx < return_items.length; rIdx++) {
+        var ri = return_items[rIdx];
+        var itm = await db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ? AND product_id = ?').get(invoice.id, ri.product_id);
         if (itm) {
           totalRefund += itm.unit_price * ri.quantity;
         }
-      });
+      }
 
-      var retResult = db.prepare(`
-        INSERT INTO sales_returns (return_number, invoice_id, store_id, customer_id, refund_amount, reason, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        returnNumber, invoice.id, invoice.store_id, invoice.customer_id, totalRefund, reason || 'إرجاع بضاعة', req.user.id, req.user.name
-      );
+      var returnId = null;
 
-      var returnId = retResult.lastInsertRowid;
-
-      // Restore inventory in this store and log transaction
-      return_items.forEach(function (ri) {
-        var itm = db.prepare('SELECT * FROM invoice_items WHERE invoice_id = ? AND product_id = ?').get(invoice.id, ri.product_id);
-        if (!itm) return;
-
-        db.prepare(`
-          INSERT INTO sales_return_items (return_id, product_id, quantity, refund_price)
-          VALUES (?, ?, ?, ?)
-        `).run(returnId, ri.product_id, ri.quantity, itm.unit_price);
-
-        // Mark returned quantity on invoice item
-        db.prepare('UPDATE invoice_items SET returned_quantity = returned_quantity + ? WHERE id = ?').run(ri.quantity, itm.id);
-
-        // Restore stock in store_inventory
-        var inv = db.prepare('SELECT id, stock_quantity FROM store_inventory WHERE store_id = ? AND product_id = ?').get(invoice.store_id, ri.product_id);
-        var newQty = inv.stock_quantity + ri.quantity;
-        db.prepare("UPDATE store_inventory SET stock_quantity = ?, updated_at = datetime('now') WHERE id = ?").run(newQty, inv.id);
-
-        // Ledger entry
-        db.prepare(`
-          INSERT INTO inventory_transactions (store_id, product_id, change_type, quantity, balance_after, reference_type, reference_id, user_id, user_name, notes)
-          VALUES (?, ?, 'sale_return', ?, ?, 'sales_return', ?, ?, ?, ?)
+      var executeReturn = async function (ctx) {
+        var retResult = await ctx.prepare(`
+          INSERT INTO sales_returns (return_number, invoice_id, store_id, customer_id, refund_amount, reason, created_by, created_by_name)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-          invoice.store_id, ri.product_id, ri.quantity, newQty, returnId, req.user.id, req.user.name,
-          `مرتجع مبيعات رقم ${returnNumber} للفاتورة ${invoice.invoice_number}`
+          returnNumber, invoice.id, invoice.store_id, invoice.customer_id, totalRefund, reason || 'إرجاع بضاعة', req.user.id, req.user.name
         );
-      });
+
+        returnId = retResult.lastInsertRowid;
+
+        for (var j = 0; j < return_items.length; j++) {
+          var ri2 = return_items[j];
+          var itm2 = await ctx.prepare('SELECT * FROM invoice_items WHERE invoice_id = ? AND product_id = ?').get(invoice.id, ri2.product_id);
+          if (!itm2) continue;
+
+          await ctx.prepare(`
+            INSERT INTO sales_return_items (return_id, product_id, quantity, refund_price)
+            VALUES (?, ?, ?, ?)
+          `).run(returnId, ri2.product_id, ri2.quantity, itm2.unit_price);
+
+          await ctx.prepare('UPDATE invoice_items SET returned_quantity = returned_quantity + ? WHERE id = ?').run(ri2.quantity, itm2.id);
+
+          var inv = await ctx.prepare('SELECT id, stock_quantity FROM store_inventory WHERE store_id = ? AND product_id = ?').get(invoice.store_id, ri2.product_id);
+          var newQty = inv.stock_quantity + ri2.quantity;
+          await ctx.prepare("UPDATE store_inventory SET stock_quantity = ?, updated_at = datetime('now') WHERE id = ?").run(newQty, inv.id);
+
+          await ctx.prepare(`
+            INSERT INTO inventory_transactions (store_id, product_id, change_type, quantity, balance_after, reference_type, reference_id, user_id, user_name, notes)
+            VALUES (?, ?, 'sale_return', ?, ?, 'sales_return', ?, ?, ?, ?)
+          `).run(
+            invoice.store_id, ri2.product_id, ri2.quantity, newQty, returnId, req.user.id, req.user.name,
+            `مرتجع مبيعات رقم ${returnNumber} للفاتورة ${invoice.invoice_number}`
+          );
+        }
+      };
+
+      if (typeof db.transaction === 'function') {
+        await db.transaction(executeReturn);
+      } else {
+        await executeReturn(db);
+      }
 
       res.json({
         message: 'تم تسجيل المرتجع وإعادة الكميات لمخزون المحل بنجاح',

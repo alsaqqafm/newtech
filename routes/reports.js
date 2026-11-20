@@ -5,7 +5,7 @@ module.exports = function (db) {
   var router = express.Router();
 
   // Unified / Per-store Dashboard KPI summary from real database records
-  router.get('/dashboard', authenticateToken, requireStoreAccess, function (req, res) {
+  router.get('/dashboard', authenticateToken, requireStoreAccess, async function (req, res) {
     try {
       var storeId = req.query.store_id || req.user.store_id;
 
@@ -43,10 +43,10 @@ module.exports = function (db) {
         lowStockParams.push(req.query.store_id);
       }
 
-      var salesStats = db.prepare(salesQuery).get.apply(null, salesParams) || {};
-      var expensesStats = db.prepare(expensesQuery).get.apply(null, expensesParams) || {};
-      var invStats = db.prepare(invQuery).get.apply(null, invParams) || {};
-      var lowStockStats = db.prepare(lowStockQuery).get.apply(null, lowStockParams) || {};
+      var salesStats = (await db.prepare(salesQuery).get.apply(null, salesParams)) || {};
+      var expensesStats = (await db.prepare(expensesQuery).get.apply(null, expensesParams)) || {};
+      var invStats = (await db.prepare(invQuery).get.apply(null, invParams)) || {};
+      var lowStockStats = (await db.prepare(lowStockQuery).get.apply(null, lowStockParams)) || {};
 
       var totalSales = salesStats.total_sales || 0;
       var totalCost = salesStats.total_cost || 0;
@@ -55,7 +55,7 @@ module.exports = function (db) {
       var netProfit = grossProfit - totalExpenses;
 
       // Per-store breakdown (for Admin or multi-store comparison)
-      var storesBreakdown = db.prepare(`
+      var rawStores = await db.prepare(`
         SELECT 
           s.id,
           s.name,
@@ -68,7 +68,9 @@ module.exports = function (db) {
           COALESCE((SELECT SUM(stock_quantity * purchase_price) FROM store_inventory WHERE store_id = s.id), 0) as inventory_value
         FROM stores s
         ORDER BY s.id ASC
-      `).all().map(function (sb) {
+      `).all();
+
+      var storesBreakdown = rawStores.map(function (sb) {
         var gp = sb.sales - sb.cogs;
         return Object.assign({}, sb, {
           gross_profit: gp,
@@ -99,10 +101,11 @@ module.exports = function (db) {
         topParams.push(req.query.store_id);
       }
       topProductsQuery += ' GROUP BY ii.product_id ORDER BY total_sold DESC LIMIT 6';
-      var topProducts = db.prepare(topProductsQuery).all.apply(null, topParams);
+      var topProducts = await db.prepare(topProductsQuery).all.apply(null, topParams);
 
-      // Recent transfers count & list
-      var transfersCount = db.prepare("SELECT COUNT(*) as count FROM stock_transfers").get().count;
+      // Recent transfers count
+      var transfersCountRow = await db.prepare("SELECT COUNT(*) as count FROM stock_transfers").get();
+      var transfersCount = transfersCountRow ? transfersCountRow.count : 0;
 
       res.json({
         totalSales: totalSales,
@@ -127,7 +130,7 @@ module.exports = function (db) {
   });
 
   // Sales Trends & Analytics
-  router.get('/sales', authenticateToken, requireStoreAccess, function (req, res) {
+  router.get('/sales', authenticateToken, requireStoreAccess, async function (req, res) {
     try {
       var storeId = req.query.store_id || req.user.store_id;
       var query = `
@@ -151,7 +154,8 @@ module.exports = function (db) {
       }
       query += " GROUP BY strftime('%Y-%m', inv.created_at) ORDER BY month DESC LIMIT 12";
 
-      var salesReport = db.prepare(query).all.apply(null, params).map(function (m) {
+      var rows = await db.prepare(query).all.apply(null, params);
+      var salesReport = rows.map(function (m) {
         return Object.assign({}, m, {
           gross_profit: m.total_sales - m.total_cost
         });

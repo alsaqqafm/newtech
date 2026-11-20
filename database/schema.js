@@ -682,56 +682,80 @@ var OFFICIAL_10_PRODUCTS = [
 
 function syncOfficialProducts(db) {
   try { db.exec("ALTER TABLE products ADD COLUMN name_en TEXT"); } catch(e) {}
-  try { db.exec("ALTER TABLE products ADD COLUMN description_en TEXT"); } catch(e) {}
-  try { db.exec("ALTER TABLE products ADD COLUMN manufacturer TEXT"); } catch(e) {}
+  // Safe schema column additions (idempotent)
+  if (typeof db.exec === 'function') {
+    try {
+      var p1 = db.exec("ALTER TABLE products ADD COLUMN name_en TEXT");
+      if (p1 && typeof p1.catch === 'function') p1.catch(function(){});
+    } catch(e) {}
+    try {
+      var p2 = db.exec("ALTER TABLE products ADD COLUMN description_en TEXT");
+      if (p2 && typeof p2.catch === 'function') p2.catch(function(){});
+    } catch(e) {}
+    try {
+      var p3 = db.exec("ALTER TABLE products ADD COLUMN manufacturer TEXT");
+      if (p3 && typeof p3.catch === 'function') p3.catch(function(){});
+    } catch(e) {}
+  }
 
-  // Clear image field for all official products (IDs 1-10) and deactivate test data
-  try { db.exec("UPDATE products SET image = '' WHERE id <= 10"); } catch(e) {}
-  try { db.exec("UPDATE products SET active = 0 WHERE (name = 'ieie' OR (name_en IS NULL AND id > 10))"); } catch(e) {}
-
+  // PROTECTION: Never clear existing product images or overwrite user modifications!
+  // Only insert baseline products if they do NOT exist at all.
   OFFICIAL_10_PRODUCTS.forEach(function (p) {
-    var existing = db.prepare(`
-      SELECT id FROM products 
-      WHERE model = ? 
-         OR name = ? 
-         OR name = ?
-         OR name_en = ?
-      LIMIT 1
-    `).get(p.model, p.name, p.name_ar, p.name_en);
+    var existing = null;
+    try {
+      existing = db.prepare(`
+        SELECT id FROM products 
+        WHERE model = ? 
+           OR name = ? 
+           OR name = ?
+           OR name_en = ?
+        LIMIT 1
+      `).get(p.model, p.name, p.name_ar, p.name_en);
+    } catch(err) {
+      existing = null;
+    }
 
-    if (existing) {
-      db.prepare(`
-        UPDATE products 
-        SET name = ?, name_en = ?, model = ?, category = ?, description = ?, description_en = ?, 
-            image = '', agent = ?, manufacturer = ?, keywords = ?, features = ?, price = ?, stock = ?, active = 1
-        WHERE id = ?
-      `).run(
-        p.name, p.name_en, p.model, p.category, p.description, p.description_en,
-        p.company, p.company, p.keywords, p.features, p.price, p.stock, existing.id
-      );
-    } else {
-      var res = db.prepare(`
-        INSERT INTO products (name, name_en, model, category, description, description_en, image, agent, manufacturer, price, stock, status, features, keywords, active)
-        VALUES (?, ?, ?, ?, ?, ?, '', ?, ?, ?, ?, ?, ?, ?, 1)
-      `).run(
-        p.name, p.name_en, p.model, p.category, p.description, p.description_en,
-        p.company, p.company, p.price, p.stock, p.status, p.features, p.keywords
-      );
-      var newId = res.lastInsertRowid;
-      var stores = db.prepare('SELECT id FROM stores').all();
-      stores.forEach(function (s) {
-        db.prepare(`
-          INSERT OR IGNORE INTO store_inventory (store_id, product_id, stock_quantity, min_stock_alert, purchase_price, wholesale_price, retail_price, unit)
-          VALUES (?, ?, 0, 5, 0, 0, 0, 'قطعة')
-        `).run(s.id, newId);
-      });
+    if (!existing) {
+      // Only insert foundational products that do not exist yet
+      try {
+        var res = db.prepare(`
+          INSERT INTO products (name, name_en, model, category, description, description_en, image, agent, manufacturer, price, stock, status, features, keywords, active)
+          VALUES (?, ?, ?, ?, ?, ?, '', ?, ?, ?, ?, ?, ?, ?, 1)
+        `).run(
+          p.name, p.name_en, p.model, p.category, p.description, p.description_en,
+          p.company, p.company, p.price, p.stock, p.status, p.features, p.keywords
+        );
+        var newId = res ? res.lastInsertRowid : 0;
+        if (newId) {
+          var stores = db.prepare('SELECT id FROM stores').all();
+          if (Array.isArray(stores)) {
+            stores.forEach(function (s) {
+              try {
+                db.prepare(`
+                  INSERT OR IGNORE INTO store_inventory (store_id, product_id, stock_quantity, min_stock_alert, purchase_price, wholesale_price, retail_price, unit)
+                  VALUES (?, ?, 0, 5, 0, 0, 0, 'قطعة')
+                `).run(s.id, newId);
+              } catch(e) {}
+            });
+          }
+        }
+      } catch (insertErr) {
+        console.warn('[Sync] Note on product insert:', insertErr.message);
+      }
     }
   });
 
-  db.save();
+  if (typeof db.save === 'function') {
+    db.save();
+  }
 }
 
 function getDatabase() {
+  if (process.env.TURSO_DATABASE_URL) {
+    var { getTursoDatabase } = require('./turso');
+    return getTursoDatabase();
+  }
+
   var fileData = null;
   try {
     if (fs.existsSync(DB_PATH)) {

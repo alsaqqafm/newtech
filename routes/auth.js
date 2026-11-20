@@ -6,14 +6,14 @@ var { authenticateToken, JWT_SECRET, JWT_EXPIRES } = require('../middleware/auth
 module.exports = function (db) {
   var router = express.Router();
 
-  router.post('/login', function (req, res) {
+  router.post('/login', async function (req, res) {
     try {
       var { username, password } = req.body;
       if (!username || !password) {
         return res.status(400).json({ error: 'Username and password required' });
       }
 
-      var user = db.prepare('SELECT * FROM users WHERE email = ? OR name = ?').get(username, username);
+      var user = await db.prepare('SELECT * FROM users WHERE email = ? OR name = ?').get(username, username);
 
       if (!user) {
         return res.status(401).json({ error: 'Invalid credentials' });
@@ -24,7 +24,7 @@ module.exports = function (db) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
-      var store = user.store_id ? db.prepare('SELECT id, name, code FROM stores WHERE id = ?').get(user.store_id) : null;
+      var store = user.store_id ? await db.prepare('SELECT id, name, code FROM stores WHERE id = ?').get(user.store_id) : null;
 
       var permissions = {
         all_stores: user.role === 'admin' || !user.store_id,
@@ -51,11 +51,11 @@ module.exports = function (db) {
         { expiresIn: JWT_EXPIRES }
       );
 
-      db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id) VALUES (?, ?, ?, ?, ?)').run(
+      await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id) VALUES (?, ?, ?, ?, ?)').run(
         user.id, user.name, 'login', 'user', user.id
       );
 
-      db.prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(user.id);
+      await db.prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(user.id);
 
       res.json({
         token: token,
@@ -77,7 +77,7 @@ module.exports = function (db) {
     }
   });
 
-  router.put('/profile', authenticateToken, function (req, res) {
+  router.put('/profile', authenticateToken, async function (req, res) {
     try {
       var authHeader = req.headers['authorization'];
       var token = authHeader && authHeader.split(' ')[1];
@@ -86,13 +86,13 @@ module.exports = function (db) {
       var { name, email } = req.body;
       if (!name || !email) return res.status(400).json({ error: 'الاسم والبريد الإلكتروني مطلوبان' });
 
-      var existing = db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, decoded.id);
+      var existing = await db.prepare('SELECT id FROM users WHERE email = ? AND id != ?').get(email, decoded.id);
       if (existing) return res.status(400).json({ error: 'البريد الإلكتروني مستخدم من قبل' });
 
-      db.prepare('UPDATE users SET name = ?, email = ? WHERE id = ?').run(name, email, decoded.id);
-      var user = db.prepare('SELECT id, name, email, role, status, created_at, last_login FROM users WHERE id = ?').get(decoded.id);
+      await db.prepare('UPDATE users SET name = ?, email = ? WHERE id = ?').run(name, email, decoded.id);
+      var user = await db.prepare('SELECT id, name, email, role, status, created_at, last_login FROM users WHERE id = ?').get(decoded.id);
 
-      db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id) VALUES (?, ?, ?, ?, ?)').run(
+      await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id) VALUES (?, ?, ?, ?, ?)').run(
         decoded.id, name, 'update', 'profile', decoded.id
       );
 
@@ -102,7 +102,7 @@ module.exports = function (db) {
     }
   });
 
-  router.put('/profile/password', authenticateToken, function (req, res) {
+  router.put('/profile/password', authenticateToken, async function (req, res) {
     try {
       var authHeader = req.headers['authorization'];
       var token = authHeader && authHeader.split(' ')[1];
@@ -116,7 +116,7 @@ module.exports = function (db) {
         return res.status(400).json({ error: 'كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل' });
       }
 
-      var user = db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.id);
+      var user = await db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.id);
       if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
 
       var valid = bcrypt.compareSync(currentPassword, user.password);
@@ -124,9 +124,9 @@ module.exports = function (db) {
 
       var salt = bcrypt.genSaltSync(10);
       var hashed = bcrypt.hashSync(newPassword, salt);
-      db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashed, decoded.id);
+      await db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashed, decoded.id);
 
-      db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id) VALUES (?, ?, ?, ?, ?)').run(
+      await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id) VALUES (?, ?, ?, ?, ?)').run(
         decoded.id, user.name, 'update', 'password', decoded.id
       );
 
@@ -136,31 +136,31 @@ module.exports = function (db) {
     }
   });
 
-  router.put('/profile/avatar', authenticateToken, function (req, res) {
+  router.put('/profile/avatar', authenticateToken, async function (req, res) {
     try {
       var authHeader = req.headers['authorization'];
       var token = authHeader && authHeader.split(' ')[1];
       var decoded = jwt.verify(token, JWT_SECRET);
 
       var { avatar } = req.body;
-      db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(avatar || '', decoded.id);
+      await db.prepare('UPDATE users SET avatar = ? WHERE id = ?').run(avatar || '', decoded.id);
       res.json({ message: 'Avatar updated' });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  router.get('/me', function (req, res) {
+  router.get('/me', async function (req, res) {
     var authHeader = req.headers['authorization'];
     var token = authHeader && authHeader.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'No token' });
 
     try {
       var decoded = jwt.verify(token, JWT_SECRET);
-      var user = db.prepare('SELECT id, name, email, role, status, created_at, last_login, store_id FROM users WHERE id = ?').get(decoded.id);
+      var user = await db.prepare('SELECT id, name, email, role, status, created_at, last_login, store_id FROM users WHERE id = ?').get(decoded.id);
       if (!user) return res.status(401).json({ error: 'User not found' });
 
-      var store = user.store_id ? db.prepare('SELECT id, name, code FROM stores WHERE id = ?').get(user.store_id) : null;
+      var store = user.store_id ? await db.prepare('SELECT id, name, code FROM stores WHERE id = ?').get(user.store_id) : null;
 
       var permissions = {
         all_stores: user.role === 'admin' || !user.store_id,

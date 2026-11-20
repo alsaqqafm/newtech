@@ -73,7 +73,7 @@ async function setup() {
 
   try {
     var { applyPhaseBMigration } = require('../database/migration_phase_b');
-    applyPhaseBMigration(db);
+    await applyPhaseBMigration(db);
   } catch (e) {}
 
   app.use('/api', require('../routes/auth')(db));
@@ -90,19 +90,19 @@ async function setup() {
   app.use('/api/finances', require('../routes/finances')(db));
   app.use('/api/reports', require('../routes/reports')(db));
 
-  app.get('/api/all', function (req, res) {
+  app.get('/api/all', async function (req, res) {
     try {
       var storeId = req.query.store_id;
       var data = {
-        stores: db.prepare('SELECT * FROM stores ORDER BY id ASC').all(),
-        products: db.prepare('SELECT * FROM products ORDER BY id DESC').all(),
+        stores: await db.prepare('SELECT * FROM stores ORDER BY id ASC').all(),
+        products: await db.prepare('SELECT * FROM products ORDER BY id DESC').all(),
         orders: storeId
-          ? db.prepare('SELECT * FROM orders WHERE store_id = ? ORDER BY id DESC').all(storeId)
-          : db.prepare('SELECT * FROM orders ORDER BY id DESC').all(),
-        customers: db.prepare('SELECT * FROM customers ORDER BY id DESC').all(),
-        partners: db.prepare('SELECT * FROM partners ORDER BY id DESC').all(),
-        quotes: db.prepare('SELECT * FROM quotes ORDER BY id DESC').all(),
-        users: db.prepare('SELECT id, name, email, role, status, store_id, created_at, last_login FROM users ORDER BY id DESC').all()
+          ? await db.prepare('SELECT * FROM orders WHERE store_id = ? ORDER BY id DESC').all(storeId)
+          : await db.prepare('SELECT * FROM orders ORDER BY id DESC').all(),
+        customers: await db.prepare('SELECT * FROM customers ORDER BY id DESC').all(),
+        partners: await db.prepare('SELECT * FROM partners ORDER BY id DESC').all(),
+        quotes: await db.prepare('SELECT * FROM quotes ORDER BY id DESC').all(),
+        users: await db.prepare('SELECT id, name, email, role, status, store_id, created_at, last_login FROM users ORDER BY id DESC').all()
       };
       res.json(data);
     } catch (err) {
@@ -110,22 +110,31 @@ async function setup() {
     }
   });
 
-  app.get('/api/stats', function (req, res) {
+  app.get('/api/stats', async function (req, res) {
     try {
       var storeId = req.query.store_id;
+      var prodCount = await db.prepare('SELECT COUNT(*) as count FROM products').get();
+      var orderCount = storeId
+        ? await db.prepare('SELECT COUNT(*) as count FROM orders WHERE store_id = ?').get(storeId)
+        : await db.prepare('SELECT COUNT(*) as count FROM orders').get();
+      var custCount = await db.prepare('SELECT COUNT(*) as count FROM customers').get();
+      var quoteCount = await db.prepare('SELECT COUNT(*) as count FROM quotes').get();
+      var partnerCount = await db.prepare('SELECT COUNT(*) as count FROM partners').get();
+      var storeCount = await db.prepare('SELECT COUNT(*) as count FROM stores').get();
+      var pendingOrder = storeId
+        ? await db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'قيد الانتظار' AND store_id = ?").get(storeId)
+        : await db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'قيد الانتظار'").get();
+      var pendingQuote = await db.prepare("SELECT COUNT(*) as count FROM quotes WHERE status = 'قيد الانتظار'").get();
+
       var stats = {
-        totalProducts: db.prepare('SELECT COUNT(*) as count FROM products').get().count,
-        totalOrders: storeId
-          ? db.prepare('SELECT COUNT(*) as count FROM orders WHERE store_id = ?').get(storeId).count
-          : db.prepare('SELECT COUNT(*) as count FROM orders').get().count,
-        totalCustomers: db.prepare('SELECT COUNT(*) as count FROM customers').get().count,
-        totalQuotes: db.prepare('SELECT COUNT(*) as count FROM quotes').get().count,
-        totalPartners: db.prepare('SELECT COUNT(*) as count FROM partners').get().count,
-        totalStores: db.prepare('SELECT COUNT(*) as count FROM stores').get().count,
-        pendingOrders: storeId
-          ? db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'قيد الانتظار' AND store_id = ?").get(storeId).count
-          : db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'قيد الانتظار'").get().count,
-        pendingQuotes: db.prepare("SELECT COUNT(*) as count FROM quotes WHERE status = 'قيد الانتظار'").get().count
+        totalProducts: prodCount ? prodCount.count : 0,
+        totalOrders: orderCount ? orderCount.count : 0,
+        totalCustomers: custCount ? custCount.count : 0,
+        totalQuotes: quoteCount ? quoteCount.count : 0,
+        totalPartners: partnerCount ? partnerCount.count : 0,
+        totalStores: storeCount ? storeCount.count : 0,
+        pendingOrders: pendingOrder ? pendingOrder.count : 0,
+        pendingQuotes: pendingQuote ? pendingQuote.count : 0
       };
       res.json(stats);
     } catch (err) {
@@ -133,9 +142,9 @@ async function setup() {
     }
   });
 
-  app.get('/api/logs', function (req, res) {
+  app.get('/api/logs', async function (req, res) {
     try {
-      var logs = db.prepare('SELECT * FROM activity_logs ORDER BY id DESC LIMIT 100').all();
+      var logs = await db.prepare('SELECT * FROM activity_log ORDER BY id DESC LIMIT 100').all();
       res.json(logs);
     } catch (err) {
       res.status(500).json({ error: err.message });

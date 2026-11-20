@@ -5,9 +5,9 @@ var { authenticateToken, requireRole } = require('../middleware/auth');
 module.exports = function (db) {
   var router = express.Router();
 
-  router.get('/', authenticateToken, requireRole('admin'), function (req, res) {
+  router.get('/', authenticateToken, requireRole('admin'), async function (req, res) {
     try {
-      var users = db.prepare(`
+      var users = await db.prepare(`
         SELECT 
           u.id, u.name, u.email, u.role, u.status, u.created_at, u.last_login, u.store_id,
           s.name as store_name, s.code as store_code
@@ -21,9 +21,9 @@ module.exports = function (db) {
     }
   });
 
-  router.get('/:id', authenticateToken, requireRole('admin'), function (req, res) {
+  router.get('/:id', authenticateToken, requireRole('admin'), async function (req, res) {
     try {
-      var user = db.prepare(`
+      var user = await db.prepare(`
         SELECT 
           u.id, u.name, u.email, u.role, u.status, u.created_at, u.last_login, u.store_id,
           s.name as store_name, s.code as store_code
@@ -38,40 +38,39 @@ module.exports = function (db) {
     }
   });
 
-  router.post('/', authenticateToken, requireRole('admin'), function (req, res) {
+  router.post('/', authenticateToken, requireRole('admin'), async function (req, res) {
     try {
       var { name, email, password, role, status, store_id } = req.body;
       if (!name || !email || !password) {
         return res.status(400).json({ error: 'الاسم والبريد الإلكتروني وكلمة المرور مطلوبة' });
       }
 
-      var existing = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+      var existing = await db.prepare('SELECT id FROM users WHERE email = ?').get(email);
       if (existing) {
         return res.status(400).json({ error: 'البريد الإلكتروني مستخدم بالفعل' });
       }
 
       var salt = bcrypt.genSaltSync(10);
       var hashedPassword = bcrypt.hashSync(password, salt);
-
       var assignedStoreId = (role === 'admin' || !store_id) ? null : parseInt(store_id);
 
-      var result = db.prepare(`
+      var result = await db.prepare(`
         INSERT INTO users (name, email, password, role, status, store_id)
         VALUES (?, ?, ?, ?, ?, ?)
       `).run(
         name, email, hashedPassword, role || 'editor', status || 'active', assignedStoreId
       );
 
-      var user = db.prepare('SELECT id, name, email, role, status, store_id, created_at, last_login FROM users WHERE id = ?').get(result.lastInsertRowid);
+      var user = await db.prepare('SELECT id, name, email, role, status, store_id, created_at, last_login FROM users WHERE id = ?').get(result.lastInsertRowid);
       res.status(201).json(user);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  router.put('/:id', authenticateToken, requireRole('admin'), function (req, res) {
+  router.put('/:id', authenticateToken, requireRole('admin'), async function (req, res) {
     try {
-      var existing = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
+      var existing = await db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
       if (!existing) return res.status(404).json({ error: 'المستخدم غير موجود' });
 
       var { name, email, password, role, status, store_id } = req.body;
@@ -82,7 +81,7 @@ module.exports = function (db) {
       if (password) {
         var salt = bcrypt.genSaltSync(10);
         var hashedPassword = bcrypt.hashSync(password, salt);
-        db.prepare('UPDATE users SET name = ?, email = ?, password = ?, role = ?, status = ?, store_id = ? WHERE id = ?').run(
+        await db.prepare('UPDATE users SET name = ?, email = ?, password = ?, role = ?, status = ?, store_id = ? WHERE id = ?').run(
           name || existing.name,
           email || existing.email,
           hashedPassword,
@@ -92,7 +91,7 @@ module.exports = function (db) {
           req.params.id
         );
       } else {
-        db.prepare('UPDATE users SET name = ?, email = ?, role = ?, status = ?, store_id = ? WHERE id = ?').run(
+        await db.prepare('UPDATE users SET name = ?, email = ?, role = ?, status = ?, store_id = ? WHERE id = ?').run(
           name || existing.name,
           email || existing.email,
           newRole,
@@ -102,27 +101,27 @@ module.exports = function (db) {
         );
       }
 
-      var user = db.prepare('SELECT id, name, email, role, status, store_id, created_at, last_login FROM users WHERE id = ?').get(req.params.id);
+      var user = await db.prepare('SELECT id, name, email, role, status, store_id, created_at, last_login FROM users WHERE id = ?').get(req.params.id);
       res.json(user);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  router.patch('/:id/toggle', authenticateToken, requireRole('admin'), function (req, res) {
+  router.patch('/:id/toggle', authenticateToken, requireRole('admin'), async function (req, res) {
     try {
-      var user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
+      var user = await db.prepare('SELECT * FROM users WHERE id = ?').get(req.params.id);
       if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
 
       if (user.role === 'admin' && user.status === 'active') {
-        var activeAdminCount = db.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'admin' AND status = 'active'").get().count;
-        if (activeAdminCount <= 1) {
+        var activeAdminCountRes = await db.prepare("SELECT COUNT(*) as count FROM users WHERE role = 'admin' AND status = 'active'").get();
+        if (activeAdminCountRes.count <= 1) {
           return res.status(400).json({ error: 'لا يمكن تعطيل آخر مسؤول نظام نشط' });
         }
       }
 
       var newStatus = user.status === 'active' ? 'inactive' : 'active';
-      db.prepare("UPDATE users SET status = ? WHERE id = ?").run(newStatus, req.params.id);
+      await db.prepare("UPDATE users SET status = ? WHERE id = ?").run(newStatus, req.params.id);
 
       res.json({ message: newStatus === 'active' ? 'تم تفعيل المستخدم' : 'تم تعطيل المستخدم', status: newStatus });
     } catch (err) {

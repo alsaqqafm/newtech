@@ -4,18 +4,18 @@ var { authenticateToken } = require('../middleware/auth');
 module.exports = function (db) {
   var router = express.Router();
 
-  router.get('/', function (req, res) {
+  router.get('/', async function (req, res) {
     try {
-      var partners = db.prepare('SELECT * FROM partners ORDER BY id DESC').all();
+      var partners = await db.prepare('SELECT * FROM partners ORDER BY id DESC').all();
       res.json(partners);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  router.get('/:id', function (req, res) {
+  router.get('/:id', async function (req, res) {
     try {
-      var partner = db.prepare('SELECT * FROM partners WHERE id = ?').get(req.params.id);
+      var partner = await db.prepare('SELECT * FROM partners WHERE id = ?').get(req.params.id);
       if (!partner) return res.status(404).json({ error: 'Partner not found' });
       res.json(partner);
     } catch (err) {
@@ -23,30 +23,30 @@ module.exports = function (db) {
     }
   });
 
-  router.post('/', authenticateToken, function (req, res) {
+  router.post('/', authenticateToken, async function (req, res) {
     try {
       var { name, country, specialty, description, phone, email, address, notes, status } = req.body;
       if (!name) return res.status(400).json({ error: 'Name is required' });
 
-      var result = db.prepare('INSERT INTO partners (name, country, specialty, description, phone, email, address, notes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
+      var result = await db.prepare('INSERT INTO partners (name, country, specialty, description, phone, email, address, notes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').run(
         name, country || '', specialty || '', description || '', phone || '', email || '', address || '', notes || '', status || 'active'
       );
 
-      var partner = db.prepare('SELECT * FROM partners WHERE id = ?').get(result.lastInsertRowid);
+      var partner = await db.prepare('SELECT * FROM partners WHERE id = ?').get(result.lastInsertRowid);
       res.status(201).json(partner);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  router.put('/:id', authenticateToken, function (req, res) {
+  router.put('/:id', authenticateToken, async function (req, res) {
     try {
-      var existing = db.prepare('SELECT * FROM partners WHERE id = ?').get(req.params.id);
+      var existing = await db.prepare('SELECT * FROM partners WHERE id = ?').get(req.params.id);
       if (!existing) return res.status(404).json({ error: 'Partner not found' });
 
       var { name, country, specialty, description, phone, email, address, notes, status } = req.body;
 
-      db.prepare('UPDATE partners SET name = ?, country = ?, specialty = ?, description = ?, phone = ?, email = ?, address = ?, notes = ?, status = ? WHERE id = ?').run(
+      await db.prepare('UPDATE partners SET name = ?, country = ?, specialty = ?, description = ?, phone = ?, email = ?, address = ?, notes = ?, status = ? WHERE id = ?').run(
         name || existing.name,
         country !== undefined ? country : existing.country,
         specialty !== undefined ? specialty : existing.specialty,
@@ -59,20 +59,20 @@ module.exports = function (db) {
         req.params.id
       );
 
-      var partner = db.prepare('SELECT * FROM partners WHERE id = ?').get(req.params.id);
+      var partner = await db.prepare('SELECT * FROM partners WHERE id = ?').get(req.params.id);
       res.json(partner);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  router.patch('/:id/toggle', authenticateToken, function (req, res) {
+  router.patch('/:id/toggle', authenticateToken, async function (req, res) {
     try {
-      var partner = db.prepare('SELECT * FROM partners WHERE id = ?').get(req.params.id);
+      var partner = await db.prepare('SELECT * FROM partners WHERE id = ?').get(req.params.id);
       if (!partner) return res.status(404).json({ error: 'Partner not found' });
 
       var newStatus = partner.status === 'active' ? 'inactive' : 'active';
-      db.prepare("UPDATE partners SET status = ? WHERE id = ?").run(newStatus, req.params.id);
+      await db.prepare("UPDATE partners SET status = ? WHERE id = ?").run(newStatus, req.params.id);
 
       res.json({ message: newStatus === 'active' ? 'Partner activated' : 'Partner deactivated', status: newStatus });
     } catch (err) {

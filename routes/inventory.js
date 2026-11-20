@@ -5,16 +5,15 @@ module.exports = function (db) {
   var router = express.Router();
 
   // Get inventory for a specific store
-  router.get('/', authenticateToken, requireStoreAccess, function (req, res) {
+  router.get('/', authenticateToken, requireStoreAccess, async function (req, res) {
     try {
       var storeId = req.query.store_id || (req.user.store_id ? req.user.store_id : 1);
 
-      // Verify user has access to this store
       if (req.user.store_id && String(req.user.store_id) !== String(storeId) && req.user.role !== 'admin') {
         return res.status(403).json({ error: 'غير مصرح لك بالوصول لمخزون هذا المحل' });
       }
 
-      var items = db.prepare(`
+      var items = await db.prepare(`
         SELECT 
           si.id,
           si.store_id,
@@ -54,7 +53,7 @@ module.exports = function (db) {
   });
 
   // Get low stock alerts for store
-  router.get('/alerts', authenticateToken, requireStoreAccess, function (req, res) {
+  router.get('/alerts', authenticateToken, requireStoreAccess, async function (req, res) {
     try {
       var storeId = req.query.store_id || req.user.store_id;
       var query = `
@@ -77,7 +76,7 @@ module.exports = function (db) {
         params.push(storeId);
       }
       query += ' ORDER BY si.stock_quantity ASC';
-      var alerts = db.prepare(query).all.apply(null, params);
+      var alerts = await db.prepare(query).all.apply(null, params);
       res.json(alerts);
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -85,7 +84,7 @@ module.exports = function (db) {
   });
 
   // Get inventory movement transactions ledger
-  router.get('/transactions', authenticateToken, requireStoreAccess, function (req, res) {
+  router.get('/transactions', authenticateToken, requireStoreAccess, async function (req, res) {
     try {
       var storeId = req.query.store_id || req.user.store_id;
       var productId = req.query.product_id;
@@ -96,7 +95,6 @@ module.exports = function (db) {
       var params = [];
 
       if (storeId) {
-        // Enforce store isolation
         if (req.user.store_id && String(req.user.store_id) !== String(storeId) && req.user.role !== 'admin') {
           return res.status(403).json({ error: 'غير مصرح بالاطلاع على حركات هذا المحل' });
         }
@@ -118,7 +116,7 @@ module.exports = function (db) {
 
       var whereSql = whereClauses.length > 0 ? 'WHERE ' + whereClauses.join(' AND ') : '';
 
-      var transactions = db.prepare(`
+      var transactions = await db.prepare(`
         SELECT 
           it.*,
           s.name as store_name,
@@ -140,19 +138,18 @@ module.exports = function (db) {
   });
 
   // Update inventory pricing / unit / batch / expiry
-  router.put('/:id', authenticateToken, requireRole('admin', 'store_manager', 'inventory'), function (req, res) {
+  router.put('/:id', authenticateToken, requireRole('admin', 'store_manager', 'inventory'), async function (req, res) {
     try {
-      var item = db.prepare('SELECT * FROM store_inventory WHERE id = ?').get(req.params.id);
+      var item = await db.prepare('SELECT * FROM store_inventory WHERE id = ?').get(req.params.id);
       if (!item) return res.status(404).json({ error: 'سجل المخزون غير موجود' });
 
-      // Check store access
       if (req.user.store_id && req.user.store_id !== item.store_id && req.user.role !== 'admin') {
         return res.status(403).json({ error: 'غير مصرح بتعديل مخزون هذا المحل' });
       }
 
       var { min_stock_alert, purchase_price, wholesale_price, retail_price, batch_number, expiry_date, unit } = req.body;
 
-      db.prepare(`
+      await db.prepare(`
         UPDATE store_inventory
         SET min_stock_alert = ?, purchase_price = ?, wholesale_price = ?, retail_price = ?, batch_number = ?, expiry_date = ?, unit = ?, updated_at = datetime('now')
         WHERE id = ?
@@ -167,15 +164,15 @@ module.exports = function (db) {
         req.params.id
       );
 
-      var updated = db.prepare('SELECT * FROM store_inventory WHERE id = ?').get(req.params.id);
+      var updated = await db.prepare('SELECT * FROM store_inventory WHERE id = ?').get(req.params.id);
       res.json(updated);
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
   });
 
-  // Physical stocktaking adjustment (تسوية الجرد)
-  router.post('/adjust', authenticateToken, requireRole('admin', 'store_manager', 'inventory'), function (req, res) {
+  // Physical stocktaking adjustment (تسوية الجرد) - ATOMIC TRANSACTION
+  router.post('/adjust', authenticateToken, requireRole('admin', 'store_manager', 'inventory'), async function (req, res) {
     try {
       var store_id = req.body.store_id;
       var product_id = req.body.product_id;
@@ -189,31 +186,36 @@ module.exports = function (db) {
         return res.status(403).json({ error: 'غير مصرح لك بإجراء تسوية جرد لهذا المحل' });
       }
 
-      var inv = db.prepare('SELECT * FROM store_inventory WHERE store_id = ? AND product_id = ?').get(store_id, product_id);
+      var inv = await db.prepare('SELECT * FROM store_inventory WHERE store_id = ? AND product_id = ?').get(store_id, product_id);
       if (!inv) return res.status(404).json({ error: 'المنتج غير معرف في مخزون هذا المحل' });
 
       var systemQty = inv.stock_quantity;
       var difference = actual_quantity - systemQty;
 
-      // Update actual stock
-      db.prepare("UPDATE store_inventory SET stock_quantity = ?, updated_at = datetime('now') WHERE id = ?").run(actual_quantity, inv.id);
+      var executeAdjustment = async function(ctx) {
+        await ctx.prepare("UPDATE store_inventory SET stock_quantity = ?, updated_at = datetime('now') WHERE id = ?").run(actual_quantity, inv.id);
 
-      // Record in stock adjustments
-      var adjResult = db.prepare(`
-        INSERT INTO stock_adjustments (store_id, product_id, system_quantity, actual_quantity, difference, reason, created_by, created_by_name)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        store_id, product_id, systemQty, actual_quantity, difference, reason || 'تسوية جرد دوري', req.user.id, req.user.name
-      );
+        var adjResult = await ctx.prepare(`
+          INSERT INTO stock_adjustments (store_id, product_id, system_quantity, actual_quantity, difference, reason, created_by, created_by_name)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          store_id, product_id, systemQty, actual_quantity, difference, reason || 'تسوية جرد دوري', req.user.id, req.user.name
+        );
 
-      // Log in inventory transaction ledger
-      db.prepare(`
-        INSERT INTO inventory_transactions (store_id, product_id, change_type, quantity, balance_after, reference_type, reference_id, user_id, user_name, notes)
-        VALUES (?, ?, 'adjustment', ?, ?, 'stock_adjustment', ?, ?, ?, ?)
-      `).run(
-        store_id, product_id, difference, actual_quantity, adjResult.lastInsertRowid, req.user.id, req.user.name,
-        'تسوية جرد: ' + (reason || 'فارق جرد فعلي') + ` (السابق: ${systemQty}، الفعلي: ${actual_quantity})`
-      );
+        await ctx.prepare(`
+          INSERT INTO inventory_transactions (store_id, product_id, change_type, quantity, balance_after, reference_type, reference_id, user_id, user_name, notes)
+          VALUES (?, ?, 'adjustment', ?, ?, 'stock_adjustment', ?, ?, ?, ?)
+        `).run(
+          store_id, product_id, difference, actual_quantity, adjResult.lastInsertRowid, req.user.id, req.user.name,
+          'تسوية جرد: ' + (reason || 'فارق جرد فعلي') + ` (السابق: ${systemQty}، الفعلي: ${actual_quantity})`
+        );
+      };
+
+      if (typeof db.transaction === 'function') {
+        await db.transaction(executeAdjustment);
+      } else {
+        await executeAdjustment(db);
+      }
 
       res.json({
         message: 'تمت تسوية الجرد وتحديث المخزون بنجاح',

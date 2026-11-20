@@ -1,6 +1,7 @@
 var express = require('express');
 var cors = require('cors');
 var path = require('path');
+var fs = require('fs');
 var rateLimit = require('express-rate-limit');
 var { getDatabase } = require('./database/schema');
 
@@ -42,13 +43,13 @@ app.use('/pages', express.static(path.join(__dirname, 'pages')));
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use(express.static(path.join(__dirname)));
 
-getDatabase().then(function (db) {
-  console.log('Database connected and seeded.');
+getDatabase().then(async function (db) {
+  console.log('Database connected and initialized.');
 
   // Idempotent Phase B Product Management Migration
   try {
     var { applyPhaseBMigration } = require('./database/migration_phase_b');
-    applyPhaseBMigration(db);
+    await applyPhaseBMigration(db);
     console.log('[Migration] Phase B product management schema active.');
   } catch (mErr) {
     console.warn('[Migration] Note:', mErr.message);
@@ -82,19 +83,19 @@ getDatabase().then(function (db) {
   app.use('/api/finances', financesRoutes);
   app.use('/api/reports', reportsRoutes);
 
-  app.get('/api/all', function (req, res) {
+  app.get('/api/all', async function (req, res) {
     try {
       var storeId = req.query.store_id;
       var data = {
-        stores: db.prepare('SELECT * FROM stores ORDER BY id ASC').all(),
-        products: db.prepare('SELECT * FROM products ORDER BY id DESC').all(),
+        stores: await db.prepare('SELECT * FROM stores ORDER BY id ASC').all(),
+        products: await db.prepare('SELECT * FROM products ORDER BY id DESC').all(),
         orders: storeId
-          ? db.prepare("SELECT *, customer_name as customer, created_at as date FROM orders WHERE store_id = ? ORDER BY id DESC").all(storeId)
-          : db.prepare("SELECT *, customer_name as customer, created_at as date FROM orders ORDER BY id DESC").all(),
-        customers: db.prepare("SELECT *, orders_count as orders FROM customers ORDER BY id DESC").all(),
-        partners: db.prepare('SELECT * FROM partners ORDER BY id DESC').all(),
-        quotes: db.prepare("SELECT *, created_at as date FROM quotes ORDER BY id DESC").all(),
-        users: db.prepare('SELECT id, name, email, role, status, store_id, created_at, last_login FROM users ORDER BY id DESC').all()
+          ? await db.prepare("SELECT *, customer_name as customer, created_at as date FROM orders WHERE store_id = ? ORDER BY id DESC").all(storeId)
+          : await db.prepare("SELECT *, customer_name as customer, created_at as date FROM orders ORDER BY id DESC").all(),
+        customers: await db.prepare("SELECT *, orders_count as orders FROM customers ORDER BY id DESC").all(),
+        partners: await db.prepare('SELECT * FROM partners ORDER BY id DESC').all(),
+        quotes: await db.prepare("SELECT *, created_at as date FROM quotes ORDER BY id DESC").all(),
+        users: await db.prepare('SELECT id, name, email, role, status, store_id, created_at, last_login FROM users ORDER BY id DESC').all()
       };
       res.json(data);
     } catch (err) {
@@ -102,36 +103,50 @@ getDatabase().then(function (db) {
     }
   });
 
-  app.get('/api/stats', function (req, res) {
+  app.get('/api/stats', async function (req, res) {
     try {
       var storeId = req.query.store_id;
       var ordersWhere = storeId ? ' WHERE store_id = ' + parseInt(storeId) : '';
-      var invWhere = storeId ? ' WHERE store_id = ' + parseInt(storeId) : '';
 
       var totalSales = 0;
       if (storeId) {
-        var invSales = db.prepare("SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE store_id = ? AND status != 'cancelled'").get(storeId);
+        var invSales = await db.prepare("SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE store_id = ? AND status != 'cancelled'").get(storeId);
         totalSales = invSales ? invSales.total : 0;
       } else {
-        var invSales = db.prepare("SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE status != 'cancelled'").get();
+        var invSales = await db.prepare("SELECT COALESCE(SUM(total_amount), 0) as total FROM invoices WHERE status != 'cancelled'").get();
         totalSales = invSales ? invSales.total : 0;
       }
 
+      var storeCount = await db.prepare('SELECT COUNT(*) as count FROM stores').get();
+      var prodCount = await db.prepare('SELECT COUNT(*) as count FROM products').get();
+      var availProd = await db.prepare("SELECT COUNT(*) as count FROM products WHERE status = 'متوفر'").get();
+      var totalOrd = await db.prepare('SELECT COUNT(*) as count FROM orders' + ordersWhere).get();
+      var compOrd = await db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'completed'" + (storeId ? ' AND store_id = ' + parseInt(storeId) : '')).get();
+      var procOrd = await db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'processing'" + (storeId ? ' AND store_id = ' + parseInt(storeId) : '')).get();
+      var pendOrd = await db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'pending'" + (storeId ? ' AND store_id = ' + parseInt(storeId) : '')).get();
+      var cancOrd = await db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'cancelled'" + (storeId ? ' AND store_id = ' + parseInt(storeId) : '')).get();
+      var custCount = await db.prepare('SELECT COUNT(*) as count FROM customers').get();
+      var actCust = await db.prepare("SELECT COUNT(*) as count FROM customers WHERE status = 'active'").get();
+      var quoteCount = await db.prepare('SELECT COUNT(*) as count FROM quotes').get();
+      var newQuote = await db.prepare("SELECT COUNT(*) as count FROM quotes WHERE status = 'new'").get();
+      var repQuote = await db.prepare("SELECT COUNT(*) as count FROM quotes WHERE status = 'replied'").get();
+      var partCount = await db.prepare('SELECT COUNT(*) as count FROM partners').get();
+
       var stats = {
-        totalStores: db.prepare('SELECT COUNT(*) as count FROM stores').get().count,
-        totalProducts: db.prepare('SELECT COUNT(*) as count FROM products').get().count,
-        availableProducts: db.prepare("SELECT COUNT(*) as count FROM products WHERE status = 'متوفر'").get().count,
-        totalOrders: db.prepare('SELECT COUNT(*) as count FROM orders' + ordersWhere).get().count,
-        completedOrders: db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'completed'" + (storeId ? ' AND store_id = ' + parseInt(storeId) : '')).get().count,
-        processingOrders: db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'processing'" + (storeId ? ' AND store_id = ' + parseInt(storeId) : '')).get().count,
-        pendingOrders: db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'pending'" + (storeId ? ' AND store_id = ' + parseInt(storeId) : '')).get().count,
-        cancelledOrders: db.prepare("SELECT COUNT(*) as count FROM orders WHERE status = 'cancelled'" + (storeId ? ' AND store_id = ' + parseInt(storeId) : '')).get().count,
-        totalCustomers: db.prepare('SELECT COUNT(*) as count FROM customers').get().count,
-        activeCustomers: db.prepare("SELECT COUNT(*) as count FROM customers WHERE status = 'active'").get().count,
-        totalQuotes: db.prepare('SELECT COUNT(*) as count FROM quotes').get().count,
-        newQuotes: db.prepare("SELECT COUNT(*) as count FROM quotes WHERE status = 'new'").get().count,
-        repliedQuotes: db.prepare("SELECT COUNT(*) as count FROM quotes WHERE status = 'replied'").get().count,
-        totalPartners: db.prepare('SELECT COUNT(*) as count FROM partners').get().count,
+        totalStores: storeCount ? storeCount.count : 0,
+        totalProducts: prodCount ? prodCount.count : 0,
+        availableProducts: availProd ? availProd.count : 0,
+        totalOrders: totalOrd ? totalOrd.count : 0,
+        completedOrders: compOrd ? compOrd.count : 0,
+        processingOrders: procOrd ? procOrd.count : 0,
+        pendingOrders: pendOrd ? pendOrd.count : 0,
+        cancelledOrders: cancOrd ? cancOrd.count : 0,
+        totalCustomers: custCount ? custCount.count : 0,
+        activeCustomers: actCust ? actCust.count : 0,
+        totalQuotes: quoteCount ? quoteCount.count : 0,
+        newQuotes: newQuote ? newQuote.count : 0,
+        repliedQuotes: repQuote ? repQuote.count : 0,
+        totalPartners: partCount ? partCount.count : 0,
         totalSales: totalSales
       };
       res.json(stats);
@@ -140,9 +155,9 @@ getDatabase().then(function (db) {
     }
   });
 
-  app.get('/api/activity', function (req, res) {
+  app.get('/api/activity', async function (req, res) {
     try {
-      var logs = db.prepare('SELECT * FROM activity_log ORDER BY id DESC LIMIT 50').all();
+      var logs = await db.prepare('SELECT * FROM activity_log ORDER BY id DESC LIMIT 50').all();
       res.json(logs);
     } catch (err) {
       res.status(500).json({ error: err.message });
@@ -158,10 +173,16 @@ getDatabase().then(function (db) {
 
   // On-demand verified backup endpoint (Admin only)
   var { authenticateToken, requireRole } = require('./middleware/auth');
-  app.post('/api/backups/run', authenticateToken, requireRole('admin'), function (req, res) {
+  app.post('/api/backups/run', authenticateToken, requireRole('admin'), async function (req, res) {
     try {
+      if (process.env.TURSO_DATABASE_URL) {
+        var { runBackup } = require('./scripts/backup_turso');
+        var bRes = await runBackup();
+        return res.json({ message: 'تم إنشاء النسخة الاحتياطية بنجاح على سحابة Turso', filename: path.basename(bRes.file), sha256: bRes.sha256 });
+      }
+
       var timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      db.save();
+      if (typeof db.save === 'function') db.save();
       var backupDir = path.join(__dirname, 'database', 'backups');
       if (!fs.existsSync(backupDir)) fs.mkdirSync(backupDir, { recursive: true });
       var backupFile = path.join(backupDir, 'newtechmed_backup_' + timestamp + '.db');
@@ -179,7 +200,7 @@ getDatabase().then(function (db) {
     console.log('=================================');
     console.log('  New Tech Medical Server');
     console.log('  Running on http://localhost:' + PORT);
-    console.log('  Database: SQLite (newtechmed.db)');
+    console.log('  Database: ' + (process.env.TURSO_DATABASE_URL ? 'Turso Cloud' : 'SQLite Local'));
     console.log('=================================');
   });
 
@@ -193,7 +214,7 @@ getDatabase().then(function (db) {
       if (activeRequests <= 0) {
         clearInterval(drainTimer);
         try {
-          db.save();
+          if (typeof db.save === 'function') db.save();
           console.log('[Shutdown] Database flushed atomically. Exiting cleanly.');
         } catch (e) {}
         process.exit(0);

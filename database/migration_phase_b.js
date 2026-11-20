@@ -9,7 +9,7 @@
 var fs = require('fs');
 var path = require('path');
 
-function applyPhaseBMigration(db) {
+async function applyPhaseBMigration(db) {
   if (!db) throw new Error('Database instance is required for migration');
 
   // 1. Safe ALTER TABLE additions for 'products' table
@@ -24,37 +24,33 @@ function applyPhaseBMigration(db) {
     { name: 'updated_at', def: 'DATETIME' }
   ];
 
-  // SQLite PRAGMA table_info check to be 100% idempotent
   var existingCols = [];
   try {
-    var colsResult = db.prepare("PRAGMA table_info(products)").all();
+    var colsResult = await db.prepare("PRAGMA table_info(products)").all();
     existingCols = colsResult.map(function (c) { return c.name; });
-  } catch (e) {
-    // Fallback if PRAGMA table_info needs different call
-  }
+  } catch (e) {}
 
-  columnsToAdd.forEach(function (col) {
+  for (var i = 0; i < columnsToAdd.length; i++) {
+    var col = columnsToAdd[i];
     if (existingCols.indexOf(col.name) === -1) {
       try {
-        db.exec("ALTER TABLE products ADD COLUMN " + col.name + " " + col.def);
-      } catch (err) {
-        // If column already exists in raw SQLite, catch silently
-      }
+        await db.exec("ALTER TABLE products ADD COLUMN " + col.name + " " + col.def);
+      } catch (err) {}
     }
-  });
+  }
 
   // Ensure inactive product #11 is marked correctly as 'hidden'
   try {
-    db.prepare("UPDATE products SET publish_status = 'hidden' WHERE id = 11 AND active = 0").run();
+    await db.prepare("UPDATE products SET publish_status = 'hidden' WHERE id = 11 AND active = 0").run();
   } catch (e) {}
 
   // Populate updated_at for existing records
   try {
-    db.exec("UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE updated_at IS NULL;");
+    await db.exec("UPDATE products SET updated_at = CURRENT_TIMESTAMP WHERE updated_at IS NULL;");
   } catch (e) {}
 
-  // 2. Create 'product_drafts' table (Complete isolation for drafts)
-  db.exec(`
+  // 2. Create 'product_drafts' table
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS product_drafts (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       product_id INTEGER,
@@ -83,8 +79,8 @@ function applyPhaseBMigration(db) {
     );
   `);
 
-  // 3. Create 'product_versions' table (Immutable revision history with 100% field parity)
-  db.exec(`
+  // 3. Create 'product_versions' table
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS product_versions (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       product_id INTEGER NOT NULL,
@@ -118,8 +114,8 @@ function applyPhaseBMigration(db) {
     );
   `);
 
-  // 4. Create 'product_images' table (Metadata & external/path references only - no Base64 blob)
-  db.exec(`
+  // 4. Create 'product_images' table
+  await db.exec(`
     CREATE TABLE IF NOT EXISTS product_images (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       product_id INTEGER,
@@ -136,17 +132,18 @@ function applyPhaseBMigration(db) {
     );
   `);
 
-  // 5. Seed baseline v1 revisions for ALL 11 existing products (if not already seeded)
-  var countRow = db.prepare("SELECT COUNT(*) as count FROM product_versions").get();
+  // 5. Seed baseline v1 revisions for existing products if empty
+  var countRow = await db.prepare("SELECT COUNT(*) as count FROM product_versions").get();
   var existingVersionsCount = countRow ? countRow.count : 0;
 
   if (existingVersionsCount === 0) {
-    var allProducts = db.prepare("SELECT * FROM products ORDER BY id ASC").all();
-    allProducts.forEach(function (p) {
+    var allProducts = await db.prepare("SELECT * FROM products ORDER BY id ASC").all();
+    for (var pIdx = 0; pIdx < allProducts.length; pIdx++) {
+      var p = allProducts[pIdx];
       var action = p.active !== 0 ? 'initial_baseline_active' : 'initial_baseline_inactive';
       var pubStatus = p.active !== 0 ? 'published' : 'hidden';
 
-      db.prepare(`
+      await db.prepare(`
         INSERT INTO product_versions (
           product_id, version_number, name, name_en, model, category,
           manufacturer, agent, description, description_en, price, stock,
@@ -181,10 +178,10 @@ function applyPhaseBMigration(db) {
         JSON.stringify(p),
         action
       );
-    });
+    }
   }
 
-  // Ensure 'images/products' folder exists on filesystem for local storage
+  // Ensure 'images/products' folder exists
   var productsImgDir = path.join(__dirname, '..', 'images', 'products');
   if (!fs.existsSync(productsImgDir)) {
     try { fs.mkdirSync(productsImgDir, { recursive: true }); } catch (e) {}
