@@ -801,7 +801,6 @@ function renderProducts() {
             else if (badgeCategory === 'كواشف التخثر') badgeCategory = 'Reagents';
         }
         var badgeHtml = badgeCategory ? '<span class="product-badge">' + badgeCategory + '</span>' : '';
-        // Category icon mapping (no product images – text+icon cards only)
         var catIcon = 'fa-flask';
         var catColor = 'var(--brand-blue)';
         var cat = p.category || '';
@@ -816,11 +815,25 @@ function renderProducts() {
         var btnGetQuote = dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'طلب عرض سعر');
         var btnDetails = dict['btn_details'] || (isEn ? 'Details' : 'التفاصيل');
 
-        return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
-            '<div class="product-icon-header" style="background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
+        var image = p.image || '';
+        if (image && !image.startsWith('http') && !image.startsWith('data:')) {
+            image = imgBase + image.replace(/^\.\.\//, '');
+        }
+        var headerHtml = '';
+        if (image) {
+            headerHtml = '<div class="product-image" style="position:relative;height:200px;background:var(--bg-gray);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
+                '<img src="' + image + '" alt="' + name.replace(/"/g, '&quot;') + '" style="width:100%;height:100%;object-fit:cover;transition:var(--transition);" onerror="this.onerror=null;this.parentElement.innerHTML=\'<div class=\\\'product-icon-header\\\' style=\\\'background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;\\\'><i class=\\\'fas ' + catIcon + '\\\' style=\\\'font-size:38px;color:' + catColor + ';display:block;margin-bottom:10px;\\\'></i>' + badgeHtml + '</div>\';">' +
+                badgeHtml +
+            '</div>';
+        } else {
+            headerHtml = '<div class="product-icon-header" style="background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
                 '<i class="fas ' + catIcon + '" style="font-size:38px;color:' + catColor + ';display:block;margin-bottom:10px;"></i>' +
                 badgeHtml +
-            '</div>' +
+            '</div>';
+        }
+
+        return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
+            headerHtml +
             '<div class="product-info">' +
                 '<h3>' + name + '</h3>' +
                 '<p class="product-agent"><i class="fas fa-building" style="color:var(--brand-blue);margin-inline-end:4px"></i> ' + agent + '</p>' +
@@ -1136,7 +1149,6 @@ function loadHomeProducts() {
                 else if (badgeCategory === 'كواشف التخثر') badgeCategory = 'Reagents';
             }
             var badgeHtml = badgeCategory ? '<span class="product-badge">' + badgeCategory + '</span>' : '';
-            // Category icon (no product images – text+icon cards only)
             var catIcon = 'fa-flask';
             var catColor = 'var(--brand-blue)';
             var cat = p.category || '';
@@ -1150,11 +1162,25 @@ function loadHomeProducts() {
             var btnGetQuote = dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'عرض سعر');
             var btnDetails = dict['btn_details'] || (isEn ? 'Details' : 'التفاصيل');
 
-            return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
-                '<div class="product-icon-header" style="background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
+            var image = p.image || '';
+            if (image && !image.startsWith('http') && !image.startsWith('data:')) {
+                image = imgBase + image.replace(/^\.\.\//, '');
+            }
+            var headerHtml = '';
+            if (image) {
+                headerHtml = '<div class="product-image" style="position:relative;height:200px;background:var(--bg-gray);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
+                    '<img src="' + image + '" alt="' + name.replace(/"/g, '&quot;') + '" style="width:100%;height:100%;object-fit:cover;transition:var(--transition);" onerror="this.onerror=null;this.parentElement.innerHTML=\'<div class=\\\'product-icon-header\\\' style=\\\'background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;\\\'><i class=\\\'fas ' + catIcon + '\\\' style=\\\'font-size:38px;color:' + catColor + ';display:block;margin-bottom:10px;\\\'></i>' + badgeHtml + '</div>\';">' +
+                    badgeHtml +
+                '</div>';
+            } else {
+                headerHtml = '<div class="product-icon-header" style="background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
                     '<i class="fas ' + catIcon + '" style="font-size:38px;color:' + catColor + ';display:block;margin-bottom:10px;"></i>' +
                     badgeHtml +
-                '</div>' +
+                '</div>';
+            }
+
+            return '<div class="product-card visible" data-category="' + (p.category || '') + '">' +
+                headerHtml +
                 '<div class="product-info">' +
                     '<h3>' + name + '</h3>' +
                     '<p class="product-agent"><i class="fas fa-building" style="color:var(--brand-blue);margin-inline-end:4px"></i> ' + agent + '</p>' +
