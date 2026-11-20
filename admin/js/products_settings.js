@@ -11,6 +11,8 @@
 
   var productsList = [];
   var draftsList = [];
+  var trashList = [];
+  var isTrashView = false;
   var currentEditingProduct = null;
   var currentDraftId = null;
   var galleryImagesArray = [];
@@ -77,13 +79,18 @@
         })
         .catch(function (e) { console.warn('Summary fetch note:', e); });
 
-      // 2. Fetch Live Products and Drafts concurrently
+      // 2. Fetch Live Products, Drafts, and Trash concurrently
       var prodsPromise = fetch('/api/products?include_archived=true', { headers: getAuthHeaders() }).then(function (r) { return r.json(); });
       var draftsPromise = fetch('/api/products/drafts', { headers: getAuthHeaders() }).then(function (r) { return r.json(); }).catch(function () { return []; });
+      var trashPromise = fetch('/api/products/trash', { headers: getAuthHeaders() }).then(function (r) { return r.json(); }).catch(function () { return []; });
 
-      var results = await Promise.all([prodsPromise, draftsPromise]);
+      var results = await Promise.all([prodsPromise, draftsPromise, trashPromise]);
       productsList = Array.isArray(results[0]) ? results[0] : [];
       draftsList = Array.isArray(results[1]) ? results[1] : [];
+      trashList = Array.isArray(results[2]) ? results[2] : [];
+
+      var elTrash = document.getElementById('psStatTrash');
+      if (elTrash) elTrash.textContent = trashList.length;
 
       // Populate Categories Dropdown
       populateCategoryFilters();
@@ -92,8 +99,26 @@
       renderProductsSettingsTable();
     } catch (err) {
       console.error('Error loading product settings:', err);
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--danger)"><i class="fas fa-exclamation-circle" style="font-size:24px;margin-bottom:8px"></i><div>فشل تحميل البيانات: ' + (err.message || 'خطأ في الاتصال') + '</div><button class="btn btn-outline btn-sm" onclick="loadProductsSettingsData()" style="margin-top:10px"><i class="fas fa-redo"></i> إعادة المحاولة</button></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--danger)"><i class="fas fa-exclamation-circle" style="font-size:24px;margin-bottom:8px"></i><div>فشل تحميل البيانات: ' + (err.message || 'خطأ في الاتصال') + '</div><button class="btn btn-outline btn-sm" onclick="loadProductsSettingsData()" style="margin-top:10px"><i class="fas fa-redo"></i> إعادة المحاولة</button></td></tr>';
     }
+  };
+
+  window.toggleTrashView = function () {
+    isTrashView = !isTrashView;
+    var btn = document.getElementById('psTrashToggleBtn');
+    var label = document.getElementById('psTrashBtnLabel');
+    if (btn && label) {
+      if (isTrashView) {
+        btn.style.background = '#dc2626';
+        btn.style.color = '#fff';
+        label.textContent = 'العودة للمنتجات';
+      } else {
+        btn.style.background = 'transparent';
+        btn.style.color = '#dc2626';
+        label.textContent = 'سلة المحذوفات';
+      }
+    }
+    renderProductsSettingsTable();
   };
 
   function populateCategoryFilters() {
@@ -126,6 +151,49 @@
     var tbody = document.getElementById('productsSettingsTableBody');
     if (!tbody) return;
 
+    if (isTrashView) {
+      if (trashList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-secondary)"><i class="fas fa-trash-alt" style="font-size:32px;margin-bottom:10px;opacity:0.4"></i><div>سلة المحذوفات فارغة حالياً</div></td></tr>';
+        return;
+      }
+
+      var trashHtml = '';
+      trashList.forEach(function (p) {
+        var imgSrc = p.image || p.main_image || '../images/logo.png';
+        trashHtml += `
+          <tr data-id="${p.id}" style="background:#fffaf0;">
+            <td style="width:60px;text-align:center;">
+              <img src="${imgSrc}" alt="${p.name}" style="width:44px;height:44px;object-fit:contain;border-radius:6px;border:1px solid var(--border-color);background:#fff;padding:2px;" onerror="this.src='../images/logo.png'">
+            </td>
+            <td>
+              <div style="font-weight:600;color:var(--text-primary);">${p.name}</div>
+              <div style="font-size:12px;color:var(--text-secondary);direction:ltr;text-align:right;">${p.name_en || p.model || ''}</div>
+            </td>
+            <td><span style="display:inline-block;padding:3px 8px;border-radius:4px;background:var(--bg-main);font-size:12px;border:1px solid var(--border-color);">${p.category || 'عام'}</span></td>
+            <td>
+              <span class="status" style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca"><i class="fas fa-trash-alt"></i> في سلة المحذوفات</span>
+            </td>
+            <td>
+              <div style="font-size:11px;color:var(--text-secondary);">${p.deleted_at ? p.deleted_at.substring(0, 16) : 'مؤخراً'}</div>
+            </td>
+            <td style="text-align:center;">
+              <div style="display:inline-flex;gap:6px;">
+                <button class="btn btn-outline btn-sm" onclick="restoreFromTrash(${p.id})" title="استرجاع المنتج وإعادته للظهور" style="padding:4px 10px;color:#059669;border-color:#a7f3d0;font-weight:600;">
+                  <i class="fas fa-undo"></i> استرجاع
+                </button>
+                <button class="btn btn-outline btn-sm" onclick="permanentDeleteProduct(${p.id})" title="حذف نهائي بلا رجعة" style="padding:4px 10px;color:#dc2626;border-color:#fca5a5;font-weight:600;">
+                  <i class="fas fa-times-circle"></i> حذف نهائي
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = trashHtml;
+      return;
+    }
+
     var searchVal = (document.getElementById('psSearchInput') ? document.getElementById('psSearchInput').value : '').toLowerCase().trim();
     var catVal = document.getElementById('psCategoryFilter') ? document.getElementById('psCategoryFilter').value : '';
     var statusVal = document.getElementById('psStatusFilter') ? document.getElementById('psStatusFilter').value : '';
@@ -154,7 +222,7 @@
     });
 
     if (filtered.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-secondary)"><i class="fas fa-box-open" style="font-size:32px;margin-bottom:10px;opacity:0.5"></i><div>لا توجد منتجات مطابقة لمعايير البحث الحالية</div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-secondary)"><i class="fas fa-box-open" style="font-size:32px;margin-bottom:10px;opacity:0.5"></i><div>لا توجد منتجات مطابقة لمعايير البحث الحالية</div></td></tr>';
       return;
     }
 
@@ -178,8 +246,6 @@
         ? '<span class="status" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a;margin-right:4px;" title="يوجد مسودة غير منشورة قيد التعديل"><i class="fas fa-edit"></i> مسودة نشطة</span>'
         : '';
 
-      var formattedPrice = (p.price && p.price > 0) ? Number(p.price).toLocaleString('en-US') + ' $' : '<span style="color:var(--text-secondary);font-size:12px;">غير محدد</span>';
-
       html += `
         <tr data-id="${p.id}">
           <td style="width:60px;text-align:center;">
@@ -190,7 +256,6 @@
             <div style="font-size:12px;color:var(--text-secondary);direction:ltr;text-align:right;">${p.name_en || p.model || ''}</div>
           </td>
           <td><span style="display:inline-block;padding:3px 8px;border-radius:4px;background:var(--bg-main);font-size:12px;border:1px solid var(--border-color);">${p.category || 'عام'}</span></td>
-          <td style="font-weight:600;color:var(--primary);">${formattedPrice}</td>
           <td>
             <span style="display:inline-block;padding:2px 8px;border-radius:12px;background:linear-gradient(135deg,var(--brand-burgundy),var(--brand-fuchsia));color:#fff;font-size:11px;font-weight:700;margin-left:6px;">v${versionNum}</span>
             ${statusBadge}
@@ -210,8 +275,8 @@
               <button class="btn btn-outline btn-sm" onclick="openVersionHistoryModal(${p.id})" title="سجل الإصدارات التاريخية والاستعادة" style="padding:4px 8px;color:#7c3aed;border-color:#ddd6fe;">
                 <i class="fas fa-history"></i> النسخ
               </button>
-              <button class="btn btn-outline btn-sm" onclick="toggleProductArchive(${p.id}, ${p.is_archived ? 1 : 0})" title="${p.is_archived ? 'إلغاء الأرشفة' : 'أرشفة المنتج'}" style="padding:4px 8px;color:${p.is_archived ? 'var(--success)' : 'var(--danger)'};border-color:${p.is_archived ? '#a7f3d0' : '#fecdd3'};">
-                <i class="fas fa-${p.is_archived ? 'box-open' : 'archive'}"></i>
+              <button class="btn btn-outline btn-sm" onclick="moveToTrash(${p.id})" title="حذف ونقل إلى سلة المحذوفات" style="padding:4px 8px;color:#dc2626;border-color:#fca5a5;">
+                <i class="fas fa-trash"></i> حذف
               </button>
             </div>
           </td>
@@ -244,7 +309,8 @@
     document.getElementById('psFormModel').value = '';
     document.getElementById('psFormCategory').value = '';
     document.getElementById('psFormManufacturer').value = '';
-    document.getElementById('psFormPrice').value = '0';
+    var priceEl = document.getElementById('psFormPrice');
+    if (priceEl) priceEl.value = '0';
     document.getElementById('psFormDescription').value = '';
     document.getElementById('psFormDescriptionEn').value = '';
     document.getElementById('psFormFeatures').value = '';
@@ -252,6 +318,10 @@
     document.getElementById('psFormMainImageUrl').value = '';
     document.getElementById('psFormChangeSummary').value = '';
     document.getElementById('psMainImagePreview').src = '../images/logo.png';
+    var statusText = document.getElementById('psImageStatusText');
+    if (statusText) statusText.innerHTML = '<span style="color:var(--text-secondary);font-size:12px;">لم يتم اختيار صورة بعد</span>';
+    var singleInput = document.getElementById('psSingleImageInput');
+    if (singleInput) singleInput.value = '';
     renderGalleryThumbnails();
 
     if (productId) {
@@ -276,7 +346,8 @@
         document.getElementById('psFormModel').value = activeData.model || '';
         document.getElementById('psFormCategory').value = activeData.category || '';
         document.getElementById('psFormManufacturer').value = activeData.manufacturer || activeData.agent || '';
-        document.getElementById('psFormPrice').value = activeData.price || 0;
+        var priceElVal = document.getElementById('psFormPrice');
+        if (priceElVal) priceElVal.value = activeData.price || 0;
         document.getElementById('psFormDescription').value = activeData.description || '';
         document.getElementById('psFormDescriptionEn').value = activeData.description_en || '';
         document.getElementById('psFormFeatures').value = activeData.features ? activeData.features.replace(/\|/g, '\n') : '';
@@ -284,7 +355,10 @@
 
         var mainImg = activeData.main_image || activeData.image || '';
         document.getElementById('psFormMainImageUrl').value = mainImg;
-        if (mainImg) document.getElementById('psMainImagePreview').src = mainImg;
+        if (mainImg) {
+          document.getElementById('psMainImagePreview').src = mainImg;
+          if (statusText) statusText.innerHTML = '<span style="color:var(--success);font-weight:600;"><i class="fas fa-check-circle"></i> صورة المنتج محددة</span>';
+        }
 
         try {
           galleryImagesArray = typeof activeData.gallery_images === 'string' ? JSON.parse(activeData.gallery_images || '[]') : (activeData.gallery_images || []);
@@ -324,12 +398,12 @@
       category: document.getElementById('psFormCategory').value.trim(),
       manufacturer: document.getElementById('psFormManufacturer').value.trim(),
       agent: document.getElementById('psFormManufacturer').value.trim(),
-      price: parseFloat(document.getElementById('psFormPrice').value) || 0,
+      price: 0,
       description: document.getElementById('psFormDescription').value.trim(),
       description_en: document.getElementById('psFormDescriptionEn').value.trim(),
       features: featuresFormatted,
       technical_specs: document.getElementById('psFormTechnicalSpecs').value.trim(),
-      main_image: document.getElementById('psFormMainImageUrl').value.trim(),
+      main_image: (document.getElementById('psFormMainImageUrl') ? document.getElementById('psFormMainImageUrl').value.trim() : ''),
       gallery_images: galleryImagesArray,
       change_summary: document.getElementById('psFormChangeSummary').value.trim() || 'تحديث مواصفات المنتج'
     };
@@ -378,7 +452,7 @@
 
     var summary = payload.change_summary;
     if (!summary || summary === 'تحديث مواصفات المنتج') {
-      var userPrompt = prompt('يرجى إدخال ملخص مختصر للتعديلات المدخلة في هذه النسخة:', 'تحديث المواصفات والأسعار');
+      var userPrompt = prompt('يرجى إدخال ملخص مختصر للتعديلات المدخلة في هذه النسخة:', 'تحديث مواصفات المنتج');
       if (userPrompt === null) return;
       payload.change_summary = userPrompt.trim() || 'تحديث مواصفات المنتج';
     }
@@ -410,7 +484,7 @@
 
       notify(`🎉 تم نشر التعديلات بنجاح وترقية الإصدار إلى v${result.version || (payload.expected_version + 1)}!`);
       closeProductEditor();
-      loadProductsSettingsData();
+      await loadProductsSettingsData();
     } catch (err) {
       notify(err.message, 'error');
     } finally {
@@ -419,10 +493,10 @@
   };
 
   // ============================================================
-  // 4. Cloudinary / Image Upload Management
+  // 4. Single Unified Image Upload (Direct from device)
   // ============================================================
 
-  window.handleMainImageUpload = function (input) {
+  window.handleSingleProductImageUpload = function (input) {
     if (!input.files || !input.files[0]) return;
     var file = input.files[0];
     if (file.size > 8 * 1024 * 1024) {
@@ -430,12 +504,17 @@
       return;
     }
 
+    var status = document.getElementById('psImageStatusText');
+    if (status) status.innerHTML = '<span style="color:var(--primary);"><i class="fas fa-spinner fa-spin"></i> جاري تجهيز وحفظ الصورة...</span>';
+
     var reader = new FileReader();
     reader.onload = async function (e) {
       var base64Data = e.target.result;
-      document.getElementById('psMainImagePreview').src = base64Data;
+      var prev = document.getElementById('psMainImagePreview');
+      if (prev) prev.src = base64Data;
+      var hiddenInput = document.getElementById('psFormMainImageUrl');
+      if (hiddenInput) hiddenInput.value = base64Data;
 
-      // Upload to server / Cloudinary endpoint
       try {
         var uploadRes = await fetch('/api/products/images/upload', {
           method: 'POST',
@@ -448,15 +527,73 @@
           })
         });
         var uploadData = await uploadRes.json();
-        if (!uploadRes.ok) throw new Error(uploadData.error || 'فشل رفع الصورة');
-
-        document.getElementById('psFormMainImageUrl').value = uploadData.image_url;
-        notify('✅ تم رفع الصورة بنجاح وتجهيز الرابط الدائم!');
+        if (uploadRes.ok && uploadData.image_url) {
+          if (hiddenInput) hiddenInput.value = uploadData.image_url;
+        }
+        if (status) status.innerHTML = '<span style="color:var(--success);font-weight:600;"><i class="fas fa-check-circle"></i> تم اختيار وتعيين الصورة بنجاح</span>';
+        notify('✅ تم حفظ وتعيين الصورة بنجاح!');
       } catch (err) {
-        notify('تنبيه: ' + err.message, 'warning');
+        if (status) status.innerHTML = '<span style="color:var(--success);font-weight:600;"><i class="fas fa-check-circle"></i> تم تعيين الصورة بنجاح (محلية)</span>';
       }
     };
     reader.readAsDataURL(file);
+  };
+
+  window.handleMainImageUpload = window.handleSingleProductImageUpload;
+
+  // ============================================================
+  // Trash Management: Move to Trash, Restore, and Permanent Delete
+  // ============================================================
+
+  window.moveToTrash = async function (productId) {
+    if (!confirm('هل أنت متأكد من حذف هذا المنتج ونقله إلى سلة المحذوفات؟\n\n(سيختفي من واجهة الموقع والكتالوج العام فوراً ويمكنك استرجاعه في أي وقت من سلة المحذوفات)')) {
+      return;
+    }
+    try {
+      var res = await fetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'فشل حذف المنتج');
+      notify('🗑️ تم نقل المنتج إلى سلة المحذوفات بنجاح');
+      await loadProductsSettingsData();
+    } catch (err) {
+      notify('خطأ في الحذف: ' + err.message, 'error');
+    }
+  };
+
+  window.restoreFromTrash = async function (productId) {
+    try {
+      var res = await fetch(`/api/products/${productId}/restore`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'فشل استرجاع المنتج');
+      notify('✅ ' + (data.message || 'تم استرجاع المنتج بنجاح وإعادته للموقع'));
+      await loadProductsSettingsData();
+    } catch (err) {
+      notify('خطأ في الاسترجاع: ' + err.message, 'error');
+    }
+  };
+
+  window.permanentDeleteProduct = async function (productId) {
+    if (!confirm('تحذير: هل أنت متأكد تماماً من الحذف النهائي لهذا المنتج؟\n\nلن يمكنك استعادة هذا المنتج بعد الآن وسيتم إزالته كلياً من قاعدة البيانات.')) {
+      return;
+    }
+    try {
+      var res = await fetch(`/api/products/${productId}/permanent`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      var data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'فشل الحذف النهائي');
+      notify('🗑️ تم الحذف النهائي للمنتج بنجاح');
+      await loadProductsSettingsData();
+    } catch (err) {
+      notify('خطأ في الحذف النهائي: ' + err.message, 'error');
+    }
   };
 
   window.addGalleryImageFromPrompt = function () {
@@ -565,7 +702,7 @@
             <div style="font-size:13px;color:var(--text-primary);margin-bottom:6px;"><strong>ملخص التغيير:</strong> ${v.change_summary || 'تحديث بيانات المنتج'}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--text-secondary);background:var(--bg-main);padding:8px;border-radius:6px;margin-bottom:8px;">
               <div>الاسم: ${v.name}</div>
-              <div>السعر: ${v.price ? Number(v.price).toLocaleString() + ' $' : 'غير محدد'}</div>
+              <div>الفئة: ${v.category || 'عام'}</div>
               <div>المسؤول: ${v.created_by_name || 'مدير النظام'}</div>
               <div>نوع الإجراء: ${v.action_type || 'نشر'}</div>
             </div>
@@ -653,7 +790,6 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
         <div style="text-align:center;">
           <img src="${prod.main_image || prod.image || '../images/logo.png'}" style="max-height:220px;max-width:100%;object-fit:contain;border-radius:8px;border:1px solid var(--border-color);background:#fff;padding:8px;" onerror="this.src='../images/logo.png'">
-          <div style="font-size:20px;font-weight:700;color:var(--primary);margin-top:12px;">${prod.price ? Number(prod.price).toLocaleString() + ' $' : 'السعر عند الطلب'}</div>
         </div>
         <div>
           <div style="font-weight:600;margin-bottom:4px;">الوصف:</div>

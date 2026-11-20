@@ -809,8 +809,6 @@ function renderProducts() {
         else if (cat === 'الإلكتروليت') { catIcon = 'fa-microchip'; catColor = 'var(--brand-blue)'; }
         else if (cat === 'أجهزة التخثر') { catIcon = 'fa-dna'; catColor = 'var(--brand-burgundy)'; }
         else if (cat === 'كواشف التخثر') { catIcon = 'fa-vials'; catColor = '#6c5ce7'; }
-        var priceCurrency = isEn ? 'YER' : 'ر.ي';
-        var priceHtml = p.price > 0 ? '<p class="product-price"><i class="fas fa-tag"></i> ' + formatNumber(p.price) + ' ' + priceCurrency + '</p>' : '';
         var btnAddOrder = dict['btn_add_order'] || (isEn ? 'Add to Order' : 'أضف للطلب');
         var btnGetQuote = dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'طلب عرض سعر');
         var btnDetails = dict['btn_details'] || (isEn ? 'Details' : 'التفاصيل');
@@ -822,7 +820,7 @@ function renderProducts() {
         var headerHtml = '';
         if (image) {
             headerHtml = '<div class="product-image" style="position:relative;height:200px;background:var(--bg-gray);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
-                '<img src="' + image + '" alt="' + name.replace(/"/g, '&quot;') + '" style="width:100%;height:100%;object-fit:cover;transition:var(--transition);" onerror="this.onerror=null;this.parentElement.innerHTML=\'<div class=\\\'product-icon-header\\\' style=\\\'background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;\\\'><i class=\\\'fas ' + catIcon + '\\\' style=\\\'font-size:38px;color:' + catColor + ';display:block;margin-bottom:10px;\\\'></i>' + badgeHtml + '</div>\';">' +
+                '<img src="' + image + '" alt="' + name.replace(/"/g, '&quot;') + '" style="width:100%;height:100%;object-fit:cover;transition:var(--transition);" onerror="this.onerror=null;this.src=\'' + imgBase + 'images/placeholder-product.svg\';">' +
                 badgeHtml +
             '</div>';
         } else {
@@ -837,7 +835,6 @@ function renderProducts() {
             '<div class="product-info">' +
                 '<h3>' + name + '</h3>' +
                 '<p class="product-agent"><i class="fas fa-building" style="color:var(--brand-blue);margin-inline-end:4px"></i> ' + agent + '</p>' +
-                priceHtml +
                 '<p class="product-desc">' + desc + '</p>' +
                 '<div class="product-btn-group">' +
                     '<button class="product-btn product-btn-order" onclick="addToCart(' + p.id + ',\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-cart-plus"></i> ' + btnAddOrder + '</button>' +
@@ -1157,7 +1154,6 @@ function loadHomeProducts() {
             else if (cat === 'الإلكتروليت') { catIcon = 'fa-microchip'; catColor = 'var(--brand-blue)'; }
             else if (cat === 'أجهزة التخثر') { catIcon = 'fa-dna'; catColor = 'var(--brand-burgundy)'; }
             else if (cat === 'كواشف التخثر') { catIcon = 'fa-vials'; catColor = '#6c5ce7'; }
-            var priceHtml2 = p.price > 0 ? '<p class="product-price" style="font-size:13px;font-weight:600;color:var(--primary-blue);margin-bottom:8px"><i class="fas fa-tag"></i> ' + formatNumber(p.price) + ' ' + (isEn ? 'YER' : 'ر.ي') + '</p>' : '';
             var btnAddOrder = dict['btn_add_order'] || (isEn ? 'Add to Order' : 'أضف للطلب');
             var btnGetQuote = dict['btn_get_quote'] || (isEn ? 'Request Quote' : 'عرض سعر');
             var btnDetails = dict['btn_details'] || (isEn ? 'Details' : 'التفاصيل');
@@ -1169,7 +1165,7 @@ function loadHomeProducts() {
             var headerHtml = '';
             if (image) {
                 headerHtml = '<div class="product-image" style="position:relative;height:200px;background:var(--bg-gray);display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:var(--radius-lg) var(--radius-lg) 0 0;">' +
-                    '<img src="' + image + '" alt="' + name.replace(/"/g, '&quot;') + '" style="width:100%;height:100%;object-fit:cover;transition:var(--transition);" onerror="this.onerror=null;this.parentElement.innerHTML=\'<div class=\\\'product-icon-header\\\' style=\\\'background:linear-gradient(135deg,color-mix(in srgb,' + catColor + ' 12%,white),color-mix(in srgb,' + catColor + ' 6%,white));border-bottom:3px solid ' + catColor + ';padding:22px;text-align:center;border-radius:var(--radius-lg) var(--radius-lg) 0 0;\\\'><i class=\\\'fas ' + catIcon + '\\\' style=\\\'font-size:38px;color:' + catColor + ';display:block;margin-bottom:10px;\\\'></i>' + badgeHtml + '</div>\';">' +
+                    '<img src="' + image + '" alt="' + name.replace(/"/g, '&quot;') + '" style="width:100%;height:100%;object-fit:cover;transition:var(--transition);" onerror="this.onerror=null;this.src=\'' + imgBase + 'images/placeholder-product.svg\';">' +
                     badgeHtml +
                 '</div>';
             } else {
@@ -1184,7 +1180,6 @@ function loadHomeProducts() {
                 '<div class="product-info">' +
                     '<h3>' + name + '</h3>' +
                     '<p class="product-agent"><i class="fas fa-building" style="color:var(--brand-blue);margin-inline-end:4px"></i> ' + agent + '</p>' +
-                    priceHtml2 +
                     '<p>' + desc.substring(0, 85) + (desc.length > 85 ? '...' : '') + '</p>' +
                     '<div class="product-btn-group">' +
                         '<button class="product-btn product-btn-order" onclick="addToCart(' + p.id + ',\'' + name.replace(/'/g, "\\'") + '\')"><i class="fas fa-cart-plus"></i> ' + btnAddOrder + '</button>' +
@@ -1381,13 +1376,7 @@ function openProductDetailsById(productId) {
         }
 
         var priceRow = document.getElementById('detailProductPriceRow');
-        var priceEl = document.getElementById('detailProductPrice');
-        if (product.price > 0) {
-            priceRow.style.display = 'block';
-            priceEl.textContent = formatNumber(product.price) + ' ' + (isEn ? 'YER' : 'ر.ي');
-        } else {
-            priceRow.style.display = 'none';
-        }
+        if (priceRow) priceRow.style.display = 'none';
 
         if (specs.length === 0) {
             if (category) specs.push((isEn ? 'Category: ' : 'الفئة: ') + category);

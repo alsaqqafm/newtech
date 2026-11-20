@@ -671,7 +671,9 @@ module.exports = function (db) {
     try {
       var storeId = req.query.store_id;
       var includeArchived = req.query.include_archived === 'true';
+      var deleteFilter = '(p.is_deleted = 0 OR p.is_deleted IS NULL)';
       var archiveFilter = includeArchived ? '1=1' : '(p.is_archived = 0 OR p.is_archived IS NULL)';
+      var whereClause = `${deleteFilter} AND ${archiveFilter}`;
       var products;
 
       if (storeId) {
@@ -691,7 +693,7 @@ module.exports = function (db) {
             END as status
           FROM products p
           LEFT JOIN store_inventory si ON p.id = si.product_id AND si.store_id = ?
-          WHERE ${archiveFilter}
+          WHERE ${whereClause}
           ORDER BY p.id DESC
         `).all(storeId);
       } else {
@@ -700,7 +702,7 @@ module.exports = function (db) {
             p.*,
             (SELECT COALESCE(SUM(stock_quantity), 0) FROM store_inventory WHERE product_id = p.id) as total_stock
           FROM products p
-          WHERE ${archiveFilter}
+          WHERE ${whereClause}
           ORDER BY p.id DESC
         `).all();
 
@@ -897,65 +899,93 @@ module.exports = function (db) {
     }
   });
 
-  // DELETE /:id - Audit-safe delete or archive
+  // GET /trash - List all products in the trash bin
+  router.get('/trash', authenticateToken, requireRole('admin', 'store_manager'), async function (req, res) {
+    try {
+      var trashed = await db.prepare(`
+        SELECT p.*,
+          (SELECT COALESCE(SUM(stock_quantity), 0) FROM store_inventory WHERE product_id = p.id) as stock
+        FROM products p
+        WHERE p.is_deleted = 1
+        ORDER BY p.deleted_at DESC, p.id DESC
+      `).all();
+      res.json(trashed);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // POST /:id/restore - Restore product from trash bin
+  router.post('/:id/restore', authenticateToken, requireRole('admin', 'store_manager'), async function (req, res) {
+    try {
+      var existing = await db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
+      if (!existing) return res.status(404).json({ error: 'المنتج غير موجود' });
+
+      await db.prepare(`
+        UPDATE products SET
+          is_deleted = 0,
+          deleted_at = NULL,
+          active = 1,
+          publish_status = 'published',
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(req.params.id);
+
+      await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
+        req.user.id, req.user.name, 'restore', 'product', req.params.id,
+        JSON.stringify({ name: existing.name })
+      );
+
+      res.json({ message: 'تم استرجاع المنتج بنجاح وإعادته للموقع', id: req.params.id, restored: true });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // DELETE /:id/permanent - Permanently delete product from database
+  router.delete('/:id/permanent', authenticateToken, requireRole('admin', 'store_manager'), async function (req, res) {
+    try {
+      var existing = await db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
+      if (!existing) return res.status(404).json({ error: 'المنتج غير موجود' });
+
+      await db.prepare('DELETE FROM store_inventory WHERE product_id = ?').run(req.params.id);
+      await db.prepare('DELETE FROM stock_adjustments WHERE product_id = ?').run(req.params.id);
+      await db.prepare('DELETE FROM product_versions WHERE product_id = ?').run(req.params.id);
+      await db.prepare('DELETE FROM product_drafts WHERE product_id = ?').run(req.params.id);
+      await db.prepare('DELETE FROM products WHERE id = ?').run(req.params.id);
+
+      await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
+        req.user.id, req.user.name, 'permanent_delete', 'product', req.params.id, JSON.stringify({ name: existing.name })
+      );
+
+      res.json({ message: 'تم حذف المنتج نهائياً من قاعدة البيانات', id: req.params.id });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+  });
+
+  // DELETE /:id - Move product to Trash (Soft Delete)
   router.delete('/:id', authenticateToken, requireRole('admin', 'store_manager'), async function (req, res) {
     try {
       var existing = await db.prepare('SELECT * FROM products WHERE id = ?').get(req.params.id);
       if (!existing) return res.status(404).json({ error: 'المنتج غير موجود' });
 
-      var invoiceRefs = 0;
-      var purchaseRefs = 0;
-      var returnRefs = 0;
-
-      try {
-        var invRow = await db.prepare('SELECT COUNT(*) as count FROM invoice_items WHERE product_id = ?').get(req.params.id);
-        invoiceRefs = invRow ? invRow.count : 0;
-      } catch (e) {}
-
-      try {
-        var purRow = await db.prepare('SELECT COUNT(*) as count FROM purchase_items WHERE product_id = ?').get(req.params.id);
-        purchaseRefs = purRow ? purRow.count : 0;
-      } catch (e) {}
-
-      try {
-        var retRow = await db.prepare('SELECT COUNT(*) as count FROM sales_return_items WHERE product_id = ?').get(req.params.id);
-        returnRefs = retRow ? retRow.count : 0;
-      } catch (e) {}
-
-      var totalRefs = invoiceRefs + purchaseRefs + returnRefs;
-
-      if (totalRefs > 0) {
-        await db.prepare(`
-          UPDATE products SET
-            is_archived = 1,
-            active = 0,
-            publish_status = 'archived',
-            updated_at = CURRENT_TIMESTAMP
-          WHERE id = ?
-        `).run(req.params.id);
-
-        await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
-          req.user.id, req.user.name, 'archive', 'product', req.params.id,
-          JSON.stringify({ name: existing.name, reason: 'مرتبط بحركات مالية وفواتير', references_count: totalRefs })
-        );
-
-        return res.json({
-          message: 'تم أرشفة المنتج بنجاح بدلاً من الحذف الفعلي لوجود سجلات فواتير ومبيعات مرتبطة به',
-          archived: true,
-          references_count: totalRefs,
-          id: req.params.id
-        });
-      }
-
-      await db.prepare('DELETE FROM store_inventory WHERE product_id = ?').run(req.params.id);
-      await db.prepare('DELETE FROM stock_adjustments WHERE product_id = ?').run(req.params.id);
-      await db.prepare('DELETE FROM products WHERE id = ?').run(req.params.id);
+      await db.prepare(`
+        UPDATE products SET
+          is_deleted = 1,
+          deleted_at = CURRENT_TIMESTAMP,
+          active = 0,
+          publish_status = 'hidden',
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+      `).run(req.params.id);
 
       await db.prepare('INSERT INTO activity_log (user_id, user_name, action, entity_type, entity_id, details) VALUES (?, ?, ?, ?, ?, ?)').run(
-        req.user.id, req.user.name, 'delete', 'product', req.params.id, JSON.stringify({ name: existing.name })
+        req.user.id, req.user.name, 'trash', 'product', req.params.id,
+        JSON.stringify({ name: existing.name })
       );
 
-      res.json({ message: 'تم حذف المنتج بنجاح', id: req.params.id, archived: false });
+      res.json({ message: 'تم نقل المنتج إلى سلة المحذوفات بنجاح', id: req.params.id, trashed: true });
     } catch (err) {
       res.status(500).json({ error: err.message });
     }

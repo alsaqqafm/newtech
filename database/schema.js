@@ -696,6 +696,14 @@ function syncOfficialProducts(db) {
       var p3 = db.exec("ALTER TABLE products ADD COLUMN manufacturer TEXT");
       if (p3 && typeof p3.catch === 'function') p3.catch(function(){});
     } catch(e) {}
+    try {
+      var p4 = db.exec("ALTER TABLE products ADD COLUMN is_deleted INTEGER DEFAULT 0");
+      if (p4 && typeof p4.catch === 'function') p4.catch(function(){});
+    } catch(e) {}
+    try {
+      var p5 = db.exec("ALTER TABLE products ADD COLUMN deleted_at DATETIME");
+      if (p5 && typeof p5.catch === 'function') p5.catch(function(){});
+    } catch(e) {}
   }
 
   // PROTECTION: Never clear existing product images or overwrite user modifications!

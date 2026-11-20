@@ -146,7 +146,6 @@
                 <th style="position:sticky;top:0;background:var(--card-bg)">الموديل</th>
                 <th style="position:sticky;top:0;background:var(--card-bg)">الوكيل</th>
                 <th style="position:sticky;top:0;background:var(--card-bg)">الفئة</th>
-                <th style="position:sticky;top:0;background:var(--card-bg)">السعر</th>
                 <th style="position:sticky;top:0;background:var(--card-bg)">الوصف</th>
                 <th style="position:sticky;top:0;background:var(--card-bg)">الكلمات المفتاحية</th>
                 <th style="position:sticky;top:0;background:var(--card-bg)">المميزات</th>
@@ -207,12 +206,17 @@
             <input type="text" class="form-control" id="addProductModel" placeholder="مثال: A1 Pro, PT1000">
           </div>
           <div class="form-group">
-            <label>السعر (ر.ي) [0 = طلب عرض سعر]</label>
-            <input type="number" class="form-control" id="addProductPrice" placeholder="0">
-          </div>
-          <div class="form-group">
             <label>الكمية</label>
             <input type="number" class="form-control" id="addProductStock" placeholder="0">
+          </div>
+        </div>
+        <div class="form-group" style="border:1px dashed var(--border-color);border-radius:8px;padding:12px;text-align:center;background:var(--bg-main)">
+          <label style="font-weight:600;display:block;margin-bottom:6px;"><i class="fas fa-camera"></i> صورة المنتج</label>
+          <img id="addProductImagePreview" src="../images/logo.png" style="max-height:80px;max-width:120px;object-fit:contain;margin-bottom:6px;border-radius:4px;" onerror="this.src='../images/logo.png'">
+          <div>
+            <input type="file" id="addProductImageInput" accept="image/*" style="display:none" onchange="previewAddProductImage(this)">
+            <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('addProductImageInput').click()"><i class="fas fa-upload"></i> اختيار صورة من الجهاز</button>
+            <input type="hidden" id="addProductImage" value="">
           </div>
         </div>
         <div class="form-group">
@@ -279,12 +283,17 @@
             <input type="text" class="form-control" id="editProductModel">
           </div>
           <div class="form-group">
-            <label>السعر (ر.ي)</label>
-            <input type="number" class="form-control" id="editProductPrice">
-          </div>
-          <div class="form-group">
             <label>الكمية</label>
             <input type="number" class="form-control" id="editProductStock">
+          </div>
+        </div>
+        <div class="form-group" style="border:1px dashed var(--border-color);border-radius:8px;padding:12px;text-align:center;background:var(--bg-main)">
+          <label style="font-weight:600;display:block;margin-bottom:6px;"><i class="fas fa-camera"></i> صورة المنتج</label>
+          <img id="editProductImagePreview" src="../images/logo.png" style="max-height:80px;max-width:120px;object-fit:contain;margin-bottom:6px;border-radius:4px;" onerror="this.src='../images/logo.png'">
+          <div>
+            <input type="file" id="editProductImageInput" accept="image/*" style="display:none" onchange="previewEditProductImage(this)">
+            <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('editProductImageInput').click()"><i class="fas fa-upload"></i> تغيير صورة المنتج</button>
+            <input type="hidden" id="editProductImage" value="">
           </div>
         </div>
         <div class="form-group">
@@ -330,6 +339,28 @@
       loadProducts();
     }
 
+    function previewAddProductImage(input) {
+      if (!input.files || !input.files[0]) return;
+      var file = input.files[0];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('addProductImagePreview').src = e.target.result;
+        document.getElementById('addProductImage').value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function previewEditProductImage(input) {
+      if (!input.files || !input.files[0]) return;
+      var file = input.files[0];
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('editProductImagePreview').src = e.target.result;
+        document.getElementById('editProductImage').value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     function updateTableHeaders() {
       var thead = document.querySelector('#productsTable thead tr');
       if (!thead) return;
@@ -340,7 +371,6 @@
           '<th style="position:sticky;top:0;background:var(--card-bg);width:90px">الموديل</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:100px">الوكيل</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:100px">الفئة</th>' +
-          '<th style="position:sticky;top:0;background:var(--card-bg);width:90px">السعر</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:200px">الوصف</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:150px">الكلمات المفتاحية</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:150px">المميزات</th>' +
@@ -351,7 +381,6 @@
           '<th style="position:sticky;top:0;background:var(--card-bg);width:40px"><input type="checkbox" class="select-row" id="selectAll"></th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg)">المنتج</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:120px">الفئة</th>' +
-          '<th style="position:sticky;top:0;background:var(--card-bg);width:100px">السعر</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:70px">المخزون</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:80px">الحالة</th>' +
           '<th style="position:sticky;top:0;background:var(--card-bg);width:100px">إجراءات</th>';
@@ -381,14 +410,12 @@
         if (keywords.length > 60) keywords = keywords.substring(0, 60) + '...';
 
         if (detailView) {
-          var priceDisplay = p.price > 0 ? formatNumber(p.price) + ' ر.ي' : '—';
           return '<tr data-id="product-' + p.id + '" data-category="' + p.category + '" data-status="' + p.status + '" class="' + (p.active === 0 ? 'row-inactive' : '') + '">' +
             '<td><input type="checkbox" class="select-row"></td>' +
             '<td><div style="font-weight:500">' + p.name + '</div></td>' +
             '<td style="font-size:12px;color:var(--text-secondary)">' + (p.model || '—') + '</td>' +
             '<td style="font-size:12px">' + (p.agent || '—') + '</td>' +
             '<td><span class="status" style="background:' + color + '20;color:' + color + ';padding:2px 8px;border-radius:4px;font-size:11px">' + p.category + '</span></td>' +
-            '<td style="font-size:12px;font-weight:500">' + priceDisplay + '</td>' +
             '<td style="font-size:12px;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (p.description || '') + '">' + desc + '</td>' +
             '<td style="font-size:11px;color:var(--text-secondary);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (p.keywords || '') + '">' + keywords + '</td>' +
             '<td style="font-size:11px;color:var(--text-secondary);max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + (p.features || '').split('|').join(' | ') + '">' + features + '</td>' +
@@ -404,7 +431,6 @@
             '<td><input type="checkbox" class="select-row"></td>' +
             '<td><div class="product-cell"><div class="product-img" style="background:rgba(' + hexToRgb(color) + ',0.1);display:flex;align-items:center;justify-content:center;color:' + color + '"><i class="fas fa-' + icon + '"></i></div><div><div style="font-weight:500">' + p.name + '</div><div style="font-size:11px;color:var(--text-secondary)">' + p.model + '</div></div></div></td>' +
             '<td>' + p.category + '</td>' +
-            '<td>' + formatNumber(p.price) + ' ر.ي</td>' +
             '<td>' + p.stock + '</td>' +
             '<td><span class="status ' + statusClass + '">' + p.status + '</span></td>' +
             '<td><div class="action-btns">' +
@@ -438,11 +464,11 @@
       var category = document.getElementById('addProductCategory').value;
       var company = document.getElementById('addProductCompany').value.trim();
       var model = document.getElementById('addProductModel').value.trim();
-      var price = parseFloat(document.getElementById('addProductPrice').value) || 0;
       var stock = parseInt(document.getElementById('addProductStock').value) || 0;
       var description = document.getElementById('addProductDesc').value.trim();
       var description_en = document.getElementById('addProductDescEn').value.trim();
       var keywords = document.getElementById('addProductKeywords').value.trim();
+      var image = document.getElementById('addProductImage') ? document.getElementById('addProductImage').value : '';
 
       if (!name || !category) {
         alert('يرجى ملء جميع الحقول المطلوبة (اسم المنتج والفئة)');
@@ -458,13 +484,14 @@
         category: category,
         agent: company,
         manufacturer: company,
-        price: price,
+        price: 0,
         stock: stock,
         status: status,
         description: description,
         description_en: description_en,
         keywords: keywords,
-        image: ''
+        image: image,
+        main_image: image
       }).then(function() {
         closeModal('addProductModal');
         loadProducts();
@@ -475,11 +502,12 @@
         document.getElementById('addProductNameEn').value = '';
         document.getElementById('addProductCompany').value = '';
         document.getElementById('addProductModel').value = '';
-        document.getElementById('addProductPrice').value = '';
         document.getElementById('addProductStock').value = '';
         document.getElementById('addProductDesc').value = '';
         document.getElementById('addProductDescEn').value = '';
         document.getElementById('addProductKeywords').value = '';
+        if (document.getElementById('addProductImage')) document.getElementById('addProductImage').value = '';
+        if (document.getElementById('addProductImagePreview')) document.getElementById('addProductImagePreview').src = '../images/logo.png';
       }).catch(function(err) {
         alert('حدث خطأ أثناء إضافة المنتج: ' + (err.error || err.message));
       });
@@ -495,12 +523,15 @@
       document.getElementById('editProductCategory').value = product.category || 'تحاليل مناعية';
       document.getElementById('editProductCompany').value = product.agent || product.manufacturer || '';
       document.getElementById('editProductModel').value = product.model || '';
-      document.getElementById('editProductPrice').value = product.price || 0;
       document.getElementById('editProductStock').value = product.stock || 0;
       document.getElementById('editProductStatus').value = product.status || 'متوفر';
       document.getElementById('editProductDesc').value = product.description || '';
       document.getElementById('editProductDescEn').value = product.description_en || '';
       document.getElementById('editProductKeywords').value = product.keywords || '';
+
+      var img = product.image || product.main_image || '';
+      if (document.getElementById('editProductImage')) document.getElementById('editProductImage').value = img;
+      if (document.getElementById('editProductImagePreview')) document.getElementById('editProductImagePreview').src = img || '../images/logo.png';
 
       openModal('editProductModal');
     }
@@ -513,12 +544,12 @@
       var category = document.getElementById('editProductCategory').value;
       var company = document.getElementById('editProductCompany').value.trim();
       var model = document.getElementById('editProductModel').value.trim();
-      var price = parseFloat(document.getElementById('editProductPrice').value) || 0;
       var stock = parseInt(document.getElementById('editProductStock').value) || 0;
       var status = document.getElementById('editProductStatus').value;
       var description = document.getElementById('editProductDesc').value.trim();
       var description_en = document.getElementById('editProductDescEn').value.trim();
       var keywords = document.getElementById('editProductKeywords').value.trim();
+      var image = document.getElementById('editProductImage') ? document.getElementById('editProductImage').value : '';
 
       DataStore.updateProduct(currentEditId, {
         name: name,
@@ -527,12 +558,14 @@
         category: category,
         agent: company,
         manufacturer: company,
-        price: price,
+        price: 0,
         stock: stock,
         status: status,
         description: description,
         description_en: description_en,
-        keywords: keywords
+        keywords: keywords,
+        image: image,
+        main_image: image
       }).then(function() {
         closeModal('editProductModal');
         loadProducts();
@@ -545,11 +578,11 @@
     function deleteProduct(id) {
       var product = DataStore.getProduct(id);
       if (!product) return;
-      if (!confirm('هل أنت متأكد من رغبتك في حذف المنتج "' + product.name + '" نهائياً؟')) return;
+      if (!confirm('هل أنت متأكد من رغبتك في حذف المنتج "' + product.name + '" ونقله إلى سلة المحذوفات؟')) return;
 
       DataStore.deleteProduct(id).then(function() {
         loadProducts();
-        showToast('تم حذف المنتج بنجاح');
+        showToast('تم نقل المنتج إلى سلة المحذوفات');
       }).catch(function(err) {
         alert('حدث خطأ أثناء الحذف: ' + (err.error || err.message));
       });
