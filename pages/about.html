@@ -54,9 +54,6 @@
                 <a href="contact.html" data-i18n="nav_contact">تواصل معنا</a>
             </nav>
             <div class="header-actions">
-                <a href="../admin/login.html" class="admin-link" title="لوحة التحكم" data-i18n-title="admin_panel">
-                    <i class="fas fa-shield-halved"></i>
-                </a>
                 <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="تبديل الوضع">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -282,7 +279,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-about">
-                    <a href="../index.html" class="logo">
+                    <a href="javascript:void(0)" class="logo" id="footerSecretAdmin" onclick="handleFooterSecretAdmin(event)" title="New Tech Medical" style="cursor:default;">
                         <img src="../images/logo.png" alt="New Tech Medical" class="logo-img">
                     </a>
                     <p data-i18n="footer_desc">شركة نيوتك الطبية للاستيراد - شريككم الموثوق في الرعاية الصحية. استيراد وتوزيع الأجهزة والمعدات الطبية والمخبرية، الأدوية، مستلزمات طب الأسنان والمستلزمات الطبية في اليمن.</p>

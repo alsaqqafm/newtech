@@ -90,6 +90,9 @@ function cacheRemove(key, id) {
   cacheSet(key, arr);
   return arr;
 }
+function cacheDelete(key, id) {
+  return cacheRemove(key, id);
+}
 
 var DataStore = {
   _ready: false,
@@ -101,6 +104,7 @@ var DataStore = {
     return api('GET', '/all' + query).then(function (data) {
       cacheSet('stores', data.stores || []);
       cacheSet('products', data.products || []);
+      cacheSet('products_trash', data.products_trash || []);
       cacheSet('orders', data.orders || []);
       cacheSet('customers', data.customers || []);
       cacheSet('partners', data.partners || []);
@@ -174,8 +178,38 @@ var DataStore = {
     });
   },
   deleteProduct: function (id) {
-    cacheDelete('products', id);
+    var prod = this.getProduct(id);
+    cacheRemove('products', id);
+    if (prod) {
+      prod.is_deleted = 1;
+      prod.deleted_at = new Date().toISOString();
+      cacheUpsert('products_trash', prod);
+    }
     return api('DELETE', '/products/' + id).then(function (r) {
+      return r;
+    });
+  },
+  getTrashProducts: function () {
+    return cacheGet('products_trash');
+  },
+  restoreProduct: function (id) {
+    var trashed = cacheGet('products_trash');
+    var item = trashed.find(function (p) { return String(p.id) === String(id); });
+    cacheRemove('products_trash', id);
+    if (item) {
+      item.is_deleted = 0;
+      item.deleted_at = null;
+      item.active = 1;
+      item.publish_status = 'published';
+      cacheUpsert('products', item);
+    }
+    return api('POST', '/products/' + id + '/restore').then(function (r) {
+      return r;
+    });
+  },
+  permanentDeleteProduct: function (id) {
+    cacheRemove('products_trash', id);
+    return api('DELETE', '/products/' + id + '/permanent').then(function (r) {
       return r;
     });
   },

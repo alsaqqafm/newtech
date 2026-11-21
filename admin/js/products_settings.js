@@ -24,7 +24,7 @@
       try {
         var u = JSON.parse(localStorage.getItem('adminUser') || '{}');
         if (u.token) token = u.token;
-      } catch (e) {}
+      } catch (e) { }
     }
     return token;
   }
@@ -153,11 +153,25 @@
 
     if (isTrashView) {
       if (trashList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-secondary)"><i class="fas fa-trash-alt" style="font-size:32px;margin-bottom:10px;opacity:0.4"></i><div>سلة المحذوفات فارغة حالياً</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-secondary)"><i class="fas fa-trash-alt" style="font-size:36px;margin-bottom:12px;opacity:0.4;display:block"></i><div style="font-size:15px;margin-bottom:14px;font-weight:600;">سلة المحذوفات فارغة حالياً</div><button type="button" class="btn btn-primary btn-sm" onclick="toggleTrashView()"><i class="fas fa-arrow-right"></i> العودة لقائمة المنتجات</button></td></tr>';
         return;
       }
 
-      var trashHtml = '';
+      var trashHtml = `
+        <tr style="background:#fef2f2;">
+          <td colspan="6" style="padding:10px 16px;border-bottom:2px solid #fecaca;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="font-weight:700;color:#dc2626;display:flex;align-items:center;gap:8px;">
+                <i class="fas fa-trash-alt"></i>
+                <span>أنت الآن في سلة المحذوفات (${trashList.length} منتج) - يمكنك استرجاع المنتج أو حذفه نهائياً</span>
+              </div>
+              <button type="button" class="btn btn-sm btn-primary" onclick="toggleTrashView()" style="background:#dc2626;border:none;font-weight:600;">
+                <i class="fas fa-arrow-right"></i> العودة لقائمة المنتجات
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
       trashList.forEach(function (p) {
         var imgSrc = p.image || p.main_image || '../images/logo.png';
         trashHtml += `
@@ -199,7 +213,7 @@
     var statusVal = document.getElementById('psStatusFilter') ? document.getElementById('psStatusFilter').value : '';
 
     var filtered = productsList.filter(function (p) {
-      var matchesSearch = !searchVal || 
+      var matchesSearch = !searchVal ||
         (p.name && p.name.toLowerCase().includes(searchVal)) ||
         (p.name_en && p.name_en.toLowerCase().includes(searchVal)) ||
         (p.model && p.model.toLowerCase().includes(searchVal)) ||
@@ -242,7 +256,7 @@
         statusBadge = '<span class="status status-active" style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0"><i class="fas fa-check-circle"></i> منشور</span>';
       }
 
-      var draftBadge = hasDraft 
+      var draftBadge = hasDraft
         ? '<span class="status" style="background:#fffbeb;color:#d97706;border:1px solid #fde68a;margin-right:4px;" title="يوجد مسودة غير منشورة قيد التعديل"><i class="fas fa-edit"></i> مسودة نشطة</span>'
         : '';
 
@@ -309,8 +323,7 @@
     document.getElementById('psFormModel').value = '';
     document.getElementById('psFormCategory').value = '';
     document.getElementById('psFormManufacturer').value = '';
-    var priceEl = document.getElementById('psFormPrice');
-    if (priceEl) priceEl.value = '0';
+    document.getElementById('psFormPrice').value = '0';
     document.getElementById('psFormDescription').value = '';
     document.getElementById('psFormDescriptionEn').value = '';
     document.getElementById('psFormFeatures').value = '';
@@ -318,10 +331,6 @@
     document.getElementById('psFormMainImageUrl').value = '';
     document.getElementById('psFormChangeSummary').value = '';
     document.getElementById('psMainImagePreview').src = '../images/logo.png';
-    var statusText = document.getElementById('psImageStatusText');
-    if (statusText) statusText.innerHTML = '<span style="color:var(--text-secondary);font-size:12px;">لم يتم اختيار صورة بعد</span>';
-    var singleInput = document.getElementById('psSingleImageInput');
-    if (singleInput) singleInput.value = '';
     renderGalleryThumbnails();
 
     if (productId) {
@@ -346,8 +355,7 @@
         document.getElementById('psFormModel').value = activeData.model || '';
         document.getElementById('psFormCategory').value = activeData.category || '';
         document.getElementById('psFormManufacturer').value = activeData.manufacturer || activeData.agent || '';
-        var priceElVal = document.getElementById('psFormPrice');
-        if (priceElVal) priceElVal.value = activeData.price || 0;
+        document.getElementById('psFormPrice').value = activeData.price || 0;
         document.getElementById('psFormDescription').value = activeData.description || '';
         document.getElementById('psFormDescriptionEn').value = activeData.description_en || '';
         document.getElementById('psFormFeatures').value = activeData.features ? activeData.features.replace(/\|/g, '\n') : '';
@@ -355,10 +363,7 @@
 
         var mainImg = activeData.main_image || activeData.image || '';
         document.getElementById('psFormMainImageUrl').value = mainImg;
-        if (mainImg) {
-          document.getElementById('psMainImagePreview').src = mainImg;
-          if (statusText) statusText.innerHTML = '<span style="color:var(--success);font-weight:600;"><i class="fas fa-check-circle"></i> صورة المنتج محددة</span>';
-        }
+        if (mainImg) document.getElementById('psMainImagePreview').src = mainImg;
 
         try {
           galleryImagesArray = typeof activeData.gallery_images === 'string' ? JSON.parse(activeData.gallery_images || '[]') : (activeData.gallery_images || []);
@@ -398,12 +403,12 @@
       category: document.getElementById('psFormCategory').value.trim(),
       manufacturer: document.getElementById('psFormManufacturer').value.trim(),
       agent: document.getElementById('psFormManufacturer').value.trim(),
-      price: 0,
+      price: parseFloat(document.getElementById('psFormPrice').value) || 0,
       description: document.getElementById('psFormDescription').value.trim(),
       description_en: document.getElementById('psFormDescriptionEn').value.trim(),
       features: featuresFormatted,
       technical_specs: document.getElementById('psFormTechnicalSpecs').value.trim(),
-      main_image: (document.getElementById('psFormMainImageUrl') ? document.getElementById('psFormMainImageUrl').value.trim() : ''),
+      main_image: document.getElementById('psFormMainImageUrl').value.trim(),
       gallery_images: galleryImagesArray,
       change_summary: document.getElementById('psFormChangeSummary').value.trim() || 'تحديث مواصفات المنتج'
     };
@@ -452,7 +457,7 @@
 
     var summary = payload.change_summary;
     if (!summary || summary === 'تحديث مواصفات المنتج') {
-      var userPrompt = prompt('يرجى إدخال ملخص مختصر للتعديلات المدخلة في هذه النسخة:', 'تحديث مواصفات المنتج');
+      var userPrompt = prompt('يرجى إدخال ملخص مختصر للتعديلات المدخلة في هذه النسخة:', 'تحديث المواصفات والأسعار');
       if (userPrompt === null) return;
       payload.change_summary = userPrompt.trim() || 'تحديث مواصفات المنتج';
     }
@@ -484,7 +489,7 @@
 
       notify(`🎉 تم نشر التعديلات بنجاح وترقية الإصدار إلى v${result.version || (payload.expected_version + 1)}!`);
       closeProductEditor();
-      await loadProductsSettingsData();
+      loadProductsSettingsData();
     } catch (err) {
       notify(err.message, 'error');
     } finally {
@@ -493,10 +498,10 @@
   };
 
   // ============================================================
-  // 4. Single Unified Image Upload (Direct from device)
+  // 4. Cloudinary / Image Upload Management
   // ============================================================
 
-  window.handleSingleProductImageUpload = function (input) {
+  window.handleMainImageUpload = function (input) {
     if (!input.files || !input.files[0]) return;
     var file = input.files[0];
     if (file.size > 8 * 1024 * 1024) {
@@ -504,17 +509,12 @@
       return;
     }
 
-    var status = document.getElementById('psImageStatusText');
-    if (status) status.innerHTML = '<span style="color:var(--primary);"><i class="fas fa-spinner fa-spin"></i> جاري تجهيز وحفظ الصورة...</span>';
-
     var reader = new FileReader();
     reader.onload = async function (e) {
       var base64Data = e.target.result;
-      var prev = document.getElementById('psMainImagePreview');
-      if (prev) prev.src = base64Data;
-      var hiddenInput = document.getElementById('psFormMainImageUrl');
-      if (hiddenInput) hiddenInput.value = base64Data;
+      document.getElementById('psMainImagePreview').src = base64Data;
 
+      // Upload to server / Cloudinary endpoint
       try {
         var uploadRes = await fetch('/api/products/images/upload', {
           method: 'POST',
@@ -527,73 +527,15 @@
           })
         });
         var uploadData = await uploadRes.json();
-        if (uploadRes.ok && uploadData.image_url) {
-          if (hiddenInput) hiddenInput.value = uploadData.image_url;
-        }
-        if (status) status.innerHTML = '<span style="color:var(--success);font-weight:600;"><i class="fas fa-check-circle"></i> تم اختيار وتعيين الصورة بنجاح</span>';
-        notify('✅ تم حفظ وتعيين الصورة بنجاح!');
+        if (!uploadRes.ok) throw new Error(uploadData.error || 'فشل رفع الصورة');
+
+        document.getElementById('psFormMainImageUrl').value = uploadData.image_url;
+        notify('✅ تم رفع الصورة بنجاح وتجهيز الرابط الدائم!');
       } catch (err) {
-        if (status) status.innerHTML = '<span style="color:var(--success);font-weight:600;"><i class="fas fa-check-circle"></i> تم تعيين الصورة بنجاح (محلية)</span>';
+        notify('تنبيه: ' + err.message, 'warning');
       }
     };
     reader.readAsDataURL(file);
-  };
-
-  window.handleMainImageUpload = window.handleSingleProductImageUpload;
-
-  // ============================================================
-  // Trash Management: Move to Trash, Restore, and Permanent Delete
-  // ============================================================
-
-  window.moveToTrash = async function (productId) {
-    if (!confirm('هل أنت متأكد من حذف هذا المنتج ونقله إلى سلة المحذوفات؟\n\n(سيختفي من واجهة الموقع والكتالوج العام فوراً ويمكنك استرجاعه في أي وقت من سلة المحذوفات)')) {
-      return;
-    }
-    try {
-      var res = await fetch(`/api/products/${productId}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-      var data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'فشل حذف المنتج');
-      notify('🗑️ تم نقل المنتج إلى سلة المحذوفات بنجاح');
-      await loadProductsSettingsData();
-    } catch (err) {
-      notify('خطأ في الحذف: ' + err.message, 'error');
-    }
-  };
-
-  window.restoreFromTrash = async function (productId) {
-    try {
-      var res = await fetch(`/api/products/${productId}/restore`, {
-        method: 'POST',
-        headers: getAuthHeaders()
-      });
-      var data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'فشل استرجاع المنتج');
-      notify('✅ ' + (data.message || 'تم استرجاع المنتج بنجاح وإعادته للموقع'));
-      await loadProductsSettingsData();
-    } catch (err) {
-      notify('خطأ في الاسترجاع: ' + err.message, 'error');
-    }
-  };
-
-  window.permanentDeleteProduct = async function (productId) {
-    if (!confirm('تحذير: هل أنت متأكد تماماً من الحذف النهائي لهذا المنتج؟\n\nلن يمكنك استعادة هذا المنتج بعد الآن وسيتم إزالته كلياً من قاعدة البيانات.')) {
-      return;
-    }
-    try {
-      var res = await fetch(`/api/products/${productId}/permanent`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-      var data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'فشل الحذف النهائي');
-      notify('🗑️ تم الحذف النهائي للمنتج بنجاح');
-      await loadProductsSettingsData();
-    } catch (err) {
-      notify('خطأ في الحذف النهائي: ' + err.message, 'error');
-    }
   };
 
   window.addGalleryImageFromPrompt = function () {
@@ -702,7 +644,7 @@
             <div style="font-size:13px;color:var(--text-primary);margin-bottom:6px;"><strong>ملخص التغيير:</strong> ${v.change_summary || 'تحديث بيانات المنتج'}</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;color:var(--text-secondary);background:var(--bg-main);padding:8px;border-radius:6px;margin-bottom:8px;">
               <div>الاسم: ${v.name}</div>
-              <div>الفئة: ${v.category || 'عام'}</div>
+              <div>السعر: ${v.price ? Number(v.price).toLocaleString() + ' $' : 'غير محدد'}</div>
               <div>المسؤول: ${v.created_by_name || 'مدير النظام'}</div>
               <div>نوع الإجراء: ${v.action_type || 'نشر'}</div>
             </div>
@@ -770,7 +712,7 @@
     if (!modal) return;
 
     var container = document.getElementById('psPreviewContainer');
-    var badge = isDraft 
+    var badge = isDraft
       ? '<span style="background:#fffbeb;color:#d97706;border:1px solid #fde68a;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;"><i class="fas fa-edit"></i> معاينة مسودة غير منشورة</span>'
       : '<span style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:700;"><i class="fas fa-check-circle"></i> النسخة المنشورة حالياً</span>';
 
@@ -790,6 +732,7 @@
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
         <div style="text-align:center;">
           <img src="${prod.main_image || prod.image || '../images/logo.png'}" style="max-height:220px;max-width:100%;object-fit:contain;border-radius:8px;border:1px solid var(--border-color);background:#fff;padding:8px;" onerror="this.src='../images/logo.png'">
+          <div style="font-size:20px;font-weight:700;color:var(--primary);margin-top:12px;">${prod.price ? Number(prod.price).toLocaleString() + ' $' : 'السعر عند الطلب'}</div>
         </div>
         <div>
           <div style="font-weight:600;margin-bottom:4px;">الوصف:</div>
@@ -815,8 +758,62 @@
   };
 
   // ============================================================
-  // 7. Toggle Active & Safe Delete / Archive
+  // 7. Recycle Bin (Move to Trash, Restore, and Permanent Delete)
   // ============================================================
+
+  window.moveToTrash = async function (productId) {
+    if (!confirm('هل أنت متأكد من حذف هذا المنتج ونقله إلى سلة المحذوفات؟\n\n(سيختفي فوراً من واجهة الموقع والكتالوج العام، ويمكنك استرجاعه في أي وقت من سلة المحذوفات)')) {
+      return;
+    }
+    try {
+      var res = await fetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      var result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'فشلت عملية الحذف');
+
+      notify('🗑️ تم نقل المنتج إلى سلة المحذوفات بنجاح');
+      await loadProductsSettingsData();
+    } catch (err) {
+      notify('خطأ أثناء الحذف: ' + err.message, 'error');
+    }
+  };
+
+  window.restoreFromTrash = async function (productId) {
+    try {
+      var res = await fetch(`/api/products/${productId}/restore`, {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      var result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'فشل استرجاع المنتج');
+
+      notify('✅ ' + (result.message || 'تم استرجاع المنتج بنجاح وإعادته للموقع'));
+      await loadProductsSettingsData();
+    } catch (err) {
+      notify('خطأ في الاسترجاع: ' + err.message, 'error');
+    }
+  };
+
+  window.permanentDeleteProduct = async function (productId) {
+    if (!confirm('تحذير نهائي: هل أنت متأكد تماماً من حذف هذا المنتج نهائياً من قاعدة البيانات؟\n\nلن يمكنك استعادة هذا المنتج بعد الآن وسيتم إزالته كلياً.')) {
+      return;
+    }
+    try {
+      var res = await fetch(`/api/products/${productId}/permanent`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      var result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'فشل الحذف النهائي');
+
+      notify('🗑️ تم الحذف النهائي للمنتج بنجاح');
+      await loadProductsSettingsData();
+    } catch (err) {
+      notify('خطأ في الحذف النهائي: ' + err.message, 'error');
+    }
+  };
 
   window.toggleProductArchive = async function (productId, isCurrentlyArchived) {
     var actionName = isCurrentlyArchived ? 'إلغاء أرشفة' : 'أرشفة';

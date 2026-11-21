@@ -63,9 +63,6 @@
             </nav>
             
             <div class="header-actions">
-                <a href="admin/login.html" class="admin-link" title="لوحة التحكم" data-i18n-title="admin_panel">
-                    <i class="fas fa-shield-halved"></i>
-                </a>
                 <button class="dark-mode-toggle" onclick="toggleDarkMode()" title="تبديل الوضع الليلي / النهاري">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -537,7 +534,7 @@
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-about">
-                    <a href="index.html" class="logo">
+                    <a href="javascript:void(0)" class="logo" id="footerSecretAdmin" onclick="handleFooterSecretAdmin(event)" title="New Tech Medical" style="cursor:default;">
                         <img src="images/logo.png" alt="New Tech Medical" class="logo-img">
                     </a>
                     <p data-i18n="footer_desc">شركة نيوتك الطبية للاستيراد - شريككم الموثوق في الرعاية الصحية. استيراد وتوزيع الأجهزة والمعدات الطبية والمخبرية، الأدوية، مستلزمات طب الأسنان والمستلزمات الطبية في اليمن.</p>
@@ -668,6 +665,42 @@
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Cart Floating Button -->
+    <button class="cart-fab" id="cartFab" onclick="openCartModal()" title="سلة الطلبات" data-i18n-title="cart_title" style="display:none;">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+
+    <!-- Order Modal (Cart) -->
+    <div class="modal-overlay" id="orderModal">
+        <div class="modal" style="max-width:550px">
+            <button class="modal-close" onclick="closeOrderModal()" aria-label="إغلاق"><i class="fas fa-times"></i></button>
+            <h3 style="margin-bottom:16px"><i class="fas fa-shopping-cart" style="color: var(--brand-blue);"></i> <span data-i18n="cart_title">سلة طلبات المنتجات</span></h3>
+            <div id="cartItems" style="margin-bottom:16px;max-height:260px;overflow-y:auto"></div>
+            <div id="cartEmpty" style="text-align:center;padding:30px;color:var(--text-secondary)">
+                <i class="fas fa-cart-plus" style="font-size:40px;display:block;margin-bottom:10px"></i>
+                <span data-i18n="cart_empty">السلة فارغة، يمكنك إضافة المنتجات من قائمة المعروضات</span>
+            </div>
+            <form id="orderForm" style="border-top:1px solid var(--border-color);padding-top:16px;display:none">
+                <div class="form-group">
+                    <label for="orderName" data-i18n="form_name">الاسم الكامل *</label>
+                    <input type="text" id="orderName" required placeholder="أدخل اسمك الكريم" data-i18n-placeholder="form_name">
+                </div>
+                <div class="form-group">
+                    <label for="orderPhone" data-i18n="form_phone">رقم الهاتف *</label>
+                    <input type="tel" id="orderPhone" required placeholder="+967 ..." data-i18n-placeholder="form_phone">
+                </div>
+                <div class="form-group">
+                    <label for="orderNotes" data-i18n="quote_message_label">ملاحظات إضافية أو الكمية المطلوبة</label>
+                    <textarea id="orderNotes" rows="2" placeholder="أي ملاحظات إضافية..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%">
+                    <i class="fas fa-paper-plane"></i> <span data-i18n="btn_checkout">إرسال الطلب</span>
+                </button>
+            </form>
         </div>
     </div>
 

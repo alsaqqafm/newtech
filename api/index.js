@@ -96,6 +96,7 @@ async function setup() {
       var data = {
         stores: await db.prepare('SELECT * FROM stores ORDER BY id ASC').all(),
         products: await db.prepare('SELECT * FROM products WHERE (is_deleted = 0 OR is_deleted IS NULL) ORDER BY id DESC').all(),
+        products_trash: await db.prepare('SELECT * FROM products WHERE is_deleted = 1 ORDER BY deleted_at DESC, id DESC').all(),
         orders: storeId
           ? await db.prepare('SELECT * FROM orders WHERE store_id = ? ORDER BY id DESC').all(storeId)
           : await db.prepare('SELECT * FROM orders ORDER BY id DESC').all(),

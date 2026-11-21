@@ -483,17 +483,22 @@ function updateCartBadge() {
   var cart = getCart();
   var badge = document.getElementById('cartBadge');
   if (badge) { badge.textContent = cart.length; badge.style.display = cart.length > 0 ? 'flex' : 'none'; }
+  var fab = document.getElementById('cartFab');
+  if (fab) { fab.style.display = cart.length > 0 ? 'flex' : 'none'; }
 }
 function addToCart(productId, productName) {
   var cart = getCart();
   var isEn = document.documentElement.lang === 'en';
   if (cart.some(function(item) { return item.id === productId; })) {
     alert(isEn ? 'This product is already in your basket' : 'المنتج موجود بالفعل في السلة');
+    openCartModal();
     return;
   }
   cart.push({ id: productId, name: productName });
   saveCart(cart);
+  updateCartBadge();
   showCartFeedback(isEn ? 'Added "' + productName + '" to basket' : ('تمت إضافة "' + productName + '" إلى السلة'));
+  openCartModal();
 }
 function removeFromCart(productId) {
   var cart = getCart().filter(function(item) { return item.id !== productId; });
@@ -546,6 +551,32 @@ window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;
 window.openCartModal = openCartModal;
 window.closeOrderModal = closeOrderModal;
+
+/* ========================================
+   Secret Admin Gateway (Bottom Footer Logo - 4 Clicks)
+   ======================================== */
+var secretAdminClicks = 0;
+var secretAdminTimer = null;
+function handleFooterSecretAdmin(e) {
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  secretAdminClicks++;
+  clearTimeout(secretAdminTimer);
+
+  if (secretAdminClicks >= 4) {
+    secretAdminClicks = 0;
+    var isInPages = window.location.pathname.includes('/pages/');
+    window.location.href = isInPages ? '../admin/login.html' : 'admin/login.html';
+    return;
+  }
+
+  secretAdminTimer = setTimeout(function () {
+    secretAdminClicks = 0;
+  }, 3500);
+}
+window.handleFooterSecretAdmin = handleFooterSecretAdmin;
 
 function initOrderForm() {
   var form = document.getElementById('orderForm');
